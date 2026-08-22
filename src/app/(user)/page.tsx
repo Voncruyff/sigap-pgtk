@@ -5,79 +5,81 @@ import { Wrench, Search, ArrowRight, ShieldCheck, Clock, FileCheck, Sparkles, Ch
 
 export default function HomePage() {
   return (
-    <div className="space-y-12 sm:space-y-16 py-2 sm:py-8">
+    <div className="space-y-8 sm:space-y-12 py-2 sm:py-6">
       {/* Hero Banner Section */}
-      <section className="text-center space-y-5 sm:space-y-6 max-w-4xl mx-auto pt-2 sm:pt-4 relative">
-        {/* Company Identity Pill Badge */}
-        <div className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-1.5 text-xs sm:text-sm font-bold text-sky-800 border border-sky-200/80 shadow-sm backdrop-blur-md hover:scale-[1.02] transition-transform">
-          <span className="relative flex h-2.5 w-2.5">
+      <section className="text-center space-y-4 sm:space-y-6 max-w-4xl mx-auto pt-1 sm:pt-4 relative">
+        {/* Company Identity Pill Badge (Slightly Smaller) */}
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-[11px] sm:text-xs font-bold text-sky-800 border border-sky-200/80 shadow-2xs backdrop-blur-md">
+          <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-600"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-600"></span>
           </span>
           <span className="tracking-wide">PT KEBON AGUNG &bull; PABRIK GULA TRANGKIL</span>
         </div>
 
         {/* Hero Title */}
-        <div className="space-y-3">
-          <h1 className="text-3xl sm:text-6xl font-black tracking-tight text-slate-900 leading-tight px-2">
+        <div className="space-y-2.5">
+          <h1 className="text-2xl sm:text-5xl font-black tracking-tight text-slate-900 leading-tight px-2">
             Layanan Pelaporan <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-sky-600 via-sky-500 to-indigo-600 bg-clip-text text-transparent">
               Gangguan & Perbaikan
             </span>
           </h1>
-          <p className="text-sm sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed px-2 font-medium">
+          <p className="text-xs sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed px-2 font-medium">
             Laporkan kendala fasilitas atau peralatan pabrik secara mudah dan cepat. Dapatkan nomor tiket resmi dan pantau status perbaikan secara realtime.
           </p>
         </div>
 
         {/* Hero CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-3">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4 pt-2">
           <Link href="/lapor" className="w-full sm:w-auto">
             <Button
               size="lg"
-              className="w-full sm:w-auto h-12 sm:h-14 px-7 sm:px-9 rounded-full text-sm sm:text-base font-bold bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white shadow-xl shadow-sky-600/30 transition-all hover:scale-105 active:scale-95"
+              className="w-full sm:w-auto h-11 sm:h-13 px-6 sm:px-8 rounded-full text-xs sm:text-base font-bold bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white shadow-lg shadow-sky-600/25 transition-all hover:scale-[1.02] active:scale-95"
             >
-              <Wrench className="mr-2.5 h-4 w-4 sm:h-5 sm:w-5" />
+              <Wrench className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               Laporkan Kerusakan
-              <ArrowRight className="ml-2.5 h-4 w-4 sm:h-5 sm:w-5" />
+              <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </Link>
           <Link href="/cek-status" className="w-full sm:w-auto">
             <Button
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto h-12 sm:h-14 px-7 sm:px-9 rounded-full text-sm sm:text-base font-bold border-sky-200/90 text-sky-800 bg-white/80 hover:bg-sky-50/90 hover:border-sky-300 transition-all shadow-xs hover:scale-105 active:scale-95"
+              className="w-full sm:w-auto h-11 sm:h-13 px-6 sm:px-8 rounded-full text-xs sm:text-base font-bold border-sky-200/90 text-sky-800 bg-white/80 hover:bg-sky-50/90 hover:border-sky-300 transition-all shadow-2xs hover:scale-[1.02] active:scale-95"
             >
-              <Search className="mr-2.5 h-4 w-4 sm:h-5 sm:w-5 text-sky-600" />
+              <Search className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-sky-600" />
               Cek Status Laporan
             </Button>
           </Link>
         </div>
       </section>
 
-      {/* 2 Main Interactive Action Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 max-w-4xl mx-auto">
+      {/* 2 Main Interactive Action Cards (Horizontal Side-by-Side Content to Reduce Height) */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-5 max-w-4xl mx-auto">
         {/* Card 1: Buat Laporan */}
         <Link href="/lapor" className="group block">
-          <Card className="h-full border border-sky-100/90 bg-white/85 backdrop-blur-md rounded-2xl sm:rounded-3xl p-1.5 sm:p-2 shadow-xl shadow-sky-100/60 transition-all duration-300 group-hover:-translate-y-1.5 group-hover:shadow-2xl group-hover:shadow-sky-500/15 group-hover:border-sky-300">
-            <CardContent className="p-5 sm:p-6 space-y-4">
-              <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-to-br from-sky-500 to-sky-700 text-white flex items-center justify-center shadow-lg shadow-sky-500/30 group-hover:scale-110 transition-transform">
-                <Wrench className="h-6 w-6 sm:h-7 sm:w-7" />
+          <Card className="border border-sky-100/90 bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-md hover:shadow-xl shadow-sky-100/50 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-sky-300">
+            <CardContent className="p-4 sm:p-5 flex items-center gap-3.5 sm:gap-4">
+              <div className="h-11 w-11 sm:h-13 sm:w-13 rounded-2xl bg-gradient-to-br from-sky-500 to-sky-700 text-white flex items-center justify-center shadow-md shadow-sky-500/25 shrink-0 group-hover:scale-105 transition-transform">
+                <Wrench className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <div className="space-y-1.5">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-sky-600 transition-colors flex items-center justify-between">
-                  Laporkan Kerusakan
-                  <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-sky-600" />
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
-                  Isi formulir kerusakan fasilitas atau mesin peralatan pabrik secara online tanpa perlu login.
+              <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm sm:text-lg font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+                    Laporkan Kerusakan
+                  </h3>
+                  <ArrowRight className="h-4 w-4 text-sky-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all shrink-0 ml-1" />
+                </div>
+                <p className="text-xs text-slate-500 line-clamp-2 leading-snug font-medium">
+                  Isi formulir kerusakan fasilitas atau peralatan pabrik online tanpa perlu login.
                 </p>
-              </div>
-              <div className="pt-2 flex items-center gap-2 text-xs font-bold text-sky-600">
-                <span className="inline-flex items-center gap-1 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100">
-                  <Sparkles className="h-3 w-3" />
-                  Formulir Cepat &bull; Unggah Foto
-                </span>
+                <div className="pt-0.5">
+                  <span className="inline-flex items-center gap-1 bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md text-[11px] font-bold border border-sky-100">
+                    <Sparkles className="h-3 w-3" />
+                    Form Cepat &bull; Foto
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -85,90 +87,93 @@ export default function HomePage() {
 
         {/* Card 2: Cek Status */}
         <Link href="/cek-status" className="group block">
-          <Card className="h-full border border-sky-100/90 bg-white/85 backdrop-blur-md rounded-2xl sm:rounded-3xl p-1.5 sm:p-2 shadow-xl shadow-sky-100/60 transition-all duration-300 group-hover:-translate-y-1.5 group-hover:shadow-2xl group-hover:shadow-sky-500/15 group-hover:border-sky-300">
-            <CardContent className="p-5 sm:p-6 space-y-4">
-              <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-sky-700 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 group-hover:scale-110 transition-transform">
-                <Search className="h-6 w-6 sm:h-7 sm:w-7" />
+          <Card className="border border-sky-100/90 bg-white/90 backdrop-blur-md rounded-2xl sm:rounded-3xl shadow-md hover:shadow-xl shadow-sky-100/50 transition-all duration-300 group-hover:-translate-y-1 group-hover:border-sky-300">
+            <CardContent className="p-4 sm:p-5 flex items-center gap-3.5 sm:gap-4">
+              <div className="h-11 w-11 sm:h-13 sm:w-13 rounded-2xl bg-gradient-to-br from-indigo-600 to-sky-700 text-white flex items-center justify-center shadow-md shadow-indigo-600/25 shrink-0 group-hover:scale-105 transition-transform">
+                <Search className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <div className="space-y-1.5">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-sky-600 transition-colors flex items-center justify-between">
-                  Cek Status Laporan
-                  <ArrowRight className="h-5 w-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-sky-600" />
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
-                  Masukkan nomor tiket laporan Anda untuk memantau progres penanganan oleh tim teknisi.
+              <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm sm:text-lg font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
+                    Cek Status Laporan
+                  </h3>
+                  <ArrowRight className="h-4 w-4 text-sky-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all shrink-0 ml-1" />
+                </div>
+                <p className="text-xs text-slate-500 line-clamp-2 leading-snug font-medium">
+                  Masukkan nomor tiket laporan untuk memantau progres penanganan teknisi.
                 </p>
-              </div>
-              <div className="pt-2 flex items-center gap-2 text-xs font-bold text-indigo-600">
-                <span className="inline-flex items-center gap-1 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
-                  <CheckCircle2 className="h-3 w-3" />
-                  Lacak Realtime &bull; Bebas Ribet
-                </span>
+                <div className="pt-0.5">
+                  <span className="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md text-[11px] font-bold border border-indigo-100">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Lacak Realtime
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>
         </Link>
       </section>
 
-      {/* 3 Easy Steps Section (1-2-3 Guide) */}
-      <section className="max-w-5xl mx-auto space-y-6 sm:space-y-8 pt-2">
-        <div className="text-center space-y-2">
-          <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900">
+      {/* 3 Easy Steps Section (Compact & Sleek Design) */}
+      <section className="max-w-4xl mx-auto space-y-4 pt-1">
+        <div className="text-center space-y-1">
+          <h2 className="text-base sm:text-2xl font-black text-slate-900">
             3 Langkah Mudah Pelaporan
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 font-medium">
-            Proses cepat dari pengajuan hingga tindak lanjut perbaikan fasilitas
+          <p className="text-xs text-slate-500 font-medium">
+            Proses cepat dari pengajuan hingga tindak lanjut perbaikan
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        {/* Compact Grid (1 Column on Mobile, 3 Columns on Desktop) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Step 1 */}
-          <Card className="border border-sky-100/90 bg-white/80 backdrop-blur-md rounded-2xl p-4 sm:p-5 text-center space-y-3 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <CardContent className="pt-2 space-y-2.5">
-              <div className="mx-auto h-12 w-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white flex items-center justify-center font-black text-lg shadow-md shadow-sky-500/20">
-                1
-              </div>
-              <h4 className="font-bold text-slate-900 text-sm sm:text-base flex items-center justify-center gap-1.5">
-                <FileCheck className="h-4 w-4 text-sky-600" />
+          <div className="border border-sky-100/90 bg-white/85 backdrop-blur-md rounded-2xl p-3.5 flex items-center md:flex-col md:text-center gap-3.5 shadow-2xs hover:shadow-md transition-all">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+              1
+            </div>
+            <div className="space-y-0.5 min-w-0">
+              <h4 className="font-bold text-slate-900 text-xs sm:text-sm flex items-center md:justify-center gap-1.5">
+                <FileCheck className="h-3.5 w-3.5 text-sky-600 shrink-0" />
                 Isi Form Laporan
               </h4>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Pilih Bagian & Unit Kerja, masukkan nama peralatan dan deskripsikan kerusakan yang terjadi.
+              <p className="text-[11px] text-slate-500 leading-tight font-medium">
+                Pilih Bagian & Unit Kerja, masukkan peralatan & deskripsi kerusakan.
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Step 2 */}
-          <Card className="border border-sky-100/90 bg-white/80 backdrop-blur-md rounded-2xl p-4 sm:p-5 text-center space-y-3 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <CardContent className="pt-2 space-y-2.5">
-              <div className="mx-auto h-12 w-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white flex items-center justify-center font-black text-lg shadow-md shadow-sky-500/20">
-                2
-              </div>
-              <h4 className="font-bold text-slate-900 text-sm sm:text-base flex items-center justify-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-sky-600" />
+          <div className="border border-sky-100/90 bg-white/85 backdrop-blur-md rounded-2xl p-3.5 flex items-center md:flex-col md:text-center gap-3.5 shadow-2xs hover:shadow-md transition-all">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+              2
+            </div>
+            <div className="space-y-0.5 min-w-0">
+              <h4 className="font-bold text-slate-900 text-xs sm:text-sm flex items-center md:justify-center gap-1.5">
+                <ShieldCheck className="h-3.5 w-3.5 text-sky-600 shrink-0" />
                 Dapatkan Kode Tiket
               </h4>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Sistem akan menerbitkan kode unik tiket laporan (contoh: <code className="font-mono text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">SIGAP-20260821-001</code>).
+              <p className="text-[11px] text-slate-500 leading-tight font-medium">
+                Sistem menerbitkan nomor tiket unik (<code className="font-mono text-sky-700">SIGAP-2026...</code>).
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Step 3 */}
-          <Card className="border border-sky-100/90 bg-white/80 backdrop-blur-md rounded-2xl p-4 sm:p-5 text-center space-y-3 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <CardContent className="pt-2 space-y-2.5">
-              <div className="mx-auto h-12 w-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white flex items-center justify-center font-black text-lg shadow-md shadow-sky-500/20">
-                3
-              </div>
-              <h4 className="font-bold text-slate-900 text-sm sm:text-base flex items-center justify-center gap-1.5">
-                <Clock className="h-4 w-4 text-sky-600" />
+          <div className="border border-sky-100/90 bg-white/85 backdrop-blur-md rounded-2xl p-3.5 flex items-center md:flex-col md:text-center gap-3.5 shadow-2xs hover:shadow-md transition-all">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+              3
+            </div>
+            <div className="space-y-0.5 min-w-0">
+              <h4 className="font-bold text-slate-900 text-xs sm:text-sm flex items-center md:justify-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-sky-600 shrink-0" />
                 Pantau Progres
               </h4>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Cek status perkembangan penanganan secara berkala hingga perbaikan diselesaikan petugas.
+              <p className="text-[11px] text-slate-500 leading-tight font-medium">
+                Cek status perkembangan penanganan hingga perbaikan selesai.
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </section>
     </div>

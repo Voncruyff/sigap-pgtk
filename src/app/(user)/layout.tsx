@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LockKeyhole, Wrench, Search, Building, Menu, Home, Activity, PhoneCall } from "lucide-react";
+import { LockKeyhole, Wrench, Search, Building, Menu, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -34,17 +34,17 @@ export default function UserLayout({
 
       {/* Responsive Header Glassmorphism */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/85 border-b border-sky-100/90 shadow-xs transition-all">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
           {/* Logo PT Kebon Agung Pabrik Gula Trangkil */}
-          <Link href="/" className="flex items-center gap-3 shrink-0 group py-1">
-            <div className="relative h-11 w-auto max-w-[220px] sm:max-w-[290px] flex items-center transition-transform group-hover:scale-[1.01]">
+          <Link href="/" className="flex items-center gap-2.5 shrink-0 group py-1">
+            <div className="relative h-8 sm:h-11 w-auto max-w-[200px] sm:max-w-[290px] flex items-center transition-transform group-hover:scale-[1.01]">
               <Image
                 src="/logo-pg-trangkil.png"
                 alt="Logo PT Kebon Agung Pabrik Gula Trangkil"
                 width={300}
                 height={60}
                 priority
-                className="h-9 sm:h-11 w-auto object-contain drop-shadow-xs"
+                className="h-7 sm:h-10 w-auto object-contain drop-shadow-xs"
               />
             </div>
             <div className="hidden xl:flex items-center gap-2 border-l pl-3 ml-1 border-sky-200/80">
@@ -88,11 +88,18 @@ export default function UserLayout({
             </Link>
           </nav>
 
-          {/* Mobile Navigation Drawer Trigger */}
+          {/* Mobile Navigation Drawer Trigger (Square Box Shape, Slightly Larger) */}
           <div className="flex md:hidden items-center gap-2">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger render={<Button variant="outline" size="icon-sm" className="rounded-xl border-sky-200 text-sky-700 bg-white/80 shadow-2xs" aria-label="Buka Menu" />}>
-                <Menu className="h-5 w-5" />
+              <SheetTrigger render={
+                <Button
+                  variant="outline"
+                  className="h-10 w-10 p-0 rounded-lg border-2 border-sky-300 bg-white text-sky-700 hover:bg-sky-50 shadow-xs flex items-center justify-center shrink-0"
+                  aria-label="Buka Menu Navigasi"
+                >
+                  <Menu className="h-5 w-5 stroke-[2.5]" />
+                </Button>
+              }>
               </SheetTrigger>
               <SheetContent side="right" className="w-80 p-6 bg-white/95 backdrop-blur-2xl">
                 <SheetHeader className="text-left border-b pb-4 mb-6">
@@ -149,25 +156,25 @@ export default function UserLayout({
       </header>
 
       {/* Main Content Body */}
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <main className="relative z-10 flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {children}
       </main>
 
       {/* Footer Modern */}
-      <footer className="relative z-10 border-t border-sky-100/90 py-8 bg-white/90 backdrop-blur-md text-slate-600 text-xs">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+      <footer className="relative z-10 border-t border-sky-100/90 py-6 bg-white/90 backdrop-blur-md text-slate-600 text-xs">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
           <div className="flex items-center gap-3 flex-wrap justify-center">
             <div className="flex items-center gap-2 font-bold text-slate-800">
               <Building className="h-4 w-4 text-sky-600" />
               <span>PT Kebon Agung &bull; Pabrik Gula Trangkil</span>
             </div>
             <span className="hidden md:inline text-slate-300">|</span>
-            <div className="flex items-center gap-1.5 text-emerald-700 font-medium bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/80">
+            <div className="flex items-center gap-1.5 text-emerald-700 font-medium bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80 text-[11px]">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Sistem SIGAP Online</span>
             </div>
           </div>
-          <p className="text-slate-400 font-medium">
+          <p className="text-slate-400 font-medium text-[11px]">
             &copy; {new Date().getFullYear()} SIGAP &bull; Sistem Informasi Gangguan & Perbaikan. All rights reserved.
           </p>
         </div>
