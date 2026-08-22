@@ -1,13 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReportForm } from "@/components/user/report-form";
+import { FadeIn, FadeInScale } from "@/components/ui/motion";
 
 export default function LaporPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Header Halaman */}
-      <div className="space-y-4">
+      <FadeIn className="space-y-4">
         <Link href="/" className="inline-block">
           <Button
             variant="outline"
@@ -31,10 +34,12 @@ export default function LaporPage() {
             Laporkan kerusakan fasilitas atau peralatan agar dapat segera ditindaklanjuti oleh petugas SIGAP.
           </p>
         </div>
-      </div>
+      </FadeIn>
 
       {/* Form Laporan Card */}
-      <ReportForm />
+      <FadeInScale delay={0.1}>
+        <ReportForm />
+      </FadeInScale>
     </div>
   );
 }

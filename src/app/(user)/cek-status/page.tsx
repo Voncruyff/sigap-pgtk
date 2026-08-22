@@ -1,13 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusSearchForm } from "@/components/user/status-search-form";
+import { FadeIn, FadeInScale } from "@/components/ui/motion";
 
 export default function CekStatusPage() {
   return (
     <div className="max-w-xl mx-auto space-y-6 pb-12">
       {/* Header Halaman */}
-      <div className="space-y-4">
+      <FadeIn className="space-y-4">
         <Link href="/" className="inline-block">
           <Button
             variant="outline"
@@ -31,10 +34,12 @@ export default function CekStatusPage() {
             Masukkan nomor laporan untuk melihat perkembangan penanganan kerusakan oleh tim teknisi.
           </p>
         </div>
-      </div>
+      </FadeIn>
 
       {/* Form Cek Status */}
-      <StatusSearchForm />
+      <FadeInScale delay={0.1}>
+        <StatusSearchForm />
+      </FadeInScale>
     </div>
   );
 }
