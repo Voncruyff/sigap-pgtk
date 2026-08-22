@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Send, FileText, Loader2 } from "lucide-react";
+import { Send, FileText, Loader2, Sparkles } from "lucide-react";
 
 import {
   reportSchema,
@@ -135,16 +135,18 @@ export function ReportForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Single Card Container For Report Form */}
-        <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-xs rounded-2xl sm:rounded-3xl shadow-xl shadow-sky-100/50 overflow-hidden">
-          <CardHeader className="p-4 sm:p-6 border-b border-sky-100/80 bg-gradient-to-r from-sky-50/80 to-white">
-            <CardTitle className="text-sm sm:text-base font-bold flex items-center gap-2 text-sky-700">
-              <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-sky-600 shrink-0" />
+        <Card className="border border-sky-100/90 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl shadow-sky-100/60 overflow-hidden">
+          <CardHeader className="p-5 sm:p-6 border-b border-sky-100/80 bg-gradient-to-r from-sky-50/80 via-white to-white">
+            <CardTitle className="text-base sm:text-lg font-extrabold flex items-center gap-2.5 text-slate-900">
+              <div className="p-2 rounded-xl bg-sky-100 text-sky-700">
+                <FileText className="h-5 w-5 text-sky-600 shrink-0" />
+              </div>
               Form Pelaporan Kerusakan Fasilitas
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+          <CardContent className="p-5 sm:p-7 space-y-4 sm:space-y-5">
             {/* Row 1: Nama Pelapor & Nomor HP */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
               {/* Nama Pelapor */}
               <FormField
                 control={form.control}
@@ -155,7 +157,7 @@ export function ReportForm() {
                       Nama Pelapor <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="Masukkan nama lengkap Anda" {...field} className="rounded-xl h-11 text-xs sm:text-sm" />
+                      <Input placeholder="Masukkan nama lengkap Anda" {...field} className="rounded-xl h-11 text-xs sm:text-sm border-sky-200/90 focus-visible:ring-sky-500" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -175,9 +177,9 @@ export function ReportForm() {
                       </span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="08xxxxxxxxxx" {...field} className="rounded-xl h-11 text-xs sm:text-sm" />
+                      <Input placeholder="08xxxxxxxxxx" {...field} className="rounded-xl h-11 text-xs sm:text-sm border-sky-200/90 focus-visible:ring-sky-500" />
                     </FormControl>
-                    <FormDescription className="text-[11px]">
+                    <FormDescription className="text-[11px] text-slate-500">
                       Digunakan jika petugas perlu menghubungi Anda.
                     </FormDescription>
                     <FormMessage />
@@ -187,7 +189,7 @@ export function ReportForm() {
             </div>
 
             {/* Row 2: Bagian & Unit / Bagian Kerja */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
               {/* Bagian */}
               <FormField
                 control={form.control}
@@ -205,7 +207,7 @@ export function ReportForm() {
                       }}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-full rounded-xl h-11 text-xs sm:text-sm">
+                        <SelectTrigger className="w-full rounded-xl h-11 text-xs sm:text-sm border-sky-200/90 focus-visible:ring-sky-500">
                           <SelectValue placeholder="Pilih bagian" />
                         </SelectTrigger>
                       </FormControl>
@@ -236,7 +238,7 @@ export function ReportForm() {
                       disabled={!selectedBagian}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-full rounded-xl h-11 text-xs sm:text-sm">
+                        <SelectTrigger className="w-full rounded-xl h-11 text-xs sm:text-sm border-sky-200/90 focus-visible:ring-sky-500">
                           <SelectValue
                             placeholder={
                               !selectedBagian
@@ -270,7 +272,7 @@ export function ReportForm() {
                     Peralatan / Fasilitas <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Contoh: AC, printer, pompa nira, klep steam" {...field} className="rounded-xl h-11 text-xs sm:text-sm" />
+                    <Input placeholder="Contoh: AC, printer, pompa nira, klep steam" {...field} className="rounded-xl h-11 text-xs sm:text-sm border-sky-200/90 focus-visible:ring-sky-500" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -289,11 +291,11 @@ export function ReportForm() {
                   <FormControl>
                     <Textarea
                       placeholder="Jelaskan kondisi atau kerusakan yang terjadi..."
-                      className="min-h-28 resize-y rounded-xl text-xs sm:text-sm"
+                      className="min-h-28 resize-y rounded-xl text-xs sm:text-sm border-sky-200/90 focus-visible:ring-sky-500"
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription className="text-[11px]">
+                  <FormDescription className="text-[11px] text-slate-500">
                     Jelaskan kondisi kerusakan secara singkat dan jelas.
                   </FormDescription>
                   <FormMessage />
@@ -319,7 +321,7 @@ export function ReportForm() {
                       onChange={(file) => field.onChange(file)}
                     />
                   </FormControl>
-                  <FormDescription className="text-[11px]">
+                  <FormDescription className="text-[11px] text-slate-500">
                     Foto dapat membantu petugas memahami kondisi kerusakan.
                   </FormDescription>
                   <FormMessage />
@@ -341,7 +343,7 @@ export function ReportForm() {
                   </FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
-                      <SelectTrigger className="w-full rounded-xl h-11 text-xs sm:text-sm">
+                      <SelectTrigger className="w-full rounded-xl h-11 text-xs sm:text-sm border-sky-200/90 focus-visible:ring-sky-500">
                         <SelectValue placeholder="Pilih dampak jika diperlukan" />
                       </SelectTrigger>
                     </FormControl>
@@ -366,7 +368,7 @@ export function ReportForm() {
             type="submit"
             size="lg"
             disabled={isSubmitting}
-            className="w-full sm:w-auto h-12 sm:h-13 px-8 sm:px-10 text-sm sm:text-base font-bold bg-sky-600 hover:bg-sky-700 text-white rounded-full shadow-lg shadow-sky-600/25 transition-all hover:scale-105"
+            className="w-full sm:w-auto h-13 px-9 text-sm sm:text-base font-bold bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white rounded-full shadow-lg shadow-sky-600/30 transition-all hover:scale-105 active:scale-95"
           >
             {isSubmitting ? (
               <>
@@ -375,7 +377,7 @@ export function ReportForm() {
               </>
             ) : (
               <>
-                <Send className="mr-2 h-5 w-5" />
+                <Send className="mr-2.5 h-5 w-5" />
                 Kirim Laporan Kerusakan
               </>
             )}

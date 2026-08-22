@@ -11,6 +11,8 @@ import {
   Activity,
   LogOut,
   Loader2,
+  Building,
+  ShieldCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -46,7 +48,7 @@ export function AdminNavLinks({ onItemClick }: NavLinksProps) {
   };
 
   return (
-    <nav className="space-y-1">
+    <nav className="space-y-1.5">
       {ADMIN_NAV_ITEMS.map((item) => {
         const Icon = item.icon;
         const isActive =
@@ -59,14 +61,14 @@ export function AdminNavLinks({ onItemClick }: NavLinksProps) {
             key={item.href}
             href={item.href}
             onClick={(e) => handleNavigate(item.href, e)}
-            className={`flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex items-center justify-between rounded-xl px-3.5 py-3 text-sm font-semibold transition-all duration-200 ${
               isActive
-                ? "bg-primary text-primary-foreground font-semibold"
-                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                ? "bg-gradient-to-r from-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/25 scale-[1.01]"
+                : "text-slate-600 hover:bg-sky-50/80 hover:text-sky-700"
             }`}
           >
             <div className="flex items-center gap-3">
-              <Icon className="h-4 w-4 shrink-0" />
+              <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-white" : "text-sky-600"}`} />
               <span>{item.label}</span>
             </div>
 
@@ -102,22 +104,29 @@ export function AdminSidebar() {
   return (
     <>
       {/* Desktop Permanent Sidebar (lg+) */}
-      <aside className="hidden lg:flex flex-col w-64 border-r bg-card p-4 space-y-6 shrink-0 h-screen sticky top-0">
-        <div className="px-3 py-2 border-b pb-4">
-          <h2 className="text-lg font-extrabold tracking-tight text-primary">SIGAP Admin</h2>
-          <p className="text-xs text-muted-foreground font-medium">PT Kebon Agung - PG Trangkil</p>
+      <aside className="hidden lg:flex flex-col w-64 border-r border-sky-100/80 bg-white p-5 space-y-6 shrink-0 h-screen sticky top-0 shadow-xs">
+        <div className="px-2 py-1 border-b border-sky-100 pb-4">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white flex items-center justify-center font-black text-sm shadow-md shadow-sky-500/20">
+              <ShieldCheck className="h-4 w-4" />
+            </div>
+            <div>
+              <h2 className="text-base font-black tracking-tight text-slate-900 leading-none">SIGAP Admin</h2>
+              <p className="text-[11px] text-slate-500 font-semibold mt-1">PT Kebon Agung &bull; PG Trangkil</p>
+            </div>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pt-2">
           <AdminNavLinks />
         </div>
 
-        <div className="pt-4 border-t">
+        <div className="pt-4 border-t border-sky-100">
           <Button
             variant="ghost"
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+            className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl font-bold"
             size="sm"
           >
             {isLoggingOut ? (
@@ -128,7 +137,7 @@ export function AdminSidebar() {
             ) : (
               <>
                 <LogOut className="mr-2 h-4 w-4" />
-                Keluar
+                Keluar Admin
               </>
             )}
           </Button>
@@ -136,18 +145,21 @@ export function AdminSidebar() {
       </aside>
 
       {/* Mobile Top Header + Sheet Drawer (< lg) */}
-      <header className="lg:hidden flex items-center justify-between h-14 px-4 border-b bg-card sticky top-0 z-40">
-        <div>
-          <span className="font-extrabold text-primary">SIGAP</span>
-          <span className="text-xs text-muted-foreground ml-1.5 font-medium">Admin Panel</span>
+      <header className="lg:hidden flex items-center justify-between h-16 px-4 border-b border-sky-100/90 bg-white/90 backdrop-blur-md sticky top-0 z-40">
+        <div className="flex items-center gap-2">
+          <span className="font-black text-sky-700">SIGAP</span>
+          <span className="text-xs text-slate-500 font-semibold bg-sky-50 px-2 py-0.5 rounded-full border border-sky-100">
+            Admin Panel
+          </span>
         </div>
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger render={<Button variant="outline" size="icon-sm" aria-label="Buka Menu Navigasi" />}>
+          <SheetTrigger render={<Button variant="outline" size="icon-sm" className="rounded-xl border-sky-200 text-sky-700" aria-label="Buka Menu Navigasi" />}>
             <Menu className="h-5 w-5" />
           </SheetTrigger>
-          <SheetContent side="left" className="w-64">
-            <SheetHeader className="text-left mb-4 border-b pb-3">
-              <SheetTitle className="text-primary font-bold">SIGAP Admin</SheetTitle>
+          <SheetContent side="left" className="w-72 p-6">
+            <SheetHeader className="text-left mb-6 border-b pb-4">
+              <SheetTitle className="text-sky-700 font-black text-lg">SIGAP Admin</SheetTitle>
+              <p className="text-xs text-slate-500">PT Kebon Agung PG Trangkil</p>
             </SheetHeader>
             <AdminNavLinks onItemClick={() => setOpen(false)} />
             <div className="mt-8 pt-4 border-t">
@@ -158,7 +170,7 @@ export function AdminSidebar() {
                   handleLogout();
                 }}
                 disabled={isLoggingOut}
-                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl font-bold"
                 size="sm"
               >
                 {isLoggingOut ? (
@@ -169,7 +181,7 @@ export function AdminSidebar() {
                 ) : (
                   <>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Keluar
+                    Keluar Admin
                   </>
                 )}
               </Button>
