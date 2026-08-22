@@ -11,7 +11,7 @@ function isValidUrl(urlStr?: string): boolean {
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -71,7 +71,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
   } catch (err) {
-    console.warn("Middleware Supabase auth error:", err);
+    console.warn("Proxy Supabase auth error:", err);
   }
 
   return supabaseResponse;

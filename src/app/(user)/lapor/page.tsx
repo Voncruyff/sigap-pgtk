@@ -8,18 +8,18 @@ export default function LaporPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-12">
       {/* Header Halaman */}
       <div className="space-y-4">
-        <Link href="/">
+        <Link href="/" className="inline-block">
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            className="-ml-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50/80 rounded-full text-xs sm:text-sm"
+            className="rounded-xl border border-sky-200/90 bg-white text-slate-700 hover:text-sky-700 hover:bg-sky-50/90 hover:border-sky-300 font-bold text-xs sm:text-sm shadow-2xs transition-all flex items-center gap-2 px-4 py-2.5"
           >
-            <ArrowLeft className="mr-1.5 h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 text-sky-600" />
             Kembali ke Beranda
           </Button>
         </Link>
 
-        <div className="space-y-1">
+        <div className="space-y-1.5 pt-1">
           <div className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-sky-600 bg-sky-100/60 px-3 py-1 rounded-full border border-sky-200/50">
             <Wrench className="h-3.5 w-3.5" />
             Formulir Online
