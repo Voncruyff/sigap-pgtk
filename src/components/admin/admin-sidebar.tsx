@@ -11,7 +11,6 @@ import {
   Activity,
   LogOut,
   Loader2,
-  Building,
   ShieldCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";

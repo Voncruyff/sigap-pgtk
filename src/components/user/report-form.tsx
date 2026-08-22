@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Send, FileText, Loader2, Sparkles } from "lucide-react";
+import { Send, FileText, Loader2 } from "lucide-react";
 
 import {
   reportSchema,

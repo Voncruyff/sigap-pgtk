@@ -50,7 +50,7 @@ export async function compressImage(
         // Draw image onto canvas
         ctx.drawImage(img, 0, 0, width, height);
 
-        let quality = 0.85;
+        const quality = 0.85;
 
         const attemptCompression = (currentQuality: number) => {
           canvas.toBlob(
