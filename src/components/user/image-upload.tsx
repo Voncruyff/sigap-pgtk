@@ -29,8 +29,8 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
     setIsCompressing(true);
 
     try {
-      // Compress image automatically to maximum 200KB
-      const compressedFile = await compressImage(file, 200);
+      // Compress image automatically to maximum 50KB
+      const compressedFile = await compressImage(file, 50);
 
       onChange(compressedFile);
       const objectUrl = URL.createObjectURL(compressedFile);
@@ -81,7 +81,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
         <div className="flex flex-col items-center justify-center border-2 border-dashed border-sky-300 rounded-xl p-6 bg-sky-50/50 text-center">
           <Loader2 className="h-6 w-6 text-sky-600 animate-spin mb-2" />
           <span className="text-sm font-medium text-sky-900">
-            Mengompresi foto (Maks. 200 KB)...
+            Mengompresi foto (Maks. 50 KB)...
           </span>
           <span className="text-xs text-sky-600 mt-1">
             Mengoptimalkan ukuran gambar tanpa merusak kualitas
@@ -112,7 +112,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                 )}
               </div>
               <p className="text-[11px] text-slate-500">
-                Terkompresi otomatis &le; 200 KB
+                Terkompresi otomatis &le; 50 KB
               </p>
             </div>
           </div>
@@ -139,7 +139,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
             + Tambahkan Foto Kerusakan
           </span>
           <span className="text-xs text-slate-500 mt-1">
-            Format: JPG, PNG, WEBP (Otomatis dikompresi &le; 200 KB)
+            Format: JPG, PNG, WEBP (Otomatis dikompresi &le; 50 KB)
           </span>
         </label>
       )}

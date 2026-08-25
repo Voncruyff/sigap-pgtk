@@ -1,13 +1,13 @@
 /**
  * Utility to compress an image file in browser using HTML5 Canvas.
- * Ensures the output file size is <= maxSizeKB (default 200KB).
+ * Ensures the output file size is <= maxSizeKB (default 50KB).
  */
 export async function compressImage(
   file: File,
-  maxSizeKB: number = 200,
-  maxWidthOrHeight: number = 1200
+  maxSizeKB: number = 50,
+  maxWidthOrHeight: number = 1000
 ): Promise<File> {
-  // If file is already smaller than target size and not overly large resolution, return as is
+  // If file is already smaller than target size and is jpeg, return as is
   if (file.size <= maxSizeKB * 1024 && file.type === "image/jpeg") {
     return file;
   }
@@ -63,7 +63,7 @@ export async function compressImage(
               // If size <= maxSizeKB or quality reached minimum limit
               if (blob.size <= maxSizeKB * 1024 || currentQuality <= 0.15) {
                 // If blob is still > maxSizeKB and dimensions are still large, scale dimensions down further
-                if (blob.size > maxSizeKB * 1024 && width > 400) {
+                if (blob.size > maxSizeKB * 1024 && maxWidthOrHeight > 300) {
                   compressImage(file, maxSizeKB, Math.round(maxWidthOrHeight * 0.7))
                     .then(resolve)
                     .catch(() => resolve(file));

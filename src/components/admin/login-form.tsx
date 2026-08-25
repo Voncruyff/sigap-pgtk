@@ -82,14 +82,15 @@ export function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Email <span className="text-destructive">*</span>
+              <FormLabel className="text-slate-700 font-bold text-xs">
+                Email Admin <span className="text-rose-500">*</span>
               </FormLabel>
               <FormControl>
                 <Input
                   type="email"
                   placeholder="Masukkan email admin"
                   autoComplete="email"
+                  className="rounded-xl border-sky-200/80 focus:border-sky-500 focus:ring-sky-500/20 bg-white/90 shadow-2xs text-slate-800 text-xs sm:text-sm font-medium h-11"
                   {...field}
                 />
               </FormControl>
@@ -104,8 +105,8 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Password <span className="text-destructive">*</span>
+              <FormLabel className="text-slate-700 font-bold text-xs">
+                Password <span className="text-rose-500">*</span>
               </FormLabel>
               <FormControl>
                 <div className="relative">
@@ -113,13 +114,14 @@ export function LoginForm() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Masukkan password"
                     autoComplete="current-password"
+                    className="rounded-xl border-sky-200/80 focus:border-sky-500 focus:ring-sky-500/20 bg-white/90 shadow-2xs text-slate-800 text-xs sm:text-sm font-medium h-11 pr-10"
                     {...field}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                    className="absolute right-1 top-1 h-9 w-9 hover:bg-sky-50 text-slate-400 hover:text-sky-600 rounded-lg"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
                   >
@@ -137,7 +139,11 @@ export function LoginForm() {
         />
 
         {/* Submit Button */}
-        <Button type="submit" size="lg" disabled={isSubmitting} className="w-full h-11 font-medium mt-2">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full h-11 font-bold mt-2 bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white shadow-md shadow-sky-600/25 active:scale-[0.98] rounded-xl text-sm transition-all"
+        >
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

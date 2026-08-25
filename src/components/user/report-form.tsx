@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/select";
 import { ImageUpload } from "./image-upload";
 
+import { saveReportToLocalHistory } from "@/lib/my-reports-storage";
+
 function generateFileName(fileExt?: string) {
   const timestamp = Date.now();
   const randomStr = Math.random().toString(36).substring(2, 7);
@@ -111,6 +113,11 @@ export function ReportForm() {
         // Fallback jika database Supabase belum terhubung / belum dikonfigurasi env
         console.warn("Supabase insert warning:", insertError);
         const fallbackTicket = `SIGAP-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-001`;
+        saveReportToLocalHistory({
+          ticket_number: fallbackTicket,
+          peralatan: data.peralatan,
+          unit_kerja: data.unitKerja,
+        });
         toast.success("Laporan berhasil dikirim!", {
           description: `Nomor laporan Anda: ${fallbackTicket}`,
         });
@@ -119,6 +126,14 @@ export function ReportForm() {
       }
 
       const generatedTicket = insertData?.ticket_number;
+      if (generatedTicket) {
+        saveReportToLocalHistory({
+          ticket_number: generatedTicket,
+          peralatan: data.peralatan,
+          unit_kerja: data.unitKerja,
+        });
+      }
+
       toast.success("Laporan berhasil dikirim!", {
         description: `Nomor laporan Anda: ${generatedTicket}`,
       });
