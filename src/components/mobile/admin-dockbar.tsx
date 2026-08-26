@@ -37,6 +37,7 @@ export function AdminDockbar() {
 
   return (
     <nav
+      suppressHydrationWarning
       aria-label="Admin Mobile Navigation Dockbar"
       className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 max-w-md mx-auto z-50 bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-xl shadow-sky-950/10 rounded-2xl p-1.5 flex items-center justify-around"
     >
