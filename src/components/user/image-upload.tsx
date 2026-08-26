@@ -150,20 +150,10 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
           </span>
         </div>
       ) : preview ? (
-        /* State 2: Uploaded Preview with Actions */
-        <div className="relative rounded-2xl border border-sky-100 bg-white p-3.5 sm:p-4 shadow-sm hover:shadow-md transition-all">
-          {/* Quick Delete / Cancel Button (Top Right) */}
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="absolute top-2.5 right-2.5 p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all border border-transparent hover:border-rose-100 cursor-pointer"
-            title="Hapus / Batalkan Foto"
-            aria-label="Hapus Foto"
-          >
-            <X className="h-4 w-4" />
-          </button>
-
-          <div className="flex items-center gap-3 pr-8 min-w-0">
+        /* State 2: Uploaded Preview with Bottom Action Row (Super Flexible & 100% Mobile Safe) */
+        <div className="w-full rounded-2xl border border-sky-100 bg-white p-3.5 sm:p-4 shadow-sm hover:shadow-md transition-all space-y-3">
+          {/* Top Section: Thumbnail + File Details */}
+          <div className="flex items-center gap-3 min-w-0">
             {/* Thumbnail */}
             <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl overflow-hidden border border-sky-100 bg-slate-100 shadow-2xs">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -174,9 +164,11 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
               />
             </div>
 
-            {/* File Info & Inline Change Trigger */}
+            {/* File Info */}
             <div className="min-w-0 flex-1 space-y-1">
-              <p className="font-bold text-slate-900 truncate text-xs sm:text-sm">{value?.name}</p>
+              <p className="font-bold text-slate-900 truncate text-xs sm:text-sm" title={value?.name}>
+                {value?.name}
+              </p>
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80 text-[10px] sm:text-[11px]">
                   <CheckCircle2 className="h-3 w-3 text-emerald-600" />
@@ -187,18 +179,35 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                     {formatFileSize(originalSize)}
                   </span>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setIsOptionModalOpen(true)}
-                  className="text-[11px] font-bold text-sky-600 hover:text-sky-800 hover:underline ml-1 cursor-pointer"
-                >
-                  Ganti Foto
-                </button>
               </div>
               <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium truncate">
                 Terkompresi otomatis &le; 50 KB (Siap diunggah)
               </p>
             </div>
+          </div>
+
+          {/* Bottom Section: Dedicated Action Buttons (Never Cuts Off) */}
+          <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsOptionModalOpen(true)}
+              className="flex-1 h-8 text-xs rounded-xl border-sky-200 text-sky-700 hover:bg-sky-50 font-bold flex items-center justify-center gap-1.5"
+            >
+              <Camera className="h-3.5 w-3.5 text-sky-600" />
+              Ganti Foto
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleRemove}
+              className="flex-1 h-8 text-xs rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-bold border border-rose-100 flex items-center justify-center gap-1.5"
+            >
+              <X className="h-3.5 w-3.5 text-rose-600" />
+              Batal / Hapus
+            </Button>
           </div>
         </div>
       ) : (
