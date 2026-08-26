@@ -1,32 +1,356 @@
 "use client";
 
-import React from "react";
-import { Search } from "lucide-react";
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Search,
+  Wrench,
+  Clock,
+  ExternalLink,
+  Building,
+  User,
+  MapPin,
+  Calendar,
+  Sparkles,
+  Filter,
+  Copy,
+  CheckCircle2,
+  RefreshCw,
+} from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
-import { StatusSearchForm } from "@/components/user/status-search-form";
-import { MyReportsList } from "@/components/user/my-reports-list";
+import { ReportStatusBadge } from "@/components/user/report-status-badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { FadeIn, FadeInScale } from "@/components/ui/motion";
+import { toast } from "sonner";
 
-export function CekStatusView() {
+export interface ActiveReportItem {
+  id: string;
+  ticket_number: string;
+  nama_pelapor: string;
+  bagian: string;
+  unit_kerja: string;
+  lokasi_kerusakan: string;
+  deskripsi: string;
+  status: string;
+  created_at: string;
+}
+
+export interface CekStatusViewProps {
+  initialReports: ActiveReportItem[];
+}
+
+export function CekStatusView({ initialReports }: CekStatusViewProps) {
+  const router = useRouter();
+  const [reports, setReports] = useState<ActiveReportItem[]>(initialReports);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBagian, setSelectedBagian] = useState<string>("ALL");
+  const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Sync initialReports when props change
+  React.useEffect(() => {
+    setReports(initialReports);
+  }, [initialReports]);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    router.refresh();
+    setTimeout(() => {
+      setIsRefreshing(false);
+      toast.success("Data laporan berhasil dimuat ulang.");
+    }, 600);
+  };
+
+  const copyTicket = (ticket: string) => {
+    navigator.clipboard.writeText(ticket);
+    toast.success(`Nomor tiket ${ticket} disalin ke clipboard!`);
+  };
+
+  const handleDirectSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = searchQuery.trim().toUpperCase();
+    if (!query) return;
+
+    // If query matches a ticket pattern, directly navigate to status detail
+    if (/^[A-Z0-9]+-\d{8}-\d+$/i.test(query)) {
+      router.push(`/status/${query}`);
+    }
+  };
+
+  const filteredReports = reports.filter((item) => {
+    const q = searchQuery.toLowerCase();
+    const matchesQuery =
+      !q ||
+      item.ticket_number.toLowerCase().includes(q) ||
+      item.nama_pelapor.toLowerCase().includes(q) ||
+      item.unit_kerja.toLowerCase().includes(q) ||
+      item.lokasi_kerusakan.toLowerCase().includes(q) ||
+      item.deskripsi.toLowerCase().includes(q);
+
+    const matchesBagian = selectedBagian === "ALL" || item.bagian === selectedBagian;
+    const matchesStatus = selectedStatus === "ALL" || item.status === selectedStatus;
+
+    return matchesQuery && matchesBagian && matchesStatus;
+  });
+
+  const waitingCount = reports.filter((r) => r.status === "MENUNGGU").length;
+  const processingCount = reports.filter((r) => r.status === "DIPROSES").length;
+
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-12">
+    <div className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* Header Halaman Dynamic */}
       <FadeIn>
         <PageHeader
           title="Cek Status Laporan"
-          description="Masukkan nomor laporan untuk melihat perkembangan penanganan kerusakan oleh tim teknisi."
-          badgeText="Pencarian Tiket"
+          description="Pantau progres laporan kerusakan yang sedang dalam penanganan teknisi PT Kebon Agung PG Trangkil."
+          badgeText="Live Realtime Tracker"
           icon={Search}
           backUrl="/"
           backLabel="Kembali ke Beranda"
         />
       </FadeIn>
 
-      {/* Form Cek Status & List Laporan Saya */}
-      <FadeInScale delay={0.1} className="space-y-6">
-        <StatusSearchForm />
-        <MyReportsList />
+      {/* Main Search & Realtime Counter Bar */}
+      <FadeInScale delay={0.05} className="space-y-4">
+        <Card className="border border-slate-200/80 bg-white rounded-3xl shadow-2xs overflow-hidden">
+          <CardContent className="p-4 sm:p-6 space-y-4">
+            {/* Search Input Bar */}
+            <form onSubmit={handleDirectSearch} className="space-y-2">
+              <div className="flex flex-col sm:flex-row items-center gap-2">
+                <div className="relative flex-1 w-full">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Cari nomor tiket (contoh: SIGAP-20260825-...) atau nama unit kerja / pelapor..."
+                    className="pl-10 h-11 text-xs sm:text-sm font-medium rounded-2xl border-slate-200 focus:border-sky-500 bg-white shadow-2xs"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <Button
+                    type="submit"
+                    className="h-11 px-5 rounded-2xl text-xs sm:text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex-1 sm:flex-initial"
+                  >
+                    <Search className="mr-1.5 h-4 w-4" />
+                    Cari Tiket
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleRefresh}
+                    disabled={isRefreshing}
+                    title="Refresh data langsung dari server"
+                    className="h-11 w-11 p-0 rounded-2xl border-slate-200 text-slate-600 hover:text-sky-700 hover:bg-sky-50 cursor-pointer shrink-0"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin text-sky-600" : ""}`} />
+                  </Button>
+                </div>
+              </div>
+            </form>
+
+            {/* Filter Pills (Bagian & Status) */}
+            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+              {/* Bagian Filter Pills */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] font-bold text-slate-400 mr-1 flex items-center gap-1">
+                  <Building className="h-3 w-3" /> Bagian:
+                </span>
+                {["ALL", "TUK", "Teknik", "Pabrikasi", "Tanaman"].map((dept) => (
+                  <button
+                    key={dept}
+                    type="button"
+                    onClick={() => setSelectedBagian(dept)}
+                    className={`h-7 px-3 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                      selectedBagian === dept
+                        ? "bg-sky-700 text-white shadow-2xs shadow-sky-700/20"
+                        : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
+                    }`}
+                  >
+                    {dept === "ALL" ? "Semua Bagian" : dept}
+                  </button>
+                ))}
+              </div>
+
+              {/* Status Filter Pills */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[11px] font-bold text-slate-400 mr-1 flex items-center gap-1">
+                  <Filter className="h-3 w-3" /> Status:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedStatus("ALL")}
+                  className={`h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                    selectedStatus === "ALL"
+                      ? "bg-slate-800 text-white shadow-2xs"
+                      : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
+                  }`}
+                >
+                  Semua ({reports.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedStatus("MENUNGGU")}
+                  className={`h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                    selectedStatus === "MENUNGGU"
+                      ? "bg-amber-600 text-white shadow-2xs"
+                      : "bg-amber-50 text-amber-800 hover:bg-amber-100/80 border border-amber-200/60"
+                  }`}
+                >
+                  Menunggu ({waitingCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedStatus("DIPROSES")}
+                  className={`h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                    selectedStatus === "DIPROSES"
+                      ? "bg-sky-700 text-white shadow-2xs"
+                      : "bg-sky-50 text-sky-800 hover:bg-sky-100/80 border border-sky-200/60"
+                  }`}
+                >
+                  Diproses ({processingCount})
+                </button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </FadeInScale>
+
+      {/* Section Title & Realtime Count */}
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-sky-100 text-sky-700">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <div>
+            <h2 className="text-sm sm:text-base font-black text-slate-900">
+              Laporan Yang Belum Selesai
+            </h2>
+            <p className="text-[11px] text-slate-500 font-medium">
+              Data laporan aktif langsung dari server SIGAP PG Trangkil
+            </p>
+          </div>
+        </div>
+        <span className="text-xs font-bold font-mono text-sky-800 bg-sky-50 border border-sky-200 px-3 py-1 rounded-xl shadow-2xs">
+          {filteredReports.length} Laporan Aktif
+        </span>
+      </div>
+
+      {/* Cards List of Active Reports */}
+      {filteredReports.length === 0 ? (
+        <Card className="border border-dashed border-slate-200 bg-white/90 rounded-3xl p-8 sm:p-12 text-center shadow-2xs space-y-3">
+          <div className="mx-auto w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center">
+            <CheckCircle2 className="h-6 w-6" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm sm:text-base font-bold text-slate-900">
+              Tidak Ada Laporan Aktif
+            </h3>
+            <p className="text-xs text-slate-500 max-w-md mx-auto font-medium">
+              {searchQuery || selectedBagian !== "ALL" || selectedStatus !== "ALL"
+                ? "Tidak ada laporan aktif yang cocok dengan filter atau pencarian Anda."
+                : "Semua laporan gangguan saat ini telah selesai ditangani oleh teknisi atau belum ada laporan baru."}
+            </p>
+          </div>
+          <Link href="/lapor" className="inline-block pt-2">
+            <Button size="sm" className="h-9 px-4 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white">
+              <Wrench className="mr-1.5 h-3.5 w-3.5" />
+              Buat Laporan Baru
+            </Button>
+          </Link>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredReports.map((report) => {
+            const dateObj = new Date(report.created_at);
+            const formattedDate = dateObj.toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            });
+            const formattedTime = dateObj.toLocaleTimeString("id-ID", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            return (
+              <Card
+                key={report.id}
+                className="border border-slate-200/90 hover:border-sky-300 bg-white rounded-3xl shadow-2xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group"
+              >
+                <div>
+                  {/* Card Header: Ticket Number & Status Badge */}
+                  <CardHeader className="p-4 pb-3 bg-slate-50/70 border-b border-slate-100 flex flex-row items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="font-mono text-xs font-black text-sky-800 truncate">
+                        {report.ticket_number}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => copyTicket(report.ticket_number)}
+                        className="p-1 rounded-md text-slate-400 hover:text-sky-700 hover:bg-white transition-colors cursor-pointer shrink-0"
+                        title="Salin Nomor Tiket"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </button>
+                    </div>
+                    <ReportStatusBadge status={report.status} />
+                  </CardHeader>
+
+                  {/* Card Content: Details */}
+                  <CardContent className="p-4 space-y-3 text-xs">
+                    <div>
+                      <span className="font-extrabold text-sm text-slate-900 block flex items-center gap-1.5">
+                        <Wrench className="h-3.5 w-3.5 text-sky-600 shrink-0" />
+                        {report.unit_kerja}
+                      </span>
+                      <p className="text-slate-600 text-xs font-medium mt-1 line-clamp-2 leading-relaxed bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
+                        {report.deskripsi || report.lokasi_kerusakan}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-500">
+                      <div className="flex items-center gap-1 truncate">
+                        <User className="h-3 w-3 text-slate-400 shrink-0" />
+                        <span className="truncate font-semibold text-slate-700">
+                          {report.nama_pelapor}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 truncate justify-end">
+                        <Calendar className="h-3 w-3 text-slate-400 shrink-0" />
+                        <span className="font-medium text-slate-500">
+                          {formattedDate}, {formattedTime}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </div>
+
+                {/* Card Footer: Detail Link */}
+                <div className="p-3 px-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
+                    {report.bagian}
+                  </span>
+
+                  <Link href={`/status/${report.ticket_number}`}>
+                    <Button
+                      size="sm"
+                      className="h-8 px-3 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex items-center gap-1.5"
+                    >
+                      Lacak Status
+                      <ExternalLink className="h-3 w-3" />
+                    </Button>
+                  </Link>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

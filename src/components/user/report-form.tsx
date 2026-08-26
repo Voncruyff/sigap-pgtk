@@ -32,7 +32,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ImageUpload } from "./image-upload";
-import { saveReportToLocalHistory } from "@/lib/my-reports-storage";
 
 function generateTicketNumber(bagian?: string) {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -118,12 +117,6 @@ export function ReportForm() {
       }
 
       const finalTicketNumber = resData.ticket_number || ticketNumber;
-
-      // Save to local device history
-      saveReportToLocalHistory({
-        ticket_number: finalTicketNumber,
-        unit_kerja: data.unitKerja,
-      });
 
       toast.success("Laporan berhasil terkirim!", {
         description: `Nomor tiket resmi: ${finalTicketNumber}`,
