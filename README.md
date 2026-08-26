@@ -84,6 +84,78 @@ Buka [http://localhost:3000](http://localhost:3000) pada browser Anda untuk meli
 
 ---
 
+## 📂 Struktur Folder & Fungsi File Proyek
+
+Berikut adalah rincian struktur direktori serta fungsi masing-masing folder dan file utama dalam repositori **SIGAP**:
+
+```text
+sigap-pgtk/
+├── 📁 prisma/                       # Konfigurasi & Schema Database Prisma ORM
+│   ├── 📄 schema.prisma             # Definisi skema tabel MySQL (admin_users, reports, activity_logs)
+│   └── 📄 seed.ts                   # Script pengisian data awal default Super Admin
+│
+├── 📁 public/                       # Asset gambar statis & favicon
+│   ├── 🖼️ logo-ka.png               # Logo resmi PT Kebon Agung (Canvas Rasio 1:1)
+│   └── 🖼️ favicon.ico               # Icon tab browser
+│
+├── 📁 src/                          # Kode Sumber Utama Aplikasi (Next.js App Router)
+│   ├── 📁 app/                      # Direktori Routing & API Endpoints Next.js
+│   │   ├── 📁 (user)/               # Halaman Publik / Pelapor (Masyarakat & Pegawai)
+│   │   │   ├── 📁 cek-status/       # Halaman pencarian status laporan (cek-status-view.tsx)
+│   │   │   ├── 📁 lapor/            # Halaman formulir buat laporan baru (lapor-view.tsx)
+│   │   │   ├── 📁 status/[ticketNumber]/ # Halaman detail stepper progres perbaikan tiket
+│   │   │   ├── 📄 layout.tsx        # Wrapper layout publik (Header & Footer pelapor)
+│   │   │   └── 📄 page.tsx          # Landing page utama SIGAP (landing-view.tsx)
+│   │   │
+│   │   ├── 📁 admin/                # Panel Operasional Administrasi Admin
+│   │   │   ├── 📁 (dashboard)/      # Kelompok halaman terlindungi sesi login admin
+│   │   │   │   ├── 📁 dashboard/    # Halaman Dashboard Analitik & Feed Aktivitas
+│   │   │   │   ├── 📁 kelola-admin/ # Halaman Manajemen Akun Admin, Banned & Akses Super Admin
+│   │   │   │   ├── 📁 laporan/      # Halaman Manajemen Laporan Aktif (MENUNGGU & DIPROSES)
+│   │   │   │   ├── 📁 log-aktivitas/# Halaman Audit Log Aktivitas Operasional
+│   │   │   │   ├── 📁 pengaturan/   # Halaman Pengaturan Profil Admin & Ganti Password
+│   │   │   │   ├── 📁 riwayat/      # Halaman Arsip Riwayat Laporan Selesai & Export
+│   │   │   │   └── 📄 layout.tsx    # Wrapper layout admin (Sidebar & Header Admin)
+│   │   │   ├── 📁 login/            # Halaman Form Login Admin (login-view.tsx)
+│   │   │   └── 📁 logout/           # Route penanganan proses Logout Admin
+│   │   │
+│   │   ├── 📁 api/                  # Backend API Routes (REST API Endpoints)
+│   │   │   ├── 📁 admin/            # API internal admin (users, profile, ban, logs)
+│   │   │   ├── 📁 notifications/    # API notifikasi laporan terkini
+│   │   │   ├── 📁 reports/          # API publik (buat laporan & cek tiket)
+│   │   │   └── 📁 upload/           # API unggah foto bukti kerusakan
+│   │   │
+│   │   ├── 📄 globals.css           # Stylesheet global & TailwindCSS base style
+│   │   ├── 📄 icon.png / favicon.ico# Favicon tab browser (Logo KA Centered 1:1)
+│   │   └── 📄 layout.tsx            # Root Layout Aplikasi (Font Poppins & Metadata)
+│   │
+│   ├── 📁 components/               # Komponen UI React Reusable
+│   │   ├── 📁 admin/                # Komponen UI khusus Admin (Header, Sidebar, StatCard, ExportDialog)
+│   │   ├── 📁 mobile/               # Komponen tampilan responsif khusus smartphone / HP
+│   │   ├── 📁 ui/                   # Atom UI Components (Button, Card, Input, Dialog, EmptyState, Table)
+│   │   └── 📁 user/                 # Komponen UI khusus Pelapor Publik (Form Lapor, SearchForm)
+│   │
+│   ├── 📁 lib/                      # Helper, Utility & Logic Business Layer
+│   │   ├── 📄 admin-services.ts     # Query database MySQL & audit log operasional admin
+│   │   ├── 📄 auth.ts               # Autentikasi JWT token, verifikasi sesi cookie & Bcrypt
+│   │   ├── 📄 date-utils.ts         # Utility format tanggal & waktu Bahasa Indonesia
+│   │   ├── 📄 db.ts                 # Koneksi Prisma Client Singleton ke Database MySQL
+│   │   ├── 📄 export-utils.ts       # Utility ekspor berkas arsip (PDF, Excel, Word DOCX, TXT)
+│   │   ├── 📄 my-reports-storage.ts # Pengelola penyimpan riwayat tiket lokal di browser (localStorage)
+│   │   ├── 📄 notifications.ts      # Helper manajemen notifikasi lokal browser admin
+│   │   └── 📄 report-services.ts    # Logika bisnis laporan (buat tiket, ubah status, pencarian)
+│   │
+│   ├── 📁 types/                    # Definisi Type Definition TypeScript
+│   │   └── 📄 index.ts              # Interface global TypeScript (Report, AdminUser, Log, Status)
+│   │
+│   └── 📄 proxy.ts                  # Server Proxy HTTP untuk routing & cookie forwarding
+│
+├── 📄 STYLE_GUIDE.md                # Dokumentasi Standar Desain Visual PG Trangkil
+└── 📄 README.md                     # Dokumentasi Utama Proyek SIGAP
+```
+
+---
+
 ## 📄 Lisensi & Hak Cipta
 
 © **PT Kebon Agung &bull; Pabrik Gula Trangkil**. Hak Cipta Dilindungi Undang-Undang.
