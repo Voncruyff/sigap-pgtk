@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Wrench, MapPin, Calendar, ArrowRight, Play, CheckCircle2, Loader2, Filter, Building } from "lucide-react";
+import { Search, Wrench, MapPin, Calendar, ArrowRight, Play, CheckCircle2, Loader2, Filter, Building, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,11 +25,21 @@ export function LaporanMobileView({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [bagianFilter, setBagianFilter] = useState<string>("ALL");
+  const [periodFilter, setPeriodFilter] = useState<string>("ALL");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   React.useEffect(() => {
     setReports(initialReports);
   }, [initialReports]);
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("ALL");
+    setBagianFilter("ALL");
+    setPeriodFilter("ALL");
+  };
+
+  const isFiltered = searchQuery !== "" || statusFilter !== "ALL" || bagianFilter !== "ALL" || periodFilter !== "ALL";
 
   // Handle Quick Status Change on Mobile (e.g. MENUNGGU -> DIPROSES)
   const handleUpdateStatus = async (id: string, newStatus: string, ticketNumber: string) => {
@@ -59,16 +69,54 @@ export function LaporanMobileView({
     }
   };
 
+  const isWithinPeriod = (dateStr: string, period: string) => {
+    if (period === "ALL") return true;
+    const itemDate = new Date(dateStr);
+    if (isNaN(itemDate.getTime())) return true;
+    const now = new Date();
+
+    if (period === "TODAY") {
+      return (
+        itemDate.getDate() === now.getDate() &&
+        itemDate.getMonth() === now.getMonth() &&
+        itemDate.getFullYear() === now.getFullYear()
+      );
+    }
+    if (period === "7DAYS") {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(now.getDate() - 7);
+      sevenDaysAgo.setHours(0, 0, 0, 0);
+      return itemDate >= sevenDaysAgo;
+    }
+    if (period === "THIS_MONTH") {
+      return (
+        itemDate.getMonth() === now.getMonth() &&
+        itemDate.getFullYear() === now.getFullYear()
+      );
+    }
+    if (period === "THIS_YEAR") {
+      return itemDate.getFullYear() === now.getFullYear();
+    }
+    return true;
+  };
+
   const filteredReports = reports.filter((item) => {
+    const q = searchQuery.toLowerCase();
     const matchesSearch =
-      item.ticket_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.nama_pelapor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.unit_kerja.toLowerCase().includes(searchQuery.toLowerCase());
+      item.ticket_number.toLowerCase().includes(q) ||
+      item.nama_pelapor.toLowerCase().includes(q) ||
+      item.lokasi_kerusakan.toLowerCase().includes(q) ||
+      item.unit_kerja.toLowerCase().includes(q) ||
+      item.bagian.toLowerCase().includes(q) ||
+      (item.deskripsi && item.deskripsi.toLowerCase().includes(q)) ||
+      (item.peralatan && item.peralatan.toLowerCase().includes(q)) ||
+      (item.penanganan && item.penanganan.toLowerCase().includes(q));
 
     const matchesStatus = statusFilter === "ALL" || item.status === statusFilter;
     const matchesBagian = bagianFilter === "ALL" || item.bagian === bagianFilter;
+    const matchesPeriod = isWithinPeriod(item.created_at, periodFilter);
 
-    return matchesSearch && matchesStatus && matchesBagian;
+    return matchesSearch && matchesStatus && matchesBagian && matchesPeriod;
   });
 
   return (
@@ -81,11 +129,12 @@ export function LaporanMobileView({
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari tiket / pelapor / alat..."
+            placeholder="Cari tiket / pelapor / deskripsi..."
             className="pl-9 h-10 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 bg-white shadow-2xs"
           />
         </div>
 
+        {/* Mobile Dropdowns Row 1: Bagian & Status */}
         <div className="grid grid-cols-2 gap-2">
           {/* Mobile Select Bagian Filter */}
           <div className="relative flex items-center w-full">
@@ -114,12 +163,45 @@ export function LaporanMobileView({
               className="w-full pl-8 pr-7 h-9 text-[11px] font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none truncate"
               aria-label="Filter Status Laporan"
             >
-              <option value="ALL">Semua Aktif ({reports.length})</option>
+              <option value="ALL">Semua Status ({reports.length})</option>
               <option value="MENUNGGU">Menunggu ({reports.filter((r) => r.status === "MENUNGGU").length})</option>
               <option value="DIPROSES">Diproses ({reports.filter((r) => r.status === "DIPROSES").length})</option>
             </select>
             <div className="absolute right-2 pointer-events-none text-slate-400 text-[9px]">▼</div>
           </div>
+        </div>
+
+        {/* Mobile Dropdowns Row 2: Periode Waktu & Reset */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 flex items-center">
+            <Calendar className="absolute left-3 h-3.5 w-3.5 text-sky-600 pointer-events-none" />
+            <select
+              value={periodFilter}
+              onChange={(e) => setPeriodFilter(e.target.value)}
+              className="w-full pl-8 pr-7 h-9 text-[11px] font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none truncate"
+              aria-label="Filter Periode Waktu Laporan"
+            >
+              <option value="ALL">Semua Periode Waktu</option>
+              <option value="TODAY">Hari Ini</option>
+              <option value="7DAYS">7 Hari Terakhir</option>
+              <option value="THIS_MONTH">Bulan Ini</option>
+              <option value="THIS_YEAR">Tahun Ini</option>
+            </select>
+            <div className="absolute right-2.5 pointer-events-none text-slate-400 text-[9px]">▼</div>
+          </div>
+
+          {/* Reset Filter Button */}
+          {isFiltered && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="h-9 px-3 rounded-xl text-[11px] font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 bg-rose-50 border border-rose-200/80 cursor-pointer shrink-0"
+              title="Reset Filter"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Reset
+            </button>
+          )}
         </div>
       </div>
 

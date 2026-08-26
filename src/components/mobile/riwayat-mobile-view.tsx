@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Search, Wrench, MapPin, Calendar, Eye } from "lucide-react";
+import { Search, Wrench, MapPin, Calendar, Eye, Building, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,32 +16,136 @@ export interface RiwayatMobileViewProps {
 
 export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [bagianFilter, setBagianFilter] = useState<string>("ALL");
+  const [periodFilter, setPeriodFilter] = useState<string>("ALL");
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setBagianFilter("ALL");
+    setPeriodFilter("ALL");
+  };
+
+  const isFiltered = searchQuery !== "" || bagianFilter !== "ALL" || periodFilter !== "ALL";
+
+  const isWithinPeriod = (dateStr: string, period: string) => {
+    if (period === "ALL") return true;
+    const itemDate = new Date(dateStr);
+    if (isNaN(itemDate.getTime())) return true;
+    const now = new Date();
+
+    if (period === "TODAY") {
+      return (
+        itemDate.getDate() === now.getDate() &&
+        itemDate.getMonth() === now.getMonth() &&
+        itemDate.getFullYear() === now.getFullYear()
+      );
+    }
+    if (period === "THIS_MONTH") {
+      return (
+        itemDate.getMonth() === now.getMonth() &&
+        itemDate.getFullYear() === now.getFullYear()
+      );
+    }
+    if (period === "LAST_MONTH") {
+      const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      return (
+        itemDate.getMonth() === prevMonth.getMonth() &&
+        itemDate.getFullYear() === prevMonth.getFullYear()
+      );
+    }
+    if (period === "THIS_YEAR") {
+      return itemDate.getFullYear() === now.getFullYear();
+    }
+    return true;
+  };
 
   const filteredReports = completedReports.filter((report) => {
     const q = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
       report.ticket_number.toLowerCase().includes(q) ||
       report.nama_pelapor.toLowerCase().includes(q) ||
       report.unit_kerja.toLowerCase().includes(q) ||
+      report.bagian.toLowerCase().includes(q) ||
       report.lokasi_kerusakan.toLowerCase().includes(q) ||
-      (report.penanganan && report.penanganan.toLowerCase().includes(q))
-    );
+      (report.deskripsi && report.deskripsi.toLowerCase().includes(q)) ||
+      (report.peralatan && report.peralatan.toLowerCase().includes(q)) ||
+      (report.penanganan && report.penanganan.toLowerCase().includes(q));
+
+    const matchesBagian = bagianFilter === "ALL" || report.bagian === bagianFilter;
+    const matchesPeriod = isWithinPeriod(report.updated_at || report.created_at, periodFilter);
+
+    return matchesSearch && matchesBagian && matchesPeriod;
   });
 
   return (
     <div className="space-y-3.5 pb-8">
-      {/* Mobile Search & Export Bar */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari arsip tiket / pelapor / tindakan..."
-            className="pl-9.5 h-10 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 bg-white shadow-2xs"
-          />
+      {/* Mobile Search & Controls */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari tiket / pelapor / deskripsi..."
+              className="pl-9.5 h-10 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 bg-white shadow-2xs"
+            />
+          </div>
+          <ExportDialog completedReports={filteredReports} />
         </div>
-        <ExportDialog completedReports={completedReports} />
+
+        {/* Mobile Filter Row */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Mobile Select Bagian Filter */}
+          <div className="relative flex items-center w-full">
+            <Building className="absolute left-3 h-3.5 w-3.5 text-emerald-600 pointer-events-none" />
+            <select
+              value={bagianFilter}
+              onChange={(e) => setBagianFilter(e.target.value)}
+              className="w-full pl-8 pr-7 h-9 text-[11px] font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-2xs cursor-pointer hover:border-emerald-400 transition-all appearance-none truncate"
+              aria-label="Filter Bagian Riwayat"
+            >
+              <option value="ALL">Semua Bagian</option>
+              <option value="TUK">TUK</option>
+              <option value="Teknik">Teknik</option>
+              <option value="Pabrikasi">Pabrikasi</option>
+              <option value="Tanaman">Tanaman</option>
+            </select>
+            <div className="absolute right-2 pointer-events-none text-slate-400 text-[9px]">▼</div>
+          </div>
+
+          {/* Mobile Select Waktu Filter */}
+          <div className="relative flex items-center w-full">
+            <Calendar className="absolute left-3 h-3.5 w-3.5 text-emerald-600 pointer-events-none" />
+            <select
+              value={periodFilter}
+              onChange={(e) => setPeriodFilter(e.target.value)}
+              className="w-full pl-8 pr-7 h-9 text-[11px] font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-2xs cursor-pointer hover:border-emerald-400 transition-all appearance-none truncate"
+              aria-label="Filter Periode Waktu"
+            >
+              <option value="ALL">Semua Waktu</option>
+              <option value="TODAY">Hari Ini</option>
+              <option value="THIS_MONTH">Bulan Ini</option>
+              <option value="LAST_MONTH">Bulan Lalu</option>
+              <option value="THIS_YEAR">Tahun Ini</option>
+            </select>
+            <div className="absolute right-2 pointer-events-none text-slate-400 text-[9px]">▼</div>
+          </div>
+        </div>
+
+        {/* Reset Filter Button if active */}
+        {isFiltered && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="text-[11px] font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 py-0.5 px-2 rounded-lg bg-rose-50 border border-rose-200/80 cursor-pointer"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Reset Filter & Pencarian
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Mobile Cards List */}

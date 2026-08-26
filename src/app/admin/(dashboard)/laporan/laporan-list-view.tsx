@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Play, CheckCircle2, Eye, Filter, Loader2, Building, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw } from "lucide-react";
+import { Search, Play, CheckCircle2, Eye, Filter, Loader2, Building, Calendar, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +51,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [bagianFilter, setBagianFilter] = useState<string>("ALL");
+  const [periodFilter, setPeriodFilter] = useState<string>("ALL");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [selectedReportToComplete, setSelectedReportToComplete] = useState<LaporanItem | null>(null);
 
@@ -67,6 +68,15 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
       toast.success("Data laporan berhasil dimuat ulang.");
     }, 600);
   };
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("ALL");
+    setBagianFilter("ALL");
+    setPeriodFilter("ALL");
+  };
+
+  const isFiltered = searchQuery !== "" || statusFilter !== "ALL" || bagianFilter !== "ALL" || periodFilter !== "ALL";
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -117,18 +127,55 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
     router.refresh();
   };
 
-  // Filter Reports based on search query, status filter & bagian filter
+  const isWithinPeriod = (dateStr: string, period: string) => {
+    if (period === "ALL") return true;
+    const itemDate = new Date(dateStr);
+    if (isNaN(itemDate.getTime())) return true;
+    const now = new Date();
+
+    if (period === "TODAY") {
+      return (
+        itemDate.getDate() === now.getDate() &&
+        itemDate.getMonth() === now.getMonth() &&
+        itemDate.getFullYear() === now.getFullYear()
+      );
+    }
+    if (period === "7DAYS") {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(now.getDate() - 7);
+      sevenDaysAgo.setHours(0, 0, 0, 0);
+      return itemDate >= sevenDaysAgo;
+    }
+    if (period === "THIS_MONTH") {
+      return (
+        itemDate.getMonth() === now.getMonth() &&
+        itemDate.getFullYear() === now.getFullYear()
+      );
+    }
+    if (period === "THIS_YEAR") {
+      return itemDate.getFullYear() === now.getFullYear();
+    }
+    return true;
+  };
+
+  // Filter Reports based on search query, status filter, bagian filter & period filter
   const filteredReports = reports.filter((item) => {
+    const q = searchQuery.toLowerCase();
     const matchesSearch =
-      item.ticket_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.nama_pelapor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.lokasi_kerusakan.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.unit_kerja.toLowerCase().includes(searchQuery.toLowerCase());
+      item.ticket_number.toLowerCase().includes(q) ||
+      item.nama_pelapor.toLowerCase().includes(q) ||
+      item.lokasi_kerusakan.toLowerCase().includes(q) ||
+      item.unit_kerja.toLowerCase().includes(q) ||
+      item.bagian.toLowerCase().includes(q) ||
+      (item.deskripsi && item.deskripsi.toLowerCase().includes(q)) ||
+      (item.peralatan && item.peralatan.toLowerCase().includes(q)) ||
+      (item.penanganan && item.penanganan.toLowerCase().includes(q));
 
     const matchesStatus = statusFilter === "ALL" || item.status === statusFilter;
     const matchesBagian = bagianFilter === "ALL" || item.bagian === bagianFilter;
+    const matchesPeriod = isWithinPeriod(item.created_at, periodFilter);
 
-    return matchesSearch && matchesStatus && matchesBagian;
+    return matchesSearch && matchesStatus && matchesBagian && matchesPeriod;
   });
 
   // Sort Reports dynamically based on selected field and order
@@ -190,7 +237,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                 </CardDescription>
               </div>
 
-              {/* Professional Search, Dual Selector Dropdown, & Refresh Button Group */}
+              {/* Professional Search, Multi-Filter Selectors & Action Buttons */}
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Search Bar Input */}
                 <div className="relative w-44 sm:w-52 lg:w-56">
@@ -198,7 +245,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cari tiket / pelapor..."
+                    placeholder="Cari tiket / pelapor / deskripsi..."
                     className="pl-9 h-9 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 focus:ring-sky-500/20 bg-white shadow-2xs"
                   />
                 </div>
@@ -230,12 +277,45 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                     className="pl-9 pr-8 h-9 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none"
                     aria-label="Filter Status Laporan"
                   >
-                    <option value="ALL">Semua Status Aktif ({totalCount})</option>
-                    <option value="MENUNGGU">Menunggu Penanganan ({waitingCount})</option>
-                    <option value="DIPROSES">Sedang Diproses ({processingCount})</option>
+                    <option value="ALL">Semua Status ({totalCount})</option>
+                    <option value="MENUNGGU">Menunggu ({waitingCount})</option>
+                    <option value="DIPROSES">Diproses ({processingCount})</option>
                   </select>
                   <div className="absolute right-2.5 pointer-events-none text-slate-400 text-[9px]">▼</div>
                 </div>
+
+                {/* Filter Waktu / Periode Selector Dropdown */}
+                <div className="relative flex items-center">
+                  <Calendar className="absolute left-3 h-3.5 w-3.5 text-sky-600 pointer-events-none" />
+                  <select
+                    value={periodFilter}
+                    onChange={(e) => setPeriodFilter(e.target.value)}
+                    className="pl-9 pr-8 h-9 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none"
+                    aria-label="Filter Periode Waktu Laporan"
+                  >
+                    <option value="ALL">Semua Waktu</option>
+                    <option value="TODAY">Hari Ini</option>
+                    <option value="7DAYS">7 Hari Terakhir</option>
+                    <option value="THIS_MONTH">Bulan Ini</option>
+                    <option value="THIS_YEAR">Tahun Ini</option>
+                  </select>
+                  <div className="absolute right-2.5 pointer-events-none text-slate-400 text-[9px]">▼</div>
+                </div>
+
+                {/* Tombol Reset Filter */}
+                {isFiltered && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleResetFilters}
+                    className="h-9 px-2.5 rounded-xl text-rose-600 hover:bg-rose-50 hover:text-rose-700 font-bold text-xs cursor-pointer transition-all active:scale-95"
+                    title="Reset Semua Filter"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                    Reset
+                  </Button>
+                )}
 
                 {/* Tombol Refresh Data */}
                 <Button

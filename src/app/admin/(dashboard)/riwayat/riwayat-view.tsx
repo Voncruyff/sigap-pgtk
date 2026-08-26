@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { History, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { History, Search, ArrowUpDown, ArrowUp, ArrowDown, Building, Calendar, RotateCcw, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,8 @@ import {
 } from "@/components/ui/table";
 import { RiwayatMobileView } from "@/components/mobile/riwayat-mobile-view";
 import { ExportDialog } from "@/components/admin/export-dialog";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export interface CompletedReportItem {
   id: string;
@@ -42,9 +45,30 @@ type SortField = "ticket_number" | "updated_at" | "nama_pelapor" | "lokasi_kerus
 type SortOrder = "asc" | "desc";
 
 export function RiwayatView({ completedReports }: RiwayatViewProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [bagianFilter, setBagianFilter] = useState<string>("ALL");
+  const [periodFilter, setPeriodFilter] = useState<string>("ALL");
   const [sortField, setSortField] = useState<SortField>("updated_at");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    router.refresh();
+    setTimeout(() => {
+      setIsRefreshing(false);
+      toast.success("Data riwayat berhasil dimuat ulang.");
+    }, 600);
+  };
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setBagianFilter("ALL");
+    setPeriodFilter("ALL");
+  };
+
+  const isFiltered = searchQuery !== "" || bagianFilter !== "ALL" || periodFilter !== "ALL";
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -55,16 +79,54 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
     }
   };
 
+  const isWithinPeriod = (dateStr: string, period: string) => {
+    if (period === "ALL") return true;
+    const itemDate = new Date(dateStr);
+    if (isNaN(itemDate.getTime())) return true;
+    const now = new Date();
+
+    if (period === "TODAY") {
+      return (
+        itemDate.getDate() === now.getDate() &&
+        itemDate.getMonth() === now.getMonth() &&
+        itemDate.getFullYear() === now.getFullYear()
+      );
+    }
+    if (period === "THIS_MONTH") {
+      return (
+        itemDate.getMonth() === now.getMonth() &&
+        itemDate.getFullYear() === now.getFullYear()
+      );
+    }
+    if (period === "LAST_MONTH") {
+      const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      return (
+        itemDate.getMonth() === prevMonth.getMonth() &&
+        itemDate.getFullYear() === prevMonth.getFullYear()
+      );
+    }
+    if (period === "THIS_YEAR") {
+      return itemDate.getFullYear() === now.getFullYear();
+    }
+    return true;
+  };
+
   const filteredReports = completedReports.filter((item) => {
     const q = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
       item.ticket_number.toLowerCase().includes(q) ||
       item.nama_pelapor.toLowerCase().includes(q) ||
       item.lokasi_kerusakan.toLowerCase().includes(q) ||
       item.unit_kerja.toLowerCase().includes(q) ||
       item.bagian.toLowerCase().includes(q) ||
-      (item.penanganan && item.penanganan.toLowerCase().includes(q))
-    );
+      (item.deskripsi && item.deskripsi.toLowerCase().includes(q)) ||
+      (item.peralatan && item.peralatan.toLowerCase().includes(q)) ||
+      (item.penanganan && item.penanganan.toLowerCase().includes(q));
+
+    const matchesBagian = bagianFilter === "ALL" || item.bagian === bagianFilter;
+    const matchesPeriod = isWithinPeriod(item.updated_at || item.created_at, periodFilter);
+
+    return matchesSearch && matchesBagian && matchesPeriod;
   });
 
   const sortedReports = [...filteredReports].sort((a, b) => {
@@ -111,7 +173,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
       <div className="hidden lg:block">
         <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
           <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <CardTitle className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                   <History className="h-4 w-4 text-emerald-600" />
@@ -121,17 +183,87 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                   Menampilkan {sortedReports.length} dari total {completedReports.length} laporan tuntas
                 </CardDescription>
               </div>
-              <div className="flex items-center gap-2.5">
-                <div className="relative w-64">
+
+              {/* Filter Controls Bar */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Search Bar Input */}
+                <div className="relative w-48 sm:w-56 lg:w-60">
                   <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cari tiket / pelapor / tindakan..."
+                    placeholder="Cari tiket / pelapor / deskripsi..."
                     className="pl-8.5 h-9 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 focus:ring-sky-500/20 bg-white"
                   />
                 </div>
-                <ExportDialog completedReports={completedReports} />
+
+                {/* Filter Bagian Selector Dropdown */}
+                <div className="relative flex items-center">
+                  <Building className="absolute left-3 h-3.5 w-3.5 text-emerald-600 pointer-events-none" />
+                  <select
+                    value={bagianFilter}
+                    onChange={(e) => setBagianFilter(e.target.value)}
+                    className="pl-9 pr-8 h-9 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-2xs cursor-pointer hover:border-emerald-400 transition-all appearance-none"
+                    aria-label="Filter Bagian Riwayat"
+                  >
+                    <option value="ALL">Semua Bagian</option>
+                    <option value="TUK">TUK</option>
+                    <option value="Teknik">Teknik</option>
+                    <option value="Pabrikasi">Pabrikasi</option>
+                    <option value="Tanaman">Tanaman</option>
+                  </select>
+                  <div className="absolute right-2.5 pointer-events-none text-slate-400 text-[9px]">▼</div>
+                </div>
+
+                {/* Filter Waktu Selector Dropdown */}
+                <div className="relative flex items-center">
+                  <Calendar className="absolute left-3 h-3.5 w-3.5 text-emerald-600 pointer-events-none" />
+                  <select
+                    value={periodFilter}
+                    onChange={(e) => setPeriodFilter(e.target.value)}
+                    className="pl-9 pr-8 h-9 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-2xs cursor-pointer hover:border-emerald-400 transition-all appearance-none"
+                    aria-label="Filter Periode Waktu"
+                  >
+                    <option value="ALL">Semua Waktu</option>
+                    <option value="TODAY">Hari Ini</option>
+                    <option value="THIS_MONTH">Bulan Ini</option>
+                    <option value="LAST_MONTH">Bulan Lalu</option>
+                    <option value="THIS_YEAR">Tahun Ini</option>
+                  </select>
+                  <div className="absolute right-2.5 pointer-events-none text-slate-400 text-[9px]">▼</div>
+                </div>
+
+                {/* Tombol Reset Filter */}
+                {isFiltered && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleResetFilters}
+                    className="h-9 px-2.5 rounded-xl text-rose-600 hover:bg-rose-50 hover:text-rose-700 font-bold text-xs cursor-pointer transition-all active:scale-95"
+                    title="Reset Semua Filter"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                    Reset
+                  </Button>
+                )}
+
+                {/* Tombol Refresh Data */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="h-9 px-3 rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-2xs font-bold text-xs cursor-pointer shrink-0 transition-all active:scale-95"
+                  title="Muat Ulang Data Riwayat"
+                >
+                  <RefreshCw className={cn("h-3.5 w-3.5 mr-1.5", isRefreshing && "animate-spin text-emerald-600")} />
+                  <span>{isRefreshing ? "Memuat..." : "Refresh"}</span>
+                </Button>
+
+                {/* Export Dialog Button */}
+                <ExportDialog completedReports={filteredReports} />
               </div>
             </div>
           </div>
