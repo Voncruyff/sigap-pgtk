@@ -14,6 +14,7 @@ import {
 
 export const ADMIN_DOCKBAR_ITEMS = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { label: "Laporan", href: "/admin/laporan", icon: FileText },
   { label: "Riwayat", href: "/admin/riwayat", icon: History },
   { label: "Admin", href: "/admin/kelola-admin", icon: Users },
   { label: "Pengaturan", href: "/admin/pengaturan", icon: Settings },

@@ -3,11 +3,13 @@
 import React, { useTransition, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Wrench, Loader2 } from "lucide-react";
+import { Home, Wrench, Search, Settings, Loader2 } from "lucide-react";
 
 export const USER_DOCKBAR_ITEMS = [
   { label: "Beranda", href: "/", icon: Home },
-  { label: "Buat Laporan", href: "/lapor", icon: Wrench },
+  { label: "Lapor", href: "/lapor", icon: Wrench },
+  { label: "Cek Status", href: "/cek-status", icon: Search },
+  { label: "Pengaturan", href: "/pengaturan", icon: Settings },
 ];
 
 export function UserDockbar() {

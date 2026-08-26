@@ -2,18 +2,17 @@ import React from "react";
 import Link from "next/link";
 import {
   FileText,
-  Calendar,
-  CalendarDays,
-  CalendarRange,
   Clock,
+  Wrench,
+  CheckCircle2,
   ArrowUpRight,
   Sparkles,
   Users,
   Activity,
-  TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
+import { ReportStatusBadge } from "@/components/user/report-status-badge";
 import {
   Table,
   TableBody,
@@ -29,9 +28,9 @@ export interface DashboardReportItem {
   id: string;
   ticket_number: string;
   nama_pelapor: string;
-  bagian: string;
   unit_kerja: string;
-  deskripsi: string;
+  peralatan?: string;
+  status: string;
   created_at: string;
 }
 
@@ -46,11 +45,10 @@ export interface DashboardLogItem {
 }
 
 export interface DashboardViewProps {
-  todayCount: number;
-  thisWeekCount: number;
-  thisMonthCount: number;
-  thisYearCount: number;
   totalCount: number;
+  waitingCount: number;
+  processingCount: number;
+  completedCount: number;
   totalAdminCount: number;
   recentReports: DashboardReportItem[];
   recentLogs: DashboardLogItem[];
@@ -58,18 +56,14 @@ export interface DashboardViewProps {
 
 export function DashboardView(props: DashboardViewProps) {
   const {
-    todayCount,
-    thisWeekCount,
-    thisMonthCount,
-    thisYearCount,
     totalCount,
+    waitingCount,
+    processingCount,
+    completedCount,
     totalAdminCount,
     recentReports,
     recentLogs,
   } = props;
-
-  const currentYear = new Date().getFullYear();
-  const currentMonthName = new Date().toLocaleDateString("id-ID", { month: "long" });
 
   const stats: Array<{
     title: string;
@@ -79,44 +73,37 @@ export function DashboardView(props: DashboardViewProps) {
     colorScheme: StatColorScheme;
   }> = [
     {
-      title: "Hari Ini",
-      value: todayCount,
-      subtext: "Laporan Masuk",
-      icon: Clock,
+      title: "Total Laporan",
+      value: totalCount,
+      subtext: "Terverifikasi",
+      icon: FileText,
       colorScheme: "sky",
     },
     {
-      title: "Minggu Ini",
-      value: thisWeekCount,
-      subtext: "7 Hari Terakhir",
-      icon: CalendarRange,
+      title: "Menunggu",
+      value: waitingCount,
+      subtext: "Perlu disposisi",
+      icon: Clock,
       colorScheme: "amber",
     },
     {
-      title: "Bulan Ini",
-      value: thisMonthCount,
-      subtext: `Bulan ${currentMonthName}`,
-      icon: CalendarDays,
+      title: "Diproses",
+      value: processingCount,
+      subtext: "Dalam perbaikan",
+      icon: Wrench,
       colorScheme: "blue",
     },
     {
-      title: "Tahun Ini",
-      value: thisYearCount,
-      subtext: `Tahun ${currentYear}`,
-      icon: TrendingUp,
+      title: "Selesai",
+      value: completedCount,
+      subtext: "Perbaikan tuntas",
+      icon: CheckCircle2,
       colorScheme: "emerald",
-    },
-    {
-      title: "Total Laporan",
-      value: totalCount,
-      subtext: "Semua Catatan",
-      icon: FileText,
-      colorScheme: "indigo",
     },
     {
       title: "Petugas Admin",
       value: totalAdminCount,
-      subtext: "Akun Terdaftar",
+      subtext: "Akun terdaftar",
       icon: Users,
       colorScheme: "purple",
     },
@@ -127,14 +114,14 @@ export function DashboardView(props: DashboardViewProps) {
       {/* Header Halaman Minimalis */}
       <PageHeader
         title="Dashboard Overview"
-        description="Ringkasan statistik catatan kerusakan fasilitas berdasarkan periode waktu & aktivitas sistem."
-        badgeText="SIGAP Analytics"
+        description="Ringkasan status penanganan fasilitas & aktivitas petugas PT Kebon Agung PG Trangkil."
+        badgeText="SIGAP Summary"
       />
 
       {/* 🖥️ Tampilan Utama Desktop / PC */}
       <div className="hidden lg:block space-y-5">
-        {/* Sleek Minimalist Stat Cards 6 Columns Grid */}
-        <div className="grid grid-cols-6 gap-3.5">
+        {/* Sleek Minimalist Stat Cards 5 Columns Grid */}
+        <div className="grid grid-cols-5 gap-3.5">
           {stats.map((stat, idx) => (
             <StatCard
               key={idx}
@@ -155,12 +142,12 @@ export function DashboardView(props: DashboardViewProps) {
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-sky-600" />
                 <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                  Catatan Kerusakan Terbaru
+                  Laporan Terbaru
                 </h3>
               </div>
-              <Link href="/admin/riwayat">
+              <Link href="/admin/laporan">
                 <Button variant="ghost" size="sm" className="text-xs text-sky-700 font-bold hover:bg-sky-50 rounded-xl px-2.5 h-7 gap-1 cursor-pointer">
-                  Buka Riwayat <ArrowUpRight className="h-3.5 w-3.5" />
+                  Lihat Semua <ArrowUpRight className="h-3.5 w-3.5" />
                 </Button>
               </Link>
             </div>
@@ -169,9 +156,9 @@ export function DashboardView(props: DashboardViewProps) {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50/70 border-b border-slate-100 hover:bg-slate-50/70">
-                    <TableHead className="w-[140px] font-bold text-slate-600 text-xs py-3 pl-5">Nomor Tiket</TableHead>
-                    <TableHead className="font-bold text-slate-600 text-xs py-3">Pelapor & Bagian</TableHead>
-                    <TableHead className="font-bold text-slate-600 text-xs py-3">Unit Kerja</TableHead>
+                    <TableHead className="w-[130px] font-bold text-slate-600 text-xs py-3 pl-5">Nomor Tiket</TableHead>
+                    <TableHead className="font-bold text-slate-600 text-xs py-3">Pelapor & Unit Kerja</TableHead>
+                    <TableHead className="w-[120px] font-bold text-slate-600 text-xs py-3">Status</TableHead>
                     <TableHead className="text-right w-[90px] font-bold text-slate-600 text-xs py-3 pr-5">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -179,7 +166,7 @@ export function DashboardView(props: DashboardViewProps) {
                   {recentReports.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="text-center py-10 text-xs text-slate-400 font-medium">
-                        Belum ada catatan kerusakan masuk
+                        Belum ada laporan kerusakan masuk
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -192,17 +179,17 @@ export function DashboardView(props: DashboardViewProps) {
                           <div className="font-bold text-xs text-slate-800 truncate">
                             {report.nama_pelapor}
                           </div>
-                          <span className="inline-flex items-center gap-1 font-semibold text-[10px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100 mt-0.5">
-                            Bagian {report.bagian}
-                          </span>
+                          <div className="text-[11px] text-slate-500 font-medium truncate max-w-[220px]">
+                            {report.unit_kerja}
+                          </div>
                         </TableCell>
-                        <TableCell className="py-3 text-xs text-slate-600 font-medium truncate max-w-[220px]">
-                          {report.unit_kerja}
+                        <TableCell className="py-3">
+                          <ReportStatusBadge status={report.status} />
                         </TableCell>
                         <TableCell className="text-right py-3 pr-5">
-                          <Link href="/admin/riwayat">
+                          <Link href={`/admin/laporan/${report.id}`}>
                             <Button variant="outline" size="sm" className="h-7 text-xs px-2.5 rounded-lg border-slate-200 text-slate-700 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 font-bold shadow-2xs cursor-pointer">
-                              Lihat
+                              Detail
                             </Button>
                           </Link>
                         </TableCell>

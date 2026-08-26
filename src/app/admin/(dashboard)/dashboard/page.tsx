@@ -7,11 +7,10 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminDashboardPage() {
-  let todayCount = 0;
-  let thisWeekCount = 0;
-  let thisMonthCount = 0;
-  let thisYearCount = 0;
   let totalCount = 0;
+  let waitingCount = 0;
+  let processingCount = 0;
+  let completedCount = 0;
   let totalAdminCount = 0;
   let recentReports: DashboardReportItem[] = [];
   let recentLogs: DashboardLogItem[] = [];
@@ -25,40 +24,10 @@ export default async function AdminDashboardPage() {
 
     if (reportsData && reportsData.length > 0) {
       totalCount = reportsData.length;
-
-      const now = new Date();
-
-      // Start of Today (00:00:00)
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-      // Start of This Week (Monday 00:00:00)
-      const dayOfWeek = now.getDay();
-      const diffToMonday = (dayOfWeek + 6) % 7;
-      const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diffToMonday);
-
-      // Start of This Month (1st day 00:00:00)
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-      // Start of This Year (Jan 1st 00:00:00)
-      const startOfYear = new Date(now.getFullYear(), 0, 1);
-
-      todayCount = reportsData.filter(
-        (r: { created_at: Date }) => new Date(r.created_at) >= startOfToday
-      ).length;
-
-      thisWeekCount = reportsData.filter(
-        (r: { created_at: Date }) => new Date(r.created_at) >= startOfWeek
-      ).length;
-
-      thisMonthCount = reportsData.filter(
-        (r: { created_at: Date }) => new Date(r.created_at) >= startOfMonth
-      ).length;
-
-      thisYearCount = reportsData.filter(
-        (r: { created_at: Date }) => new Date(r.created_at) >= startOfYear
-      ).length;
-
-      recentReports = reportsData.slice(0, 6).map((r: { created_at: Date; [key: string]: unknown }) => ({
+      waitingCount = reportsData.filter((r: { status: string }) => r.status === "MENUNGGU").length;
+      processingCount = reportsData.filter((r: { status: string }) => r.status === "DIPROSES").length;
+      completedCount = reportsData.filter((r: { status: string }) => r.status === "SELESAI").length;
+      recentReports = reportsData.slice(0, 5).map((r: { created_at: Date; [key: string]: unknown }) => ({
         ...(r as unknown as DashboardReportItem),
         created_at: r.created_at.toISOString(),
       }));
@@ -80,11 +49,10 @@ export default async function AdminDashboardPage() {
 
   return (
     <DashboardView
-      todayCount={todayCount}
-      thisWeekCount={thisWeekCount}
-      thisMonthCount={thisMonthCount}
-      thisYearCount={thisYearCount}
       totalCount={totalCount}
+      waitingCount={waitingCount}
+      processingCount={processingCount}
+      completedCount={completedCount}
       totalAdminCount={totalAdminCount}
       recentReports={recentReports}
       recentLogs={recentLogs}

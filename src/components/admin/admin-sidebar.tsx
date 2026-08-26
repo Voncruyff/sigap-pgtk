@@ -28,6 +28,7 @@ import { AdminJwtPayload } from "@/lib/auth";
 
 export const ADMIN_NAV_ITEMS = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { label: "Manage Laporan", href: "/admin/laporan", icon: FileText },
   { label: "Riwayat Laporan", href: "/admin/riwayat", icon: History },
   { label: "Daftar Admin", href: "/admin/kelola-admin", icon: Users },
   { label: "Pengaturan", href: "/admin/pengaturan", icon: Settings },

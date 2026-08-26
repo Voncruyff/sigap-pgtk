@@ -5,14 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Send, FileText, Loader2, CheckCircle2, Copy, Plus, Home } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Send, FileText, Loader2 } from "lucide-react";
 
 import {
   reportSchema,
@@ -66,13 +59,6 @@ function generateTicketNumber(bagian?: string) {
 export function ReportForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submittedReport, setSubmittedReport] = useState<{
-    ticketNumber: string;
-    namaPelapor: string;
-    bagian: string;
-    unitKerja: string;
-    deskripsi: string;
-  } | null>(null);
 
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(reportSchema),
@@ -91,25 +77,6 @@ export function ReportForm() {
   const filteredWorkUnits = selectedBagian
     ? WORK_UNITS.filter((unit) => unit.department === selectedBagian)
     : [];
-
-  const copyTicketNumber = () => {
-    if (submittedReport) {
-      navigator.clipboard.writeText(submittedReport.ticketNumber);
-      toast.success("Nomor tiket berhasil disalin ke clipboard!");
-    }
-  };
-
-  const handleCreateNewReport = () => {
-    setSubmittedReport(null);
-    form.reset({
-      namaPelapor: "",
-      bagian: "",
-      unitKerja: "",
-      nomorHp: "",
-      deskripsi: "",
-      foto: null,
-    });
-  };
 
   const onSubmit = async (data: ReportFormValues) => {
     setIsSubmitting(true);
@@ -158,17 +125,11 @@ export function ReportForm() {
         unit_kerja: data.unitKerja,
       });
 
-      setSubmittedReport({
-        ticketNumber: finalTicketNumber,
-        namaPelapor: data.namaPelapor,
-        bagian: data.bagian,
-        unitKerja: data.unitKerja,
-        deskripsi: data.deskripsi,
+      toast.success("Laporan berhasil terkirim!", {
+        description: `Nomor tiket resmi: ${finalTicketNumber}`,
       });
 
-      toast.success("Laporan kerusakan berhasil tercatat!", {
-        description: `Nomor Tiket: ${finalTicketNumber}`,
-      });
+      router.push(`/status/${finalTicketNumber}`);
     } catch (err: unknown) {
       console.error("Error submitting report:", err);
       const msg = err instanceof Error ? err.message : "Terjadi kesalahan saat mengirim laporan.";
@@ -376,7 +337,7 @@ export function ReportForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Mencatat Laporan...
+                Mengirim Laporan...
               </>
             ) : (
               <>
@@ -387,93 +348,6 @@ export function ReportForm() {
           </Button>
         </div>
       </form>
-
-      {/* 🎉 Modal Dialog: Konfirmasi Sukses Pelaporan */}
-      <Dialog
-        open={Boolean(submittedReport)}
-        onOpenChange={(open) => {
-          if (!open) handleCreateNewReport();
-        }}
-      >
-        <DialogContent className="max-w-md p-6 rounded-3xl bg-white border border-sky-100 shadow-2xl space-y-4">
-          <DialogHeader className="text-center sm:text-center space-y-2">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200/80 flex items-center justify-center shadow-xs">
-              <CheckCircle2 className="h-8 w-8" />
-            </div>
-            <DialogTitle className="text-lg sm:text-xl font-black text-slate-900">
-              Laporan Berhasil Dicatat!
-            </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500 font-medium">
-              Laporan gangguan fasilitas Anda telah berhasil tersimpan ke sistem SIGAP PT Kebon Agung PG Trangkil.
-            </DialogDescription>
-          </DialogHeader>
-
-          {/* Ticket Badge Box */}
-          {submittedReport && (
-            <div className="space-y-3">
-              <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 text-center space-y-2">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Nomor Tiket Resmi
-                </span>
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-base sm:text-lg font-black text-sky-800 font-mono tracking-tight bg-white px-3 py-1 rounded-xl border border-sky-200 shadow-2xs">
-                    {submittedReport.ticketNumber}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={copyTicketNumber}
-                    className="p-1.5 rounded-xl bg-white text-slate-600 hover:text-sky-700 border border-slate-200 hover:border-sky-300 shadow-2xs transition-all cursor-pointer"
-                    title="Salin Nomor Tiket"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Summary Details */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-3.5 space-y-2 text-xs">
-                <div className="flex justify-between items-center text-slate-600 border-b border-slate-50 pb-1.5">
-                  <span className="text-slate-400 font-medium">Pelapor:</span>
-                  <span className="font-bold text-slate-900">{submittedReport.namaPelapor}</span>
-                </div>
-                <div className="flex justify-between items-center text-slate-600 border-b border-slate-50 pb-1.5">
-                  <span className="text-slate-400 font-medium">Bagian / Unit:</span>
-                  <span className="font-bold text-slate-900 text-right truncate max-w-[200px]">
-                    {submittedReport.bagian} - {submittedReport.unitKerja}
-                  </span>
-                </div>
-                <div className="space-y-1 pt-1">
-                  <span className="text-slate-400 font-medium block">Deskripsi:</span>
-                  <p className="font-medium text-slate-700 bg-slate-50 p-2.5 rounded-xl line-clamp-3 text-[11px] leading-relaxed">
-                    {submittedReport.deskripsi}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-2.5 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCreateNewReport}
-              className="h-10 text-xs font-bold rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5"
-            >
-              <Plus className="h-4 w-4 text-sky-600" />
-              Lapor Lagi
-            </Button>
-            <Button
-              type="button"
-              onClick={() => router.push("/")}
-              className="h-10 text-xs font-bold rounded-xl bg-sky-700 hover:bg-sky-800 text-white shadow-md shadow-sky-700/20 flex items-center justify-center gap-1.5"
-            >
-              <Home className="h-4 w-4" />
-              Ke Beranda
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </Form>
   );
 }

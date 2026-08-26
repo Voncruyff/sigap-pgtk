@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation";
+import React from "react";
+import { UserPengaturanView } from "./pengaturan-view";
 
-export default function UserPengaturanRedirectPage() {
-  redirect("/lapor");
+export default function PengaturanPage() {
+  return <UserPengaturanView />;
 }
