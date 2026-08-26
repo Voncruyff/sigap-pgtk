@@ -56,6 +56,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { KelolaAdminMobileView } from "@/components/mobile/kelola-admin-mobile-view";
 import { toast } from "sonner";
 
 export interface AdminUserItem {
@@ -511,9 +512,10 @@ export function KelolaAdminView({
         icon={isSuperAdmin ? Crown : Users}
       />
 
-      {/* Main Full-Width Table Card */}
-      <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
-        <CardHeader className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
+      {/* 💻 Desktop Full-Width Table View */}
+      <div className="hidden lg:block">
+        <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
+          <CardHeader className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div>
               <CardTitle className="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">
@@ -1257,6 +1259,26 @@ export function KelolaAdminView({
           </div>
         </CardContent>
       </Card>
+      </div>
+
+      {/* 📱 Mobile Card View */}
+      <div className="block lg:hidden">
+        <KelolaAdminMobileView
+          users={users}
+          currentUserRole={currentUserRole}
+          onOpenAdd={() => {
+            setNama("");
+            setUsername("");
+            setPassword("");
+            setRole("ADMIN");
+            setIsAddDialogOpen(true);
+          }}
+          onOpenEdit={handleOpenEdit}
+          onOpenBan={handleOpenBan}
+          onOpenUnban={handleOpenUnbanModal}
+          onOpenDelete={handleOpenDeleteModal}
+        />
+      </div>
 
       {/* Pop-up Modal Custom: Konfirmasi Unban */}
       <Dialog open={isUnbanDialogOpen} onOpenChange={setIsUnbanDialogOpen}>

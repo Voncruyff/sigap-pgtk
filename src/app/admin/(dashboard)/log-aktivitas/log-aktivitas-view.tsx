@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { LogAktivitasMobileView } from "@/components/mobile/log-aktivitas-mobile-view";
 
 export interface LogItem {
   id: string;
@@ -97,9 +98,10 @@ export function LogAktivitasView({ logs }: LogAktivitasViewProps) {
         badgeColor="purple"
       />
 
-      {/* Main Table Card */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
-        <div className="p-3.5 sm:p-5 border-b border-slate-100 bg-slate-50/50">
+      {/* 💻 Desktop Table View */}
+      <div className="hidden lg:block">
+        <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
+          <div className="p-3.5 sm:p-5 border-b border-slate-100 bg-slate-50/50">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div>
               <CardTitle className="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
@@ -249,6 +251,12 @@ export function LogAktivitasView({ logs }: LogAktivitasViewProps) {
             </Table>
           </div>
         </div>
+      </div>
+      </div>
+
+      {/* 📱 Tampilan Khusus Mobile HP */}
+      <div className="block lg:hidden">
+        <LogAktivitasMobileView logs={logs} />
       </div>
     </div>
   );
