@@ -13,7 +13,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
   }
 
   return (
-    <div className="h-screen h-[100dvh] w-full overflow-hidden flex flex-col lg:flex-row bg-slate-50 text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-700">
+    <div className="h-full w-full overflow-hidden flex flex-col lg:flex-row bg-slate-50 text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-700 relative">
       {/* Background Push Notifier Listener */}
       <AdminReportNotifier />
 

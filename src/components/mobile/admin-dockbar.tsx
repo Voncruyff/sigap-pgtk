@@ -38,11 +38,11 @@ export function AdminDockbar() {
   };
 
   return (
-    <div className="lg:hidden fixed bottom-3 inset-x-0 z-[9999] flex justify-center px-3 pointer-events-none">
+    <div className="lg:hidden fixed bottom-4 inset-x-0 z-[9999] flex justify-center px-3 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
       <nav
         suppressHydrationWarning
         aria-label="Admin Mobile Navigation Dockbar"
-        className="w-full max-w-md bg-white/95 backdrop-blur-2xl border border-slate-200/90 shadow-[0_10px_35px_rgba(2,132,199,0.18)] rounded-3xl p-1 flex items-center justify-around pointer-events-auto transition-all"
+        className="w-full max-w-md bg-white/95 backdrop-blur-2xl border border-slate-200/90 shadow-[0_12px_36px_rgba(2,132,199,0.2)] rounded-3xl p-1.5 flex items-center justify-around pointer-events-auto transition-all"
       >
         {ADMIN_DOCKBAR_ITEMS.map((item) => {
           const Icon = item.icon;
