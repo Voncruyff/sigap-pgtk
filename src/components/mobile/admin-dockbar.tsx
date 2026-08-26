@@ -41,7 +41,7 @@ export function AdminDockbar() {
     <nav
       suppressHydrationWarning
       aria-label="Admin Mobile Navigation Dockbar"
-      className="lg:hidden fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-1.25rem)] max-w-md z-[60] bg-white/90 backdrop-blur-2xl border border-slate-200/80 shadow-[0_10px_35px_rgba(2,132,199,0.18)] rounded-3xl p-1 flex items-center justify-around transition-all pointer-events-auto"
+      className="lg:hidden fixed bottom-3 inset-x-3 max-w-md mx-auto z-50 bg-white/95 backdrop-blur-2xl border border-slate-200/90 shadow-[0_10px_35px_rgba(2,132,199,0.18)] rounded-3xl p-1 flex items-center justify-around pointer-events-auto"
     >
       {ADMIN_DOCKBAR_ITEMS.map((item) => {
         const Icon = item.icon;

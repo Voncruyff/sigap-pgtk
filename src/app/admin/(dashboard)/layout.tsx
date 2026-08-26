@@ -13,7 +13,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
   }
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden flex flex-col lg:flex-row bg-slate-50/70 text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-700">
+    <div className="min-h-screen min-h-[100dvh] lg:h-screen lg:overflow-hidden w-full flex flex-col lg:flex-row bg-slate-50/70 text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-700 relative">
       {/* Background Push Notifier Listener */}
       <AdminReportNotifier />
 
@@ -29,17 +29,17 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
       <AdminSidebar />
 
       {/* Main Content Wrapper Column */}
-      <div className="relative z-10 flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden">
+      <div className="relative z-10 flex-1 flex flex-col min-w-0 lg:h-screen lg:overflow-hidden">
         {/* Fixed Desktop Top Header Bar */}
         <AdminHeader />
 
-        {/* Main Content Area (Strictly Only This Scrolls) */}
-        <main className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-5 lg:p-6 pb-28 lg:pb-6">
+        {/* Main Content Area (Natural mobile scroll, strict desktop scroll) */}
+        <main className="flex-1 p-3.5 sm:p-5 lg:p-6 pb-28 lg:pb-6 lg:overflow-y-auto">
           {children}
         </main>
       </div>
 
-      {/* 📱 Mobile Fixed Floating Dockbar (Always Top Level on Root Layout) */}
+      {/* 📱 Mobile Fixed Floating Dockbar (Always visible on mobile view) */}
       <AdminDockbar />
     </div>
   );
