@@ -153,7 +153,7 @@ export function ReportForm() {
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="p-5 sm:p-6 space-y-4">
+          <CardContent className="p-3.5 sm:p-6 space-y-4">
             {/* Row 1: Nama Pelapor & Nomor HP (Perfectly Aligned 2 Columns) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
               {/* Nama Pelapor */}

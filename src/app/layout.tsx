@@ -35,7 +35,7 @@ export default function RootLayout({
       lang="id"
       className={`${poppins.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="h-full flex flex-col font-sans bg-background text-foreground overflow-hidden">
+      <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         {children}
         <Toaster />
       </body>
