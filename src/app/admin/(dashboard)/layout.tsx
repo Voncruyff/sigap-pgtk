@@ -1,9 +1,16 @@
 import React from "react";
+import { redirect } from "next/navigation";
+import { getAdminSession } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminReportNotifier } from "@/components/admin/admin-report-notifier";
 
-export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
+  const session = await getAdminSession();
+  if (!session) {
+    redirect("/admin/login");
+  }
+
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col lg:flex-row bg-slate-50/70 text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-700 relative">
       {/* Background Push Notifier Listener */}
