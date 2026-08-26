@@ -156,6 +156,4 @@ sigap-pgtk/
 
 ---
 
-## 📄 Lisensi & Hak Cipta
-
-© **PT Kebon Agung &bull; Pabrik Gula Trangkil**. Hak Cipta Dilindungi Undang-Undang.
+© **PT Kebon Agung &bull; Pabrik Gula Trangkil**.
