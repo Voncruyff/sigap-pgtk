@@ -38,7 +38,10 @@ export function AdminDockbar() {
   };
 
   return (
-    <div className="lg:hidden fixed bottom-4 inset-x-0 z-[9999] flex justify-center px-3 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
+    <div
+      suppressHydrationWarning
+      className="lg:hidden fixed bottom-4 inset-x-0 z-[9999] flex justify-center px-3 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]"
+    >
       <nav
         suppressHydrationWarning
         aria-label="Admin Mobile Navigation Dockbar"
