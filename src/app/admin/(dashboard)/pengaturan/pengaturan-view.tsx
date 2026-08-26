@@ -49,6 +49,7 @@ import {
   playNotificationSound,
   NotificationPermissionState,
 } from "@/lib/notifications";
+import { AdminPengaturanMobileView } from "@/components/mobile/admin-pengaturan-mobile-view";
 import { toast } from "sonner";
 
 export function AdminPengaturanView() {
@@ -309,7 +310,8 @@ export function AdminPengaturanView() {
         icon={Settings}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* 💻 Desktop 2-Column Settings View */}
+      <div className="hidden lg:grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COLUMN: PUSH NOTIFICATIONS SETTINGS */}
         <div className="lg:col-span-7 space-y-6">
           <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
@@ -514,6 +516,27 @@ export function AdminPengaturanView() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* 📱 Tampilan Khusus Mobile HP */}
+      <div className="block lg:hidden">
+        <AdminPengaturanMobileView
+          nama={nama}
+          username={username}
+          role={role}
+          isLoadingProfile={isLoadingProfile}
+          pushEnabled={pushEnabled}
+          soundEnabled={soundEnabled}
+          permissionState={permissionState}
+          isTestingNotif={isTestingNotif}
+          onTogglePush={handleTogglePush}
+          onToggleSound={handleToggleSound}
+          onTestNotif={handleTestPushNotification}
+          onOpenEditProfile={handleOpenEditProfile}
+          onOpenChangePassword={() => setIsChangePasswordOpen(true)}
+          onLogout={handleLogout}
+          isLoggingOut={isLoggingOut}
+        />
       </div>
 
       {/* Modal 1: Edit Profil Akun (Nama & Username) */}

@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { LockKeyhole, Wrench, Search, Building, Menu, Home, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { UserDockbar } from "@/components/mobile/user-dockbar";
 
 export default function UserLayout({
   children,
@@ -155,12 +156,15 @@ export default function UserLayout({
       </header>
 
       {/* Main Content Body */}
-      <main className="relative z-10 flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <main className="relative z-10 flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-8 pb-24 md:pb-8">
         {children}
       </main>
 
+      {/* 📱 Mobile User Floating Dockbar */}
+      <UserDockbar />
+
       {/* Footer Minimalis Corporate */}
-      <footer className="relative z-10 border-t border-slate-200/80 py-6 bg-white text-slate-600 text-xs">
+      <footer className="relative z-10 border-t border-slate-200/80 py-6 pb-24 md:pb-6 bg-white text-slate-600 text-xs">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
           <div className="flex items-center gap-3 flex-wrap justify-center">
             <div className="flex items-center gap-2 font-bold text-slate-800">

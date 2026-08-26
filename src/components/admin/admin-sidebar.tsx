@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { AdminDockbar } from "@/components/mobile/admin-dockbar";
 
 export const ADMIN_NAV_ITEMS = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -95,64 +96,7 @@ export function AdminNavLinks({ onItemClick, isCollapsed = false }: NavLinksProp
 }
 
 export function AdminBottomNav() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [loadingHref, setLoadingHref] = useState<string | null>(null);
-
-  const handleNavigate = (href: string, e: React.MouseEvent) => {
-    if (pathname === href) return;
-
-    e.preventDefault();
-    setLoadingHref(href);
-
-    startTransition(() => {
-      router.push(href);
-    });
-  };
-
-  return (
-    <nav
-      suppressHydrationWarning
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-t border-sky-100/90 shadow-[0_-4px_25px_rgba(2,132,199,0.12)] px-2 py-1.5 flex items-center justify-around"
-    >
-      {ADMIN_NAV_ITEMS.map((item) => {
-        const Icon = item.icon;
-        const isActive =
-          pathname === item.href ||
-          (item.href !== "/admin/dashboard" && pathname.startsWith(item.href));
-        const isLoadingThis = isPending && loadingHref === item.href && pathname !== item.href;
-
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={(e) => handleNavigate(item.href, e)}
-            className={`relative flex flex-col items-center justify-center w-full py-1.5 px-1 rounded-2xl transition-all duration-200 ${
-              isActive ? "text-sky-700 font-extrabold" : "text-slate-500 hover:text-sky-600 font-medium"
-            }`}
-          >
-            {/* Active Indicator Top Glowing Pill */}
-            {isActive && (
-              <span className="absolute -top-1.5 h-1 w-7 bg-gradient-to-r from-sky-500 to-sky-700 rounded-full shadow-xs" />
-            )}
-
-            <div className={`p-1 rounded-xl transition-all ${isActive ? "bg-sky-100/80 text-sky-700 scale-110 shadow-xs" : ""}`}>
-              {isLoadingThis ? (
-                <Loader2 className="h-5 w-5 animate-spin text-sky-600" />
-              ) : (
-                <Icon className={`h-5 w-5 ${isActive ? "text-sky-700 stroke-[2.5]" : "text-slate-500"}`} />
-              )}
-            </div>
-
-            <span className={`text-[10px] tracking-tight mt-0.5 ${isActive ? "text-sky-800 font-black" : "text-slate-500 font-medium"}`}>
-              {item.label}
-            </span>
-          </Link>
-        );
-      })}
-    </nav>
-  );
+  return <AdminDockbar />;
 }
 
 export function AdminSidebar() {
@@ -286,36 +230,28 @@ export function AdminSidebar() {
         }`}
       />
 
-      {/* Mobile Top Header (< lg) */}
-      <header className="lg:hidden flex items-center justify-between h-14 px-4 border-b border-sky-100/90 bg-white/95 backdrop-blur-xl sticky top-0 z-40 shadow-xs">
+      {/* Mobile Top Header (< lg) - Clean & Minimalist */}
+      <header className="lg:hidden flex items-center justify-between h-13 px-4 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl sticky top-0 z-40 shadow-2xs">
         <Link href="/admin/dashboard" className="flex items-center gap-2">
           <Image
             src="/assets/images/logo-pg-trangkil.png"
             alt="Logo PT Kebon Agung PG Trangkil"
-            width={180}
-            height={38}
-            className="h-7 w-auto object-contain"
+            width={170}
+            height={36}
+            className="h-6.5 w-auto object-contain"
           />
-          <span className="font-black text-[11px] text-sky-800 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-100">
+          <span className="font-extrabold text-[9px] uppercase tracking-wider text-sky-800 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-100">
             Admin
           </span>
         </Link>
 
-        <Button
-          size="sm"
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className="bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl font-bold text-xs px-3.5 h-8 border border-rose-200/90 flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors active:scale-95"
+        <Link
+          href="/admin/pengaturan"
+          className="p-1.5 rounded-xl text-slate-600 hover:text-sky-700 hover:bg-sky-50 transition-colors border border-slate-200/80 shadow-2xs"
+          title="Pengaturan Admin"
         >
-          {isLoggingOut ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <>
-              <LogOut className="h-3.5 w-3.5 shrink-0" />
-              <span>Logout</span>
-            </>
-          )}
-        </Button>
+          <Settings className="h-4 w-4" />
+        </Link>
       </header>
 
       {/* Mobile Bottom Navigation Bar (Shopee Style) */}
