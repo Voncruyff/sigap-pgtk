@@ -49,6 +49,26 @@ function formatDateIndo(dateStr?: string): string {
   });
 }
 
+function escapeHtml(str: string | null | undefined): string {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function sanitizeCsvField(str: string | null | undefined): string {
+  if (!str) return '""';
+  let cleaned = String(str).replace(/"/g, '""');
+  // Prevent CSV / Spreadsheet Formula Injection (=, +, -, @, tab, cr)
+  if (/^[=+\-@\t\r]/.test(cleaned)) {
+    cleaned = `'${cleaned}`;
+  }
+  return `"${cleaned}"`;
+}
+
 // 📗 1. Export as Excel / CSV
 export function exportToExcel(reports: CompletedReportItem[], options: ExportFilterOptions) {
   const headers = [
@@ -65,14 +85,14 @@ export function exportToExcel(reports: CompletedReportItem[], options: ExportFil
 
   const rows = reports.map((r, idx) => [
     idx + 1,
-    `"${r.ticket_number}"`,
-    `"${r.nama_pelapor.replace(/"/g, '""')}"`,
-    `"${r.bagian.replace(/"/g, '""')}"`,
-    `"${r.unit_kerja.replace(/"/g, '""')}"`,
-    `"${r.lokasi_kerusakan.replace(/"/g, '""')}"`,
-    `"${r.status}"`,
-    `"${formatDateIndo(r.created_at)}"`,
-    `"${formatDateIndo(r.updated_at || r.created_at)}"`,
+    sanitizeCsvField(r.ticket_number),
+    sanitizeCsvField(r.nama_pelapor),
+    sanitizeCsvField(r.bagian),
+    sanitizeCsvField(r.unit_kerja),
+    sanitizeCsvField(r.lokasi_kerusakan),
+    sanitizeCsvField(r.status),
+    sanitizeCsvField(formatDateIndo(r.created_at)),
+    sanitizeCsvField(formatDateIndo(r.updated_at || r.created_at)),
   ]);
 
   const csvContent = "\uFEFF" + [headers.join(","), ...rows.map((row) => row.join(","))].join("\r\n");
@@ -99,8 +119,8 @@ export function exportToTxt(reports: CompletedReportItem[], options: ExportFilte
   const bagianText = options.bagian && options.bagian !== "ALL" ? options.bagian : "Semua Bagian";
 
   let content = `${lineSeparator}\r\n`;
-  content += `       LAPORAN RIWAYAT GANGGUAN & PERBAIKAN FASILITAS (SIGAP)\r\n`;
-  content += `                       PT KEBON AGUNG - PG TRANGKIL\r\n`;
+  content += `SISTEM INFORMASI GANGGUAN DAN PERBAIKAN (SIGAP)\r\n`;
+  content += `REKAPITULASI ARSIP RIWAYAT LAPORAN GANGGUAN & PERBAIKAN\r\n`;
   content += `${lineSeparator}\r\n`;
   content += `Tanggal Cetak  : ${new Date().toLocaleString("id-ID")}\r\n`;
   content += `Periode Data   : ${startText} s/d ${endText}\r\n`;
@@ -109,7 +129,7 @@ export function exportToTxt(reports: CompletedReportItem[], options: ExportFilte
   content += `${lineSeparator}\r\n\r\n`;
 
   if (reports.length === 0) {
-    content += `(Tidak ada riwayat laporan yang sesuai dengan rentang tanggal yang dipilih)\r\n`;
+    content += `Tidak ada data laporan selesai pada rentang periode yang dipilih.\r\n`;
   } else {
     reports.forEach((r, idx) => {
       content += `[${idx + 1}] NOMOR TIKET : ${r.ticket_number}\r\n`;
@@ -125,7 +145,7 @@ export function exportToTxt(reports: CompletedReportItem[], options: ExportFilte
   }
 
   content += `\r\n${lineSeparator}\r\n`;
-  content += `Dicetak otomatis oleh Sistem SIGAP PG Trangkil\r\n`;
+  content += `PT Kebon Agung - PG Trangkil | Dicetak Otomatis oleh Sistem SIGAP\r\n`;
   content += `${lineSeparator}\r\n`;
 
   const blob = new Blob([content], { type: "text/plain;charset=utf-8;" });
@@ -142,24 +162,24 @@ export function exportToTxt(reports: CompletedReportItem[], options: ExportFilte
 
 // 🟦 3. Export as Word / DOCX
 export function exportToDocx(reports: CompletedReportItem[], options: ExportFilterOptions) {
-  const startText = options.startDate ? options.startDate : "Awal";
-  const endText = options.endDate ? options.endDate : "Sekarang";
-  const bagianText = options.bagian && options.bagian !== "ALL" ? options.bagian : "Semua Bagian";
+  const startText = options.startDate ? escapeHtml(options.startDate) : "Awal";
+  const endText = options.endDate ? escapeHtml(options.endDate) : "Sekarang";
+  const bagianText = options.bagian && options.bagian !== "ALL" ? escapeHtml(options.bagian) : "Semua Bagian";
 
   const rowsHtml = reports
     .map(
       (r, idx) => `
       <tr>
         <td style="text-align: center; border: 1px solid #cbd5e1; padding: 6px;">${idx + 1}</td>
-        <td style="font-family: Consolas, monospace; font-weight: bold; color: #0284c7; border: 1px solid #cbd5e1; padding: 6px;">${r.ticket_number}</td>
-        <td style="font-weight: bold; border: 1px solid #cbd5e1; padding: 6px;">${r.nama_pelapor}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px;">${r.bagian}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px;">${r.unit_kerja}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px;">${r.lokasi_kerusakan}</td>
+        <td style="font-family: Consolas, monospace; font-weight: bold; color: #0284c7; border: 1px solid #cbd5e1; padding: 6px;">${escapeHtml(r.ticket_number)}</td>
+        <td style="font-weight: bold; border: 1px solid #cbd5e1; padding: 6px;">${escapeHtml(r.nama_pelapor)}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px;">${escapeHtml(r.bagian)}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px;">${escapeHtml(r.unit_kerja)}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px;">${escapeHtml(r.lokasi_kerusakan)}</td>
         <td style="text-align: center; border: 1px solid #cbd5e1; padding: 6px;">
-          <b style="color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">${r.status}</b>
+          <b style="color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">${escapeHtml(r.status)}</b>
         </td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px;">${formatDateIndo(r.updated_at || r.created_at)}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px;">${escapeHtml(formatDateIndo(r.updated_at || r.created_at))}</td>
       </tr>
     `
     )
@@ -245,28 +265,28 @@ export function exportToDocx(reports: CompletedReportItem[], options: ExportFilt
   URL.revokeObjectURL(url);
 }
 
-// 📕 3. Export as PDF (Direct Print without about:blank tab)
+// 📕 4. Export as PDF (Direct Print without about:blank tab)
 export function exportToPdf(reports: CompletedReportItem[], options: ExportFilterOptions) {
-  const startText = options.startDate ? options.startDate : "Awal";
-  const endText = options.endDate ? options.endDate : "Sekarang";
-  const bagianText = options.bagian && options.bagian !== "ALL" ? options.bagian : "Semua Bagian";
+  const startText = options.startDate ? escapeHtml(options.startDate) : "Awal";
+  const endText = options.endDate ? escapeHtml(options.endDate) : "Sekarang";
+  const bagianText = options.bagian && options.bagian !== "ALL" ? escapeHtml(options.bagian) : "Semua Bagian";
 
   const rowsHtml = reports
     .map(
       (r, idx) => `
       <tr>
         <td style="text-align: center; padding: 7px 8px; border: 1px solid #cbd5e1;">${idx + 1}</td>
-        <td style="padding: 7px 8px; border: 1px solid #cbd5e1; font-family: monospace; font-weight: bold; color: #0369a1;">${r.ticket_number}</td>
-        <td style="padding: 7px 8px; border: 1px solid #cbd5e1; font-weight: 600;">${r.nama_pelapor}</td>
-        <td style="padding: 7px 8px; border: 1px solid #cbd5e1;">${r.bagian}</td>
-        <td style="padding: 7px 8px; border: 1px solid #cbd5e1;">${r.unit_kerja}</td>
-        <td style="padding: 7px 8px; border: 1px solid #cbd5e1;">${r.lokasi_kerusakan}</td>
+        <td style="padding: 7px 8px; border: 1px solid #cbd5e1; font-family: monospace; font-weight: bold; color: #0369a1;">${escapeHtml(r.ticket_number)}</td>
+        <td style="padding: 7px 8px; border: 1px solid #cbd5e1; font-weight: 600;">${escapeHtml(r.nama_pelapor)}</td>
+        <td style="padding: 7px 8px; border: 1px solid #cbd5e1;">${escapeHtml(r.bagian)}</td>
+        <td style="padding: 7px 8px; border: 1px solid #cbd5e1;">${escapeHtml(r.unit_kerja)}</td>
+        <td style="padding: 7px 8px; border: 1px solid #cbd5e1;">${escapeHtml(r.lokasi_kerusakan)}</td>
         <td style="text-align: center; padding: 7px 8px; border: 1px solid #cbd5e1;">
           <span style="background-color: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 9999px; font-weight: bold; font-size: 11px;">
-            ${r.status}
+            ${escapeHtml(r.status)}
           </span>
         </td>
-        <td style="padding: 7px 8px; border: 1px solid #cbd5e1; font-size: 11px;">${formatDateIndo(r.updated_at || r.created_at)}</td>
+        <td style="padding: 7px 8px; border: 1px solid #cbd5e1; font-size: 11px;">${escapeHtml(formatDateIndo(r.updated_at || r.created_at))}</td>
       </tr>
     `
     )

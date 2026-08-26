@@ -19,6 +19,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "ID admin wajib disertakan" }, { status: 400 });
     }
 
+    if (id === session.id) {
+      return NextResponse.json(
+        { error: "Anda tidak dapat menonaktifkan (banned) akun yang sedang Anda gunakan saat ini demi keamanan sistem." },
+        { status: 400 }
+      );
+    }
+
     // Fetch target admin details for clean activity logging
     const targetUsers = await db.$queryRawUnsafe<Array<{ username: string; nama: string }>>(
       `SELECT username, nama FROM admin_users WHERE id = ? LIMIT 1`,

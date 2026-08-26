@@ -7,7 +7,8 @@ const JWT_SECRET = new TextEncoder().encode(
 
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request });
-  const pathname = request.nextUrl.pathname;
+  const rawPathname = request.nextUrl.pathname;
+  const pathname = rawPathname.toLowerCase();
 
   // Check admin session cookie
   const token = request.cookies.get("sigap_admin_session")?.value;
