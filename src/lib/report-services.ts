@@ -140,6 +140,49 @@ export async function getActivityLogs() {
   }
 }
 
+export function getBagianTicketPrefix(bagian?: string): string {
+  if (!bagian) return "TUK";
+  const cleaned = bagian.trim().toUpperCase();
+  if (cleaned.includes("TUK")) return "TUK";
+  if (cleaned.includes("TEKNIK") || cleaned.startsWith("TEK") || cleaned.startsWith("TNK")) return "TNK";
+  if (cleaned.includes("PABRIK") || cleaned.startsWith("PAB") || cleaned.startsWith("PBK")) return "PBK";
+  if (cleaned.includes("TANAMAN") || cleaned.startsWith("TAN") || cleaned.startsWith("TNM")) return "TNM";
+  return cleaned.replace(/[^A-Z0-9]/g, "").slice(0, 3) || "TUK";
+}
+
+export async function generateNextSequentialTicket(bagian?: string, offset = 0): Promise<string> {
+  const prefix = getBagianTicketPrefix(bagian);
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const tglBulan = `${day}${month}`; // Contoh: 2608 (26 Agustus)
+
+  const searchPattern = `${prefix}-${tglBulan}-%`;
+
+  // Query seluruh tiket pada hari & prefix tersebut untuk mencari urutan nomor tertinggi
+  const existingTickets = await db.$queryRawUnsafe<Array<{ ticket_number: string }>>(
+    `SELECT ticket_number FROM reports WHERE ticket_number LIKE ? ORDER BY ticket_number DESC`,
+    searchPattern
+  );
+
+  let maxSeq = 0;
+  if (existingTickets && existingTickets.length > 0) {
+    for (const item of existingTickets) {
+      const parts = item.ticket_number.split("-");
+      if (parts.length >= 3) {
+        const lastPart = parts[parts.length - 1];
+        const num = parseInt(lastPart, 10);
+        if (!isNaN(num) && num > maxSeq) {
+          maxSeq = num;
+        }
+      }
+    }
+  }
+
+  const nextSeq = String(maxSeq + 1 + offset).padStart(3, "0");
+  return `${prefix}-${tglBulan}-${nextSeq}`;
+}
+
 export async function createReport(data: {
   ticket_number?: string;
   nama_pelapor: string;
@@ -151,21 +194,14 @@ export async function createReport(data: {
   foto_url?: string | null;
 }) {
   await ensurePenangananColumn();
-  const basePrefix = "SIGAP";
   const now = new Date();
-  const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
 
-  let currentTicket = data.ticket_number;
-  if (!currentTicket) {
-    const timestampEntropy = String(Date.now()).slice(-4);
-    const randomSalt = Math.floor(100 + Math.random() * 900);
-    currentTicket = `${basePrefix}-${dateStr}-${timestampEntropy}${randomSalt}`;
-  }
-
-  const maxAttempts = 5;
+  const maxAttempts = 10;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const currentTicket = await generateNextSequentialTicket(data.bagian, attempt);
+    const newId = crypto.randomUUID();
+
     try {
-      const newId = crypto.randomUUID();
       await db.$executeRawUnsafe(
         `INSERT INTO reports (id, ticket_number, nama_pelapor, bagian, unit_kerja, nomor_hp, lokasi_kerusakan, deskripsi, foto_url, status, penanganan, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'MENUNGGU', NULL, ?, ?)`,
         newId,
@@ -197,17 +233,14 @@ export async function createReport(data: {
         updated_at: now,
       };
     } catch (err: unknown) {
-      const isUnique =
+      const isDuplicate =
         typeof err === "object" &&
         err !== null &&
         "message" in err &&
         typeof (err as { message: string }).message === "string" &&
         (err as { message: string }).message.includes("Duplicate entry");
 
-      if (isUnique && attempt < maxAttempts - 1) {
-        const timestampEntropy = String(Date.now()).slice(-4);
-        const randomSalt = Math.floor(1000 + Math.random() * 9000);
-        currentTicket = `${basePrefix}-${dateStr}-${timestampEntropy}${randomSalt}`;
+      if (isDuplicate && attempt < maxAttempts - 1) {
         continue;
       }
       console.error("Failed to create report in MySQL:", err);

@@ -34,25 +34,26 @@ import {
 import { ImageUpload } from "./image-upload";
 
 function generateTicketNumber(bagian?: string) {
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  const timeEntropy = Date.now().toString().slice(-4);
-  const randomNum = Math.floor(1000 + Math.random() * 9000);
-  let prefix = "TRK";
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const tglBulan = `${day}${month}`;
+  let prefix = "TUK";
   if (bagian) {
     const cleaned = bagian.trim().toUpperCase();
-    if (cleaned === "TUK" || cleaned.startsWith("TUK")) {
+    if (cleaned.includes("TUK")) {
       prefix = "TUK";
-    } else if (cleaned.startsWith("TEK")) {
+    } else if (cleaned.includes("TEKNIK") || cleaned.startsWith("TEK") || cleaned.startsWith("TNK")) {
       prefix = "TNK";
-    } else if (cleaned.startsWith("PAB")) {
+    } else if (cleaned.includes("PABRIK") || cleaned.startsWith("PAB") || cleaned.startsWith("PBK")) {
       prefix = "PBK";
-    } else if (cleaned.startsWith("TAN")) {
+    } else if (cleaned.includes("TANAMAN") || cleaned.startsWith("TAN") || cleaned.startsWith("TNM")) {
       prefix = "TNM";
     } else {
-      prefix = cleaned.replace(/[^A-Z0-9]/g, "").slice(0, 3) || "TRK";
+      prefix = cleaned.replace(/[^A-Z0-9]/g, "").slice(0, 3) || "TUK";
     }
   }
-  return `${prefix}-${dateStr}-${timeEntropy}${randomNum}`;
+  return `${prefix}-${tglBulan}-001`;
 }
 
 export function ReportForm() {

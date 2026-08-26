@@ -51,7 +51,7 @@ Seluruh antarmuka SIGAP menggunakan font **Poppins** dari Google Fonts sebagai h
 | **Card Title H3** | `0.875rem - 1rem` (14-16px) | `Bold (700)` | Judul Modul / Header Kartu |
 | **Body Text** | `0.8125rem - 0.875rem` (13-14px) | `Medium (500)` | Isi Paragraf & Tabel |
 | **Form Label** | `0.75rem` (12px) | `Bold (700)` | Label Input & Select Form |
-| **Ticket Code** | `0.75rem - 0.875rem` (12-14px) | `Bold (700) Mono` | Nomor Tiket (`TUK-20260825-1001`) |
+| **Ticket Code** | `0.75rem - 0.875rem` (12-14px) | `Bold (700) Mono` | Nomor Tiket (`TUK-2608-001`) |
 
 ---
 

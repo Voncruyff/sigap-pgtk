@@ -73,7 +73,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
     if (!query) return;
 
     // If query matches a ticket pattern, directly navigate to status detail
-    if (/^[A-Z0-9]+-\d{8}-\d+$/i.test(query)) {
+    if (/^[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+$/i.test(query)) {
       router.push(`/status/${query}`);
     }
   };
