@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       role: session.role,
       aktivitas: "Tambah Admin Baru",
       target: targetUsername,
-      deskripsi: `Menambahkan akun admin baru ${targetUsername} (${newUser.nama}) sebagai ${roleTitle}.`,
+      deskripsi: `Telah menambahkan admin ${targetUsername}`,
     });
 
     return NextResponse.json(newUser, { status: 201 });
@@ -113,7 +113,7 @@ export async function PUT(request: Request) {
       role: session.role,
       aktivitas: "Update Akun Admin",
       target: targetUsername,
-      deskripsi: `Memperbarui data akun admin ${targetUsername}.`,
+      deskripsi: `Memperbarui akun ${targetUsername}`,
     });
 
     return NextResponse.json({ success: true });
@@ -155,7 +155,7 @@ export async function DELETE(request: Request) {
       role: session.role,
       aktivitas: "Hapus Akun Admin",
       target: targetUsername,
-      deskripsi: `Menghapus akun admin ${targetUsername} dari sistem.`,
+      deskripsi: `Menghapus akun ${targetUsername}`,
     });
 
     return NextResponse.json({ success: true });

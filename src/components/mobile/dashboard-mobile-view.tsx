@@ -177,7 +177,7 @@ export function DashboardMobileView({
                     {new Date(log.waktu).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} WIB
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 font-medium leading-snug line-clamp-2">
+                <p className="text-[11px] text-slate-500 font-medium truncate" title={log.deskripsi || log.aktivitas}>
                   {log.deskripsi || log.aktivitas}
                 </p>
               </div>
