@@ -293,10 +293,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                         {renderSortIndicator("nama_pelapor")}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[200px] px-3 py-3.5 font-extrabold text-slate-700 text-xs">
-                      Deskripsi Kerusakan
-                    </TableHead>
-                    <TableHead className="w-[140px] px-3 py-3.5">
+                    <TableHead className="w-[150px] px-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("lokasi_kerusakan")}
@@ -306,6 +303,9 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                         <span>Lokasi Kerusakan</span>
                         {renderSortIndicator("lokasi_kerusakan")}
                       </button>
+                    </TableHead>
+                    <TableHead className="w-[200px] px-3 py-3.5 font-extrabold text-slate-700 text-xs">
+                      Deskripsi Kerusakan
                     </TableHead>
                     <TableHead className="w-[115px] px-3 py-3.5">
                       <button
@@ -362,14 +362,14 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                               {report.bagian} &bull; {report.unit_kerja}
                             </div>
                           </TableCell>
+                          <TableCell className="text-xs text-slate-600 font-medium px-3 py-4 max-w-[150px]">
+                            <div className="truncate" title={report.lokasi_kerusakan}>
+                              {report.lokasi_kerusakan}
+                            </div>
+                          </TableCell>
                           <TableCell className="text-xs text-slate-700 font-medium px-3 py-4 max-w-[200px]">
                             <div className="line-clamp-2 leading-relaxed" title={report.deskripsi || "-"}>
                               {report.deskripsi || "-"}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-xs text-slate-600 font-medium px-3 py-4 max-w-[140px]">
-                            <div className="truncate" title={report.lokasi_kerusakan}>
-                              {report.lokasi_kerusakan}
                             </div>
                           </TableCell>
                           <TableCell className="px-3 py-4">
