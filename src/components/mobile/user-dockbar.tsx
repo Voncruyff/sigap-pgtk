@@ -3,12 +3,11 @@
 import React, { useTransition, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Wrench, LockKeyhole, Loader2 } from "lucide-react";
+import { Home, Wrench, Loader2 } from "lucide-react";
 
 export const USER_DOCKBAR_ITEMS = [
   { label: "Beranda", href: "/", icon: Home },
   { label: "Buat Laporan", href: "/lapor", icon: Wrench },
-  { label: "Admin", href: "/admin/login", icon: LockKeyhole },
 ];
 
 export function UserDockbar() {
