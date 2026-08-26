@@ -1,38 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏭 SIGAP &bull; Sistem Informasi Gangguan & Perbaikan
+**PT Kebon Agung &bull; Pabrik Gula Trangkil**
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-Vanilla-38BDF8?style=flat-square&logo=tailwindcss)
 
-First, run the development server:
+**SIGAP** adalah platform web sistem pelaporan gangguan dan perbaikan fasilitas serta peralatan kerja di **PT Kebon Agung Pabrik Gula Trangkil**. Aplikasi ini dirancang untuk mempercepat respon perbaikan teknis, meningkatkan transparansi penanganan kendala di lapangan, serta menyediakan manajemen arsip data perbaikan secara efisien.
 
+---
+
+## ✨ Fitur-Fitur Utama
+
+### 👤 Modul Publik & Pelapor (User Side)
+* **Formulir Laporan Gangguan (`/lapor`)**: Form pelaporan dengan generator nomor tiket otomatis (format `TUK-YYYYMMDD-XXXX`), pilihan unit/bagian kerja, lokasi kendala, rincian kerusakan, dan upload foto lampiran.
+* **Pencarian & Cek Status Tiket (`/cek-status`)**: Pelacakan status perbaikan real-time berdasarkan nomor tiket laporan tanpa perlu login.
+* **Papan Perkembangan Tiket (`/status/[ticketNumber]`)**: Tampilan alur progres perbaikan 4-langkah (*Form Dikirim &rarr; Menunggu Disposisi &rarr; Sedang Diproses &rarr; Perbaikan Selesai*).
+* **Riwayat Tiket Lokal**: Penyimpanan otomatis nomor tiket laporan di peranti pelapor untuk kemudahan akses kembali.
+
+### 🛡️ Modul Panel Admin SIGAP (Admin Side)
+* **Dashboard Analitik (`/admin/dashboard`)**: Ringkasan 5 statistik utama (*Total Laporan, Menunggu, Diproses, Selesai, Petugas Admin*) dan feed Log Aktivitas terbaru.
+* **Manajemen Laporan Aktif (`/admin/laporan`)**: Pengelolaan laporan berstatus `MENUNGGU` & `DIPROSES`. Laporan yang telah berstatus `SELESAI` otomatis dipindahkan ke arsip riwayat.
+* **Riwayat & Arsip Perbaikan (`/admin/riwayat`)**: Pengarsipan data laporan tuntas dengan filter tanggal, pencarian kata kunci, serta opsi ekspor dokumen (PDF/Excel).
+* **Kelola Akun Admin (`/admin/kelola-admin`)**: Manajemen pengguna admin oleh Super Admin, termasuk fitur penonaktifan/banned berjangka maupun permanen.
+* **Audit Log Aktivitas (`/admin/log-aktivitas`)**: Pencatatan riwayat tindakan admin (perubahan status laporan, pembaruan profil, penambahan/banned admin).
+* **Pengaturan Profil (`/admin/pengaturan`)**: Pembaruan profil dengan verifikasi keamanan kata sandi saat menyimpan perubahan.
+
+---
+
+## 🛠️ Teknologi & Arsitektur
+
+* **Framework**: [Next.js 15](https://nextjs.org/) (App Router, React Server Components, API Routes)
+* **Bahasa**: [TypeScript](https://www.typescriptlang.org/)
+* **Database & ORM**: [Prisma ORM](https://www.prisma.io/) dengan Database PostgreSQL
+* **Desain & UI**: [TailwindCSS](https://tailwindcss.com/), Radix UI, Lucide Icons, dan Motion Animation
+* **Tipografi**: Google Font `Poppins` (Font Utama) & `JetBrains Mono` (Nomor Tiket & Kode Log)
+* **Autentikasi**: JWT (JSON Web Token) dengan penyimpanan HttpOnly Cookie & Bcrypt Password Hashing
+
+---
+
+## 📐 Panduan Desain & Style Guide
+
+Aplikasi ini menggunakan standar panduan visual resmi **PT Kebon Agung PG Trangkil**. Dokumentasi lengkap warna, tipografi, dan prinsip desain minimalis dapat dilihat pada dokumen:
+
+👉 [**STYLE_GUIDE.md**](./STYLE_GUIDE.md)
+
+---
+
+## 🚀 Cara Menjalankan Proyek (Getting Started)
+
+### 1. Prasyarat Sistem
+* Node.js v18.0.0 atau versi yang lebih baru
+* Database PostgreSQL
+
+### 2. Instalasi Dependensi
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone repositori proyek
+git clone https://github.com/Voncruyff/sigap-pgtk.git
+cd sigap-pgtk
+
+# Instal dependensi paket
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Konfigurasi Environment Variable (`.env`)
+Buat file `.env` di root proyek dan lengkapi konfigurasi variabel berikut:
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/sigap_db?schema=public"
+JWT_SECRET="sigap_secret_key_change_in_production"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Migrasi & Seed Database
+```bash
+# Sinkronisasi skema database Prisma
+npx prisma db push
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Menjalankan data awal admin default
+npx prisma db seed
+```
 
-## Learn More
+### 5. Menjalankan Server Pengembang
+```bash
+npm run dev
+```
+Buka [http://localhost:3000](http://localhost:3000) pada browser Anda untuk melihat aplikasi SIGAP.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📄 Lisensi & Hak Cipta
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-# sigap-pgtk
+© **PT Kebon Agung &bull; Pabrik Gula Trangkil**. Hak Cipta Dilindungi Undang-Undang.
