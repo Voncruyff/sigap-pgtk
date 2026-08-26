@@ -18,10 +18,13 @@ import {
   Building,
   ChevronLeft,
   ChevronRight,
+  Crown,
+  Wrench,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AdminDockbar } from "@/components/mobile/admin-dockbar";
+import { AdminJwtPayload } from "@/lib/auth";
 
 export const ADMIN_NAV_ITEMS = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -103,6 +106,18 @@ export function AdminSidebar() {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [userSession, setUserSession] = useState<AdminJwtPayload | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated && data.user) {
+          setUserSession(data.user);
+        }
+      })
+      .catch((err) => console.warn("Failed to load session for mobile header:", err));
+  }, []);
 
   // Restore collapsed state from localStorage on load
   useEffect(() => {
@@ -231,28 +246,49 @@ export function AdminSidebar() {
       />
 
       {/* Mobile Top Header (< lg) - Clean & Minimalist */}
-      <header className="lg:hidden flex items-center justify-between h-13 px-4 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl sticky top-0 z-40 shadow-2xs">
-        <Link href="/admin/dashboard" className="flex items-center gap-2">
+      <header className="lg:hidden flex items-center justify-between min-h-[56px] py-2 px-3.5 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl sticky top-0 z-40 shadow-2xs">
+        {/* Left: Compact Official PG Trangkil Logo (No Admin Text) */}
+        <Link href="/admin/dashboard" className="flex items-center shrink-0">
           <Image
             src="/assets/images/logo-pg-trangkil.png"
             alt="Logo PT Kebon Agung PG Trangkil"
-            width={170}
-            height={36}
-            className="h-6.5 w-auto object-contain"
+            width={125}
+            height={26}
+            className="h-5 w-auto object-contain"
           />
-          <span className="font-extrabold text-[9px] uppercase tracking-wider text-sky-800 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-100">
-            Admin
-          </span>
         </Link>
 
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-sky-50 to-indigo-50 border border-sky-200/80 shadow-2xs">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-600"></span>
-          </span>
-          <span className="font-black text-xs tracking-wider text-sky-900">
-            SIGAP
-          </span>
+        {/* Right: SIGAP Badge + User Session Pill */}
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gradient-to-r from-sky-50 to-indigo-50 border border-sky-200/80 shadow-2xs">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-600"></span>
+            </span>
+            <span className="font-black text-[10.5px] tracking-wider text-sky-900 leading-none">
+              SIGAP
+            </span>
+          </div>
+
+          {userSession && (
+            <div
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold border shadow-2xs max-w-[170px] sm:max-w-[230px] ${
+                userSession.role === "SUPER_ADMIN"
+                  ? "bg-purple-50 text-purple-800 border-purple-200"
+                  : "bg-sky-50 text-sky-800 border-sky-200"
+              }`}
+              title={`${userSession.nama} : ${userSession.role === "SUPER_ADMIN" ? "Super Admin" : "Admin Teknis"}`}
+            >
+              {userSession.role === "SUPER_ADMIN" ? (
+                <Crown className="h-2.5 w-2.5 text-purple-600 shrink-0" />
+              ) : (
+                <Wrench className="h-2.5 w-2.5 text-sky-600 shrink-0" />
+              )}
+              <span className="truncate">
+                {userSession.nama} : {userSession.role === "SUPER_ADMIN" ? "Super Admin" : "Admin Teknis"}
+              </span>
+            </div>
+          )}
         </div>
       </header>
 
