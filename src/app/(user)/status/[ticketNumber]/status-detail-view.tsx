@@ -32,6 +32,7 @@ export interface StatusDetailReportItem {
   peralatan?: string;
   deskripsi?: string;
   status?: string;
+  penanganan?: string | null;
   foto_url?: string | null;
   created_at?: string;
 }
@@ -161,6 +162,35 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
           </div>
         </CardContent>
       </Card>
+
+      {/* Card Hasil Tindakan Penanganan (Jika Status SELESAI & Memiliki Catatan Penanganan) */}
+      {report?.penanganan && (
+        <Card className="border border-emerald-200 bg-emerald-50/40 rounded-2xl shadow-2xs overflow-hidden">
+          <CardHeader className="p-4 sm:p-5 border-b border-emerald-100 bg-emerald-100/30 flex flex-row items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-xl bg-emerald-100 text-emerald-700">
+                <CheckCircle2 className="h-4 w-4" />
+              </div>
+              <div>
+                <CardTitle className="text-xs sm:text-sm font-black text-emerald-900">
+                  Hasil Tindakan Penanganan Teknisi
+                </CardTitle>
+                <span className="text-[10px] text-emerald-700 font-medium">
+                  Catatan perbaikan resmi dari petugas SIGAP
+                </span>
+              </div>
+            </div>
+            <span className="text-[10.5px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              Selesai Dikerjakan
+            </span>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-5">
+            <div className="bg-white p-4 rounded-xl border border-emerald-200/80 shadow-2xs text-xs sm:text-sm text-emerald-950 font-medium whitespace-pre-wrap leading-relaxed">
+              {report.penanganan}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Details Grid: Left Metadata & Right Description / Photo */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">

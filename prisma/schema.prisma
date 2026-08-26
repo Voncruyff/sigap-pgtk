@@ -20,6 +20,7 @@ model Report {
   deskripsi        String   @db.Text
   foto_url         String?  @db.LongText
   status           String   @default("MENUNGGU")
+  penanganan       String?  @db.Text
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 

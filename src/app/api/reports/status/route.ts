@@ -9,7 +9,7 @@ async function handleStatusUpdate(request: Request) {
       return NextResponse.json({ error: "Unauthorized. Silakan login sebagai admin." }, { status: 401 });
     }
 
-    const { id, status, adminName } = await request.json();
+    const { id, status, adminName, penanganan } = await request.json();
 
     if (!id || !status) {
       return NextResponse.json({ error: "ID dan status wajib diisi" }, { status: 400 });
@@ -23,7 +23,12 @@ async function handleStatusUpdate(request: Request) {
       );
     }
 
-    const updated = await updateReportStatus(id, status, adminName || session.nama || "Admin SIGAP");
+    const updated = await updateReportStatus(
+      id,
+      status,
+      adminName || session.nama || "Admin SIGAP",
+      penanganan
+    );
     return NextResponse.json(updated);
   } catch (err: any) {
     console.error("Status update error:", err);

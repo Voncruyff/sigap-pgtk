@@ -23,7 +23,8 @@ export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) 
       report.ticket_number.toLowerCase().includes(q) ||
       report.nama_pelapor.toLowerCase().includes(q) ||
       report.unit_kerja.toLowerCase().includes(q) ||
-      report.lokasi_kerusakan.toLowerCase().includes(q)
+      report.lokasi_kerusakan.toLowerCase().includes(q) ||
+      (report.penanganan && report.penanganan.toLowerCase().includes(q))
     );
   });
 
@@ -36,7 +37,7 @@ export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) 
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari arsip tiket / pelapor..."
+            placeholder="Cari arsip tiket / pelapor / tindakan..."
             className="pl-9.5 h-10 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 bg-white shadow-2xs"
           />
         </div>
@@ -89,6 +90,15 @@ export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) 
                       </p>
                     )}
                   </div>
+
+                  {report.penanganan && (
+                    <div className="bg-emerald-50/70 border border-emerald-100 p-2 rounded-xl text-[11px] text-emerald-950 font-medium line-clamp-2">
+                      <span className="font-bold text-emerald-800 block text-[10px] uppercase tracking-wide mb-0.5">
+                        Tindakan Penanganan:
+                      </span>
+                      {report.penanganan}
+                    </div>
+                  )}
 
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
                     <div className="space-y-0.5 min-w-0 pr-2">

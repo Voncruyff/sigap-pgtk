@@ -12,12 +12,24 @@ const reportSelect = {
   deskripsi: true,
   foto_url: true,
   status: true,
+  penanganan: true,
   created_at: true,
   updated_at: true,
 };
 
+async function ensurePenangananColumn() {
+  try {
+    await db.$executeRawUnsafe(
+      `ALTER TABLE reports ADD COLUMN penanganan TEXT DEFAULT NULL`
+    );
+  } catch {
+    // Column already exists or table not ready, safely ignore
+  }
+}
+
 export async function getAllReports() {
   try {
+    await ensurePenangananColumn();
     return await db.report.findMany({
       select: reportSelect,
       orderBy: { created_at: "desc" },
@@ -30,6 +42,7 @@ export async function getAllReports() {
 
 export async function getActiveReports() {
   try {
+    await ensurePenangananColumn();
     return await db.report.findMany({
       where: {
         status: { in: ["MENUNGGU", "DIPROSES"] },
@@ -45,6 +58,7 @@ export async function getActiveReports() {
 
 export async function getReportByTicket(ticketNumber: string) {
   try {
+    await ensurePenangananColumn();
     return await db.report.findUnique({
       where: { ticket_number: ticketNumber },
       select: reportSelect,
@@ -57,6 +71,7 @@ export async function getReportByTicket(ticketNumber: string) {
 
 export async function getReportById(id: string) {
   try {
+    await ensurePenangananColumn();
     return await db.report.findUnique({
       where: { id },
       select: reportSelect,
@@ -69,6 +84,7 @@ export async function getReportById(id: string) {
 
 export async function getCompletedReports() {
   try {
+    await ensurePenangananColumn();
     return await db.report.findMany({
       where: { status: "SELESAI" },
       select: reportSelect,
@@ -101,32 +117,42 @@ export async function createReport(data: {
   deskripsi: string;
   foto_url?: string | null;
 }) {
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  const basePrefix = data.bagian ? data.bagian.replace(/[^A-Za-z0-9]/g, "").slice(0, 3).toUpperCase() : "TRK";
+  const basePrefix = "SIGAP";
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
 
-  let currentTicket = data.ticket_number || `${basePrefix}-${dateStr}-${Math.floor(1000 + Math.random() * 9000)}`;
+  let currentTicket = data.ticket_number;
+  if (!currentTicket) {
+    const timestampEntropy = String(Date.now()).slice(-4);
+    const randomSalt = Math.floor(100 + Math.random() * 900);
+    currentTicket = `${basePrefix}-${dateStr}-${timestampEntropy}${randomSalt}`;
+  }
 
-  // Auto-retry loop to handle any possible unique constraint collision seamlessly
-  for (let attempt = 0; attempt < 5; attempt++) {
+  const maxAttempts = 5;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       return await db.report.create({
         data: {
           ticket_number: currentTicket,
-          nama_pelapor: data.nama_pelapor.trim(),
-          bagian: data.bagian.trim(),
-          unit_kerja: data.unit_kerja.trim(),
+          nama_pelapor: data.nama_pelapor,
+          bagian: data.bagian,
+          unit_kerja: data.unit_kerja,
           nomor_hp: data.nomor_hp || null,
-          lokasi_kerusakan: data.lokasi_kerusakan || data.unit_kerja,
-          deskripsi: data.deskripsi.trim(),
+          lokasi_kerusakan: data.lokasi_kerusakan,
+          deskripsi: data.deskripsi,
           foto_url: data.foto_url || null,
           status: "MENUNGGU",
         },
-        select: reportSelect,
       });
-    } catch (err: any) {
-      const isDuplicate = err?.code === "P2002" || err?.message?.includes("Unique constraint") || err?.message?.includes("Duplicate entry");
-      if (isDuplicate) {
-        const timestampEntropy = Date.now().toString().slice(-4);
+    } catch (err: unknown) {
+      const isUniqueConstraint =
+        typeof err === "object" &&
+        err !== null &&
+        "code" in err &&
+        (err as { code: string }).code === "P2002";
+
+      if (isUniqueConstraint && attempt < maxAttempts - 1) {
+        const timestampEntropy = String(Date.now()).slice(-4);
         const randomSalt = Math.floor(1000 + Math.random() * 9000);
         currentTicket = `${basePrefix}-${dateStr}-${timestampEntropy}${randomSalt}`;
         continue;
@@ -139,18 +165,34 @@ export async function createReport(data: {
   throw new Error("Gagal membuat laporan setelah beberapa percobaan nomor tiket unik.");
 }
 
-export async function updateReportStatus(id: string, newStatus: string, adminName = "Admin SIGAP") {
+export async function updateReportStatus(
+  id: string,
+  newStatus: string,
+  adminName = "Admin SIGAP",
+  penanganan?: string | null
+) {
   try {
+    await ensurePenangananColumn();
     const now = new Date();
 
-    // Update by id or ticket_number
-    await db.$executeRawUnsafe(
-      `UPDATE reports SET status = ?, updated_at = ? WHERE id = ? OR ticket_number = ?`,
-      newStatus,
-      now,
-      id,
-      id
-    );
+    if (penanganan !== undefined && penanganan !== null) {
+      await db.$executeRawUnsafe(
+        `UPDATE reports SET status = ?, penanganan = ?, updated_at = ? WHERE id = ? OR ticket_number = ?`,
+        newStatus,
+        penanganan,
+        now,
+        id,
+        id
+      );
+    } else {
+      await db.$executeRawUnsafe(
+        `UPDATE reports SET status = ?, updated_at = ? WHERE id = ? OR ticket_number = ?`,
+        newStatus,
+        now,
+        id,
+        id
+      );
+    }
 
     const reports = await db.$queryRawUnsafe<Array<{
       id: string;
@@ -163,21 +205,26 @@ export async function updateReportStatus(id: string, newStatus: string, adminNam
       deskripsi: string;
       foto_url: string | null;
       status: string;
+      penanganan?: string | null;
       created_at: Date | string;
       updated_at: Date | string;
     }>>(
-      `SELECT id, ticket_number, nama_pelapor, bagian, unit_kerja, nomor_hp, lokasi_kerusakan, deskripsi, foto_url, status, created_at, updated_at FROM reports WHERE id = ? OR ticket_number = ? LIMIT 1`,
+      `SELECT id, ticket_number, nama_pelapor, bagian, unit_kerja, nomor_hp, lokasi_kerusakan, deskripsi, foto_url, status, penanganan, created_at, updated_at FROM reports WHERE id = ? OR ticket_number = ? LIMIT 1`,
       id,
       id
     );
 
     const report = reports && reports.length > 0
       ? reports[0]
-      : { id, ticket_number: id, status: newStatus, updated_at: now };
+      : { id, ticket_number: id, status: newStatus, penanganan, updated_at: now };
 
     // Record activity log
     try {
       const logId = crypto.randomUUID();
+      const logDeskripsi = penanganan
+        ? `Mengubah status laporan ${report.ticket_number} menjadi ${newStatus}. Catatan penanganan: ${penanganan}`
+        : `Mengubah status laporan ${report.ticket_number} menjadi ${newStatus}.`;
+
       await db.$executeRawUnsafe(
         `INSERT INTO activity_logs (id, waktu, admin, role, aktivitas, target, deskripsi) VALUES (?, ?, ?, 'SUPER_ADMIN', ?, ?, ?)`,
         logId,
@@ -185,7 +232,7 @@ export async function updateReportStatus(id: string, newStatus: string, adminNam
         adminName,
         newStatus === "SELESAI" ? "Penyelesaian Perbaikan" : "Disposisi Laporan",
         report.ticket_number,
-        `Mengubah status laporan ${report.ticket_number} menjadi ${newStatus}.`
+        logDeskripsi
       );
     } catch (logErr) {
       console.warn("Failed to create activity log:", logErr);

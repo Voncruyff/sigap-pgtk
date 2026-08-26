@@ -13,9 +13,13 @@ import { toast } from "sonner";
 
 export interface LaporanMobileViewProps {
   reports: LaporanItem[];
+  onOpenCompleteModal?: (report: LaporanItem) => void;
 }
 
-export function LaporanMobileView({ reports: initialReports }: LaporanMobileViewProps) {
+export function LaporanMobileView({
+  reports: initialReports,
+  onOpenCompleteModal,
+}: LaporanMobileViewProps) {
   const router = useRouter();
   const [reports, setReports] = useState<LaporanItem[]>(initialReports);
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,7 +31,7 @@ export function LaporanMobileView({ reports: initialReports }: LaporanMobileView
     setReports(initialReports);
   }, [initialReports]);
 
-  // Handle Quick Status Change on Mobile
+  // Handle Quick Status Change on Mobile (e.g. MENUNGGU -> DIPROSES)
   const handleUpdateStatus = async (id: string, newStatus: string, ticketNumber: string) => {
     setUpdatingId(id);
     try {
@@ -39,19 +43,12 @@ export function LaporanMobileView({ reports: initialReports }: LaporanMobileView
 
       if (!res.ok) throw new Error("Gagal mengupdate status via API");
 
-      if (newStatus === "SELESAI") {
-        setReports((prev) => prev.filter((item) => item.id !== id));
-        toast.success(`Tiket ${ticketNumber} Selesai!`, {
-          description: "Laporan tuntas dan dipindahkan ke Riwayat Laporan.",
-        });
-      } else {
-        setReports((prev) =>
-          prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
-        );
-        toast.success(`Status ${ticketNumber} Diperbarui!`, {
-          description: `Status diubah menjadi: ${newStatus}`,
-        });
-      }
+      setReports((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
+      );
+      toast.success(`Status ${ticketNumber} Diperbarui!`, {
+        description: `Status diubah menjadi: ${newStatus}`,
+      });
 
       router.refresh();
     } catch (err) {
@@ -206,17 +203,17 @@ export function LaporanMobileView({ reports: initialReports }: LaporanMobileView
                         <Button
                           size="sm"
                           disabled={isUpdatingThis}
-                          onClick={() => handleUpdateStatus(report.id, "SELESAI", report.ticket_number)}
+                          onClick={() => {
+                            if (onOpenCompleteModal) {
+                              onOpenCompleteModal(report);
+                            } else {
+                              handleUpdateStatus(report.id, "SELESAI", report.ticket_number);
+                            }
+                          }}
                           className="h-8 px-2.5 rounded-full text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs"
                         >
-                          {isUpdatingThis ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <>
-                              <CheckCircle2 className="mr-1 h-3 w-3" />
-                              Selesai
-                            </>
-                          )}
+                          <CheckCircle2 className="mr-1 h-3 w-3" />
+                          Selesai
                         </Button>
                       )}
 

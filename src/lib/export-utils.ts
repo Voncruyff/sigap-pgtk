@@ -78,6 +78,7 @@ export function exportToExcel(reports: CompletedReportItem[], options: ExportFil
     "Bagian",
     "Unit Kerja",
     "Lokasi Kerusakan",
+    "Tindakan Penanganan",
     "Status",
     "Waktu Lapor",
     "Waktu Selesai",
@@ -90,6 +91,7 @@ export function exportToExcel(reports: CompletedReportItem[], options: ExportFil
     sanitizeCsvField(r.bagian),
     sanitizeCsvField(r.unit_kerja),
     sanitizeCsvField(r.lokasi_kerusakan),
+    sanitizeCsvField(r.penanganan || "-"),
     sanitizeCsvField(r.status),
     sanitizeCsvField(formatDateIndo(r.created_at)),
     sanitizeCsvField(formatDateIndo(r.updated_at || r.created_at)),
@@ -137,6 +139,7 @@ export function exportToTxt(reports: CompletedReportItem[], options: ExportFilte
       content += `    Bagian       : ${r.bagian}\r\n`;
       content += `    Unit Kerja   : ${r.unit_kerja}\r\n`;
       content += `    Lokasi       : ${r.lokasi_kerusakan}\r\n`;
+      content += `    Penanganan   : ${r.penanganan || "-"}\r\n`;
       content += `    Status       : ${r.status}\r\n`;
       content += `    Waktu Masuk  : ${formatDateIndo(r.created_at)}\r\n`;
       content += `    Waktu Selesai: ${formatDateIndo(r.updated_at || r.created_at)}\r\n`;
@@ -176,6 +179,7 @@ export function exportToDocx(reports: CompletedReportItem[], options: ExportFilt
         <td style="border: 1px solid #cbd5e1; padding: 6px;">${escapeHtml(r.bagian)}</td>
         <td style="border: 1px solid #cbd5e1; padding: 6px;">${escapeHtml(r.unit_kerja)}</td>
         <td style="border: 1px solid #cbd5e1; padding: 6px;">${escapeHtml(r.lokasi_kerusakan)}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; font-size: 9pt; color: #065f46;">${escapeHtml(r.penanganan || "-")}</td>
         <td style="text-align: center; border: 1px solid #cbd5e1; padding: 6px;">
           <b style="color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">${escapeHtml(r.status)}</b>
         </td>
@@ -241,12 +245,13 @@ export function exportToDocx(reports: CompletedReportItem[], options: ExportFilt
             <th style="width: 70px;">Bagian</th>
             <th>Unit / Bagian Kerja</th>
             <th>Lokasi Kerusakan</th>
+            <th>Tindakan Penanganan</th>
             <th style="width: 70px; text-align: center;">Status</th>
             <th style="width: 120px;">Waktu Selesai</th>
           </tr>
         </thead>
         <tbody>
-          ${rowsHtml || `<tr><td colspan="8" style="text-align: center; padding: 15px;">Tidak ada data laporan</td></tr>`}
+          ${rowsHtml || `<tr><td colspan="9" style="text-align: center; padding: 15px;">Tidak ada data laporan</td></tr>`}
         </tbody>
       </table>
     </body>
@@ -281,6 +286,7 @@ export function exportToPdf(reports: CompletedReportItem[], options: ExportFilte
         <td style="padding: 7px 8px; border: 1px solid #cbd5e1;">${escapeHtml(r.bagian)}</td>
         <td style="padding: 7px 8px; border: 1px solid #cbd5e1;">${escapeHtml(r.unit_kerja)}</td>
         <td style="padding: 7px 8px; border: 1px solid #cbd5e1;">${escapeHtml(r.lokasi_kerusakan)}</td>
+        <td style="padding: 7px 8px; border: 1px solid #cbd5e1; font-size: 10.5px; color: #065f46;">${escapeHtml(r.penanganan || "-")}</td>
         <td style="text-align: center; padding: 7px 8px; border: 1px solid #cbd5e1;">
           <span style="background-color: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 9999px; font-weight: bold; font-size: 11px;">
             ${escapeHtml(r.status)}

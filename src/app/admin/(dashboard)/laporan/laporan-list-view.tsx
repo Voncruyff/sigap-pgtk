@@ -21,6 +21,8 @@ import { LaporanMobileView } from "@/components/mobile/laporan-mobile-view";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+import { SelesaiPenangananModal } from "@/components/admin/selesai-penanganan-modal";
+
 export interface LaporanItem {
   id: string;
   ticket_number: string;
@@ -32,6 +34,7 @@ export interface LaporanItem {
   peralatan?: string;
   deskripsi: string;
   status: string;
+  penanganan?: string | null;
   created_at: string;
 }
 
@@ -49,6 +52,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [bagianFilter, setBagianFilter] = useState<string>("ALL");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [selectedReportToComplete, setSelectedReportToComplete] = useState<LaporanItem | null>(null);
 
   // Sorting States
   const [sortField, setSortField] = useState<SortField>("created_at");
@@ -78,7 +82,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
     setReports(initialReports);
   }, [initialReports]);
 
-  // Handle Quick Status Update Action
+  // Handle Quick Status Update Action (e.g. MENUNGGU -> DIPROSES)
   const handleUpdateStatus = async (id: string, newStatus: string, ticketNumber: string) => {
     setUpdatingId(id);
     try {
@@ -92,19 +96,12 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
         throw new Error("Gagal mengupdate status");
       }
 
-      if (newStatus === "SELESAI") {
-        setReports((prev) => prev.filter((item) => item.id !== id));
-        toast.success("Laporan Selesai Perbaikan!", {
-          description: `Tiket ${ticketNumber} telah tuntas dan dipindahkan ke Riwayat Laporan.`,
-        });
-      } else {
-        setReports((prev) =>
-          prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
-        );
-        toast.success("Status Laporan Diperbarui!", {
-          description: `Status berhasil diubah menjadi ${newStatus}.`,
-        });
-      }
+      setReports((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
+      );
+      toast.success("Status Laporan Diperbarui!", {
+        description: `Status berhasil diubah menjadi ${newStatus}.`,
+      });
 
       router.refresh();
     } catch (err) {
@@ -113,6 +110,11 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
     } finally {
       setUpdatingId(null);
     }
+  };
+
+  const handleCompleteSuccess = (reportId: string) => {
+    setReports((prev) => prev.filter((item) => item.id !== reportId));
+    router.refresh();
   };
 
   // Filter Reports based on search query, status filter & bagian filter
@@ -390,18 +392,12 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                                 <Button
                                   size="sm"
                                   disabled={isUpdatingThis}
-                                  onClick={() => handleUpdateStatus(report.id, "SELESAI", report.ticket_number)}
+                                  onClick={() => setSelectedReportToComplete(report)}
                                   className="h-7 text-[11px] px-2.5 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold shadow-2xs active:scale-95 cursor-pointer"
                                   title="Tandai Selesai Perbaikan"
                                 >
-                                  {isUpdatingThis ? (
-                                    <Loader2 className="h-3 w-3 animate-spin" />
-                                  ) : (
-                                    <>
-                                      <CheckCircle2 className="mr-1 h-3 w-3" />
-                                      Selesai
-                                    </>
-                                  )}
+                                  <CheckCircle2 className="mr-1 h-3 w-3" />
+                                  Selesai
                                 </Button>
                               )}
 
@@ -432,8 +428,19 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
 
       {/* 📱 Tampilan Khusus Mobile HP */}
       <div className="block lg:hidden">
-        <LaporanMobileView reports={reports} />
+        <LaporanMobileView
+          reports={reports}
+          onOpenCompleteModal={(report) => setSelectedReportToComplete(report)}
+        />
       </div>
+
+      {/* 📝 Modal Deskripsi Tindakan Penanganan Selesai */}
+      <SelesaiPenangananModal
+        report={selectedReportToComplete}
+        open={Boolean(selectedReportToComplete)}
+        onOpenChange={(open) => !open && setSelectedReportToComplete(null)}
+        onSuccess={handleCompleteSuccess}
+      />
     </div>
   );
 }

@@ -27,6 +27,8 @@ export interface CompletedReportItem {
   unit_kerja: string;
   lokasi_kerusakan: string;
   peralatan?: string;
+  deskripsi?: string;
+  penanganan?: string | null;
   status: string;
   created_at: string;
   updated_at?: string;
@@ -60,7 +62,8 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
       item.nama_pelapor.toLowerCase().includes(q) ||
       item.lokasi_kerusakan.toLowerCase().includes(q) ||
       item.unit_kerja.toLowerCase().includes(q) ||
-      item.bagian.toLowerCase().includes(q)
+      item.bagian.toLowerCase().includes(q) ||
+      (item.penanganan && item.penanganan.toLowerCase().includes(q))
     );
   });
 
@@ -99,7 +102,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
       {/* Header Halaman Dynamic */}
       <PageHeader
         title="Riwayat & Arsip Laporan"
-        description="Daftar seluruh laporan gangguan fasilitas yang telah selesai ditangani oleh tim teknisi."
+        description="Daftar seluruh laporan gangguan fasilitas yang telah selesai ditangani beserta rincian tindakan perbaikan."
         badgeText="SIGAP Archive & History"
         badgeColor="emerald"
       />
@@ -124,7 +127,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cari riwayat tiket / pelapor..."
+                    placeholder="Cari tiket / pelapor / tindakan..."
                     className="pl-8.5 h-9 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 focus:ring-sky-500/20 bg-white"
                   />
                 </div>
@@ -137,7 +140,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50/90 border-b border-sky-100/80 select-none">
-                    <TableHead className="w-[150px] pl-5 pr-3 py-3.5">
+                    <TableHead className="w-[145px] pl-5 pr-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("ticket_number")}
@@ -148,7 +151,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                         {renderSortIndicator("ticket_number")}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[135px] px-3 py-3.5">
+                    <TableHead className="w-[130px] px-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("updated_at")}
@@ -181,10 +184,13 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                         {renderSortIndicator("lokasi_kerusakan")}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[125px] font-extrabold text-slate-700 text-xs px-3 py-3.5">
+                    <TableHead className="px-3 py-3.5 font-extrabold text-slate-700 text-xs">
+                      Tindakan Penanganan
+                    </TableHead>
+                    <TableHead className="w-[110px] font-extrabold text-slate-700 text-xs px-3 py-3.5">
                       Status
                     </TableHead>
-                    <TableHead className="text-center w-[120px] font-extrabold text-slate-700 text-xs pr-5 pl-3 py-3.5">
+                    <TableHead className="text-center w-[100px] font-extrabold text-slate-700 text-xs pr-5 pl-3 py-3.5">
                       Aksi
                     </TableHead>
                   </TableRow>
@@ -192,7 +198,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                 <TableBody>
                   {sortedReports.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-12 text-slate-400 italic text-xs">
+                      <TableCell colSpan={7} className="text-center py-12 text-slate-400 italic text-xs">
                         Tidak ada riwayat laporan yang cocok dengan pencarian.
                       </TableCell>
                     </TableRow>
@@ -228,6 +234,15 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                           </TableCell>
                           <TableCell className="text-xs text-slate-600 font-medium px-3 py-4">
                             {report.lokasi_kerusakan}
+                          </TableCell>
+                          <TableCell className="text-xs text-emerald-900 font-medium px-3 py-4 max-w-[240px]">
+                            {report.penanganan ? (
+                              <div className="bg-emerald-50/80 border border-emerald-100 text-emerald-900 px-2.5 py-1.5 rounded-xl truncate text-[11px]" title={report.penanganan}>
+                                {report.penanganan}
+                              </div>
+                            ) : (
+                              <span className="text-slate-400 italic text-[11px]">-</span>
+                            )}
                           </TableCell>
                           <TableCell className="px-3 py-4">
                             <ReportStatusBadge status={report.status} />

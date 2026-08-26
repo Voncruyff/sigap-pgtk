@@ -1,8 +1,26 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, User, Wrench, MapPin, Calendar, Clock, Phone } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  ArrowLeft,
+  User,
+  Wrench,
+  MapPin,
+  Calendar,
+  Clock,
+  Phone,
+  CheckCircle2,
+  Play,
+  Loader2,
+  Copy,
+  FileCheck,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
+import { SelesaiPenangananModal } from "@/components/admin/selesai-penanganan-modal";
+import { toast } from "sonner";
 
 export interface LaporanDetailItem {
   id: string;
@@ -16,6 +34,7 @@ export interface LaporanDetailItem {
   deskripsi: string;
   foto_url?: string;
   status: string;
+  penanganan?: string;
   created_at: string;
 }
 
@@ -23,7 +42,12 @@ export interface LaporanDetailViewProps {
   report: LaporanDetailItem;
 }
 
-export function LaporanDetailView({ report }: LaporanDetailViewProps) {
+export function LaporanDetailView({ report: initialReport }: LaporanDetailViewProps) {
+  const router = useRouter();
+  const [report, setReport] = useState<LaporanDetailItem>(initialReport);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isSelesaiModalOpen, setIsSelesaiModalOpen] = useState(false);
+
   const dateObj = new Date(report.created_at);
   const formattedDate = dateObj.toLocaleDateString("id-ID", {
     day: "numeric",
@@ -35,28 +59,113 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
     minute: "2-digit",
   });
 
+  const copyTicket = () => {
+    navigator.clipboard.writeText(report.ticket_number);
+    toast.success("Nomor tiket berhasil disalin ke clipboard!");
+  };
+
+  const handleUpdateStatus = async (newStatus: string) => {
+    setIsUpdating(true);
+    try {
+      const res = await fetch("/api/reports/status", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: report.id, status: newStatus }),
+      });
+
+      if (!res.ok) throw new Error("Gagal mengupdate status");
+
+      setReport((prev) => ({ ...prev, status: newStatus }));
+      toast.success("Status Berhasil Diperbarui!", {
+        description: `Status tiket diubah menjadi ${newStatus}.`,
+      });
+      router.refresh();
+    } catch (err) {
+      console.error("Update status error:", err);
+      toast.error("Gagal mengubah status laporan.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleCompleteSuccess = (reportId: string, ticketNumber: string, penanganan: string) => {
+    setReport((prev) => ({
+      ...prev,
+      status: "SELESAI",
+      penanganan,
+    }));
+    router.refresh();
+  };
+
   return (
     <div className="w-full space-y-6 pb-12">
       {/* Header Halaman */}
       <div className="space-y-4">
-        <Link href="/admin/laporan">
-          <Button variant="ghost" size="sm" className="-ml-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50/80 rounded-full font-bold">
-            <ArrowLeft className="mr-1.5 h-4 w-4" />
-            Kembali ke Daftar Laporan
-          </Button>
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link href="/admin/laporan">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="-ml-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50/80 rounded-full font-bold cursor-pointer"
+            >
+              <ArrowLeft className="mr-1.5 h-4 w-4" />
+              Kembali ke Daftar Laporan
+            </Button>
+          </Link>
+        </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-b border-slate-100 pb-4 sm:pb-5">
           <div>
             <div className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">
               Nomor Tiket Laporan Resmi
             </div>
-            <h1 className="text-xl sm:text-3xl font-mono font-bold tracking-wider text-sky-700 mt-0.5 sm:mt-1">
-              {report.ticket_number}
-            </h1>
+            <div className="flex items-center gap-2 mt-0.5 sm:mt-1">
+              <h1 className="text-xl sm:text-3xl font-mono font-black tracking-wider text-sky-800">
+                {report.ticket_number}
+              </h1>
+              <button
+                type="button"
+                onClick={copyTicket}
+                className="p-1.5 rounded-xl bg-slate-100 hover:bg-sky-50 text-slate-500 hover:text-sky-700 border border-slate-200 transition-colors cursor-pointer"
+                title="Salin Nomor Tiket"
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+            </div>
           </div>
+
           <div className="flex items-center gap-3">
             <ReportStatusBadge status={report.status} />
+
+            {/* Quick Action Button in Header */}
+            {report.status === "MENUNGGU" && (
+              <Button
+                size="sm"
+                disabled={isUpdating}
+                onClick={() => handleUpdateStatus("DIPROSES")}
+                className="h-8 px-3 rounded-full bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white font-bold shadow-2xs cursor-pointer"
+              >
+                {isUpdating ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <>
+                    <Play className="mr-1 h-3.5 w-3.5 fill-current" />
+                    Mulai Proses
+                  </>
+                )}
+              </Button>
+            )}
+
+            {report.status === "DIPROSES" && (
+              <Button
+                size="sm"
+                onClick={() => setIsSelesaiModalOpen(true)}
+                className="h-8 px-3 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold shadow-2xs cursor-pointer"
+              >
+                <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                Tandai Selesai
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -65,12 +174,32 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Main Details (2 Columns on Desktop) */}
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          {/* Card: Tindakan Penanganan Selesai (Jika Ada) */}
+          {report.penanganan && (
+            <div className="bg-emerald-50/60 border border-emerald-200 rounded-2xl shadow-2xs overflow-hidden">
+              <div className="p-4 sm:p-5 border-b border-emerald-100 bg-emerald-100/40 flex items-center justify-between">
+                <h3 className="text-xs sm:text-sm font-black flex items-center gap-2 text-emerald-900">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  Tindakan Penanganan &amp; Catatan Perbaikan
+                </h3>
+                <span className="text-[10.5px] font-bold text-emerald-700 bg-emerald-200/60 px-2 py-0.5 rounded-md">
+                  Tuntas
+                </span>
+              </div>
+              <div className="p-4 sm:p-5">
+                <p className="text-xs sm:text-sm text-emerald-950 font-medium whitespace-pre-wrap leading-relaxed bg-white/80 p-4 rounded-xl border border-emerald-200/80 shadow-2xs">
+                  {report.penanganan}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Card 1: Informasi Pelapor & Lokasi */}
           <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
             <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
               <h3 className="text-xs sm:text-sm font-extrabold flex items-center gap-2 text-slate-900">
                 <User className="h-4 w-4 text-sky-600" />
-                Informasi Pelapor & Lokasi
+                Informasi Pelapor &amp; Lokasi
               </h3>
             </div>
             <div className="p-4 sm:p-5 space-y-3.5 text-xs sm:text-sm">
@@ -109,7 +238,7 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
             <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
               <h3 className="text-xs sm:text-sm font-extrabold flex items-center gap-2 text-slate-900">
                 <Wrench className="h-4 w-4 text-sky-600" />
-                Detail Kerusakan & Lampiran Foto
+                Detail Kerusakan &amp; Lampiran Foto
               </h3>
             </div>
             <div className="p-4 sm:p-5 space-y-4 text-sm">
@@ -142,11 +271,12 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
           </div>
         </div>
 
-        {/* Side Panel: Informasi Waktu */}
+        {/* Side Panel: Informasi Waktu & Status */}
         <div className="space-y-6">
           <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
             <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
-              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
+              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <FileCheck className="h-4 w-4 text-sky-600" />
                 Informasi Waktu
               </h3>
             </div>
@@ -173,6 +303,14 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
           </div>
         </div>
       </div>
+
+      {/* Modal Selesai Penanganan */}
+      <SelesaiPenangananModal
+        report={report}
+        open={isSelesaiModalOpen}
+        onOpenChange={setIsSelesaiModalOpen}
+        onSuccess={handleCompleteSuccess}
+      />
     </div>
   );
 }

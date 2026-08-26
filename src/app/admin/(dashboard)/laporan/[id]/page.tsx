@@ -23,6 +23,7 @@ export default async function AdminLaporanDetailPage({ params }: ReportDetailPag
         ...data,
         nomor_hp: data.nomor_hp || undefined,
         foto_url: data.foto_url || undefined,
+        penanganan: data.penanganan || undefined,
         created_at: data.created_at.toISOString(),
       };
     }
