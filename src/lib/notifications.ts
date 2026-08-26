@@ -41,11 +41,28 @@ export function getNotificationPermissionState(): NotificationPermissionState {
   return Notification.permission as NotificationPermissionState;
 }
 
+export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+    return null;
+  }
+  try {
+    const reg = await navigator.serviceWorker.register("/sw.js");
+    return reg;
+  } catch (err) {
+    console.warn("Service Worker registration warning:", err);
+    return null;
+  }
+}
+
 export async function requestNotificationPermission(): Promise<NotificationPermissionState> {
   if (typeof window === "undefined" || !("Notification" in window)) {
     return "unsupported";
   }
   try {
+    // Also register service worker when permission is requested
+    if ("serviceWorker" in navigator) {
+      await registerServiceWorker();
+    }
     const perm = await Notification.requestPermission();
     return perm as NotificationPermissionState;
   } catch (err) {
@@ -98,40 +115,75 @@ export function playNotificationSound(_type: "new-report" | "status-change" = "n
   }
 }
 
-export function sendBrowserPushNotification(options: {
+export async function sendBrowserPushNotification(options: {
   title: string;
   body: string;
   iconUrl?: string;
   badgeUrl?: string;
   onClickUrl?: string;
-}): Notification | null {
-  if (typeof window === "undefined" || !("Notification" in window)) return null;
+}): Promise<boolean> {
+  if (typeof window === "undefined") return false;
 
   const settings = getNotificationSettings();
-  if (!settings.pushEnabled) return null;
+  if (!settings.pushEnabled) return false;
 
-  if (Notification.permission !== "granted") return null;
+  // Play audio chime
+  playNotificationSound("new-report");
 
+  // Mobile physical vibration
+  if ("vibrate" in navigator) {
+    try {
+      navigator.vibrate([200, 100, 200]);
+    } catch {
+      // Ignore vibration errors
+    }
+  }
+
+  if (!("Notification" in window) || Notification.permission !== "granted") {
+    return false;
+  }
+
+  const icon = options.iconUrl || "/assets/images/logo-pg-trangkil.png";
+  const badge = options.badgeUrl || "/assets/images/logo-pg-trangkil.png";
+  const url = options.onClickUrl || "/admin/riwayat";
+
+  // 1. Mobile Android & modern browser: Use ServiceWorker showNotification
+  if ("serviceWorker" in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      if (registration && "showNotification" in registration) {
+        await registration.showNotification(options.title, {
+          body: options.body,
+          icon,
+          badge,
+          tag: "sigap-report-notification",
+          data: { url },
+        });
+        return true;
+      }
+    } catch (err) {
+      console.warn("ServiceWorker showNotification failed, trying fallback:", err);
+    }
+  }
+
+  // 2. Desktop fallback: new Notification()
   try {
-    playNotificationSound("new-report");
-
     const notif = new Notification(options.title, {
       body: options.body,
-      icon: options.iconUrl || "/logo.png",
-      badge: options.badgeUrl || "/logo.png",
+      icon,
+      badge,
       tag: "sigap-report-notification",
     });
 
-    if (options.onClickUrl) {
+    if (url) {
       notif.onclick = () => {
         window.focus();
-        window.location.href = options.onClickUrl!;
+        window.location.href = url;
       };
     }
-
-    return notif;
+    return true;
   } catch (err) {
-    console.warn("Push notification error:", err);
-    return null;
+    console.warn("Desktop Notification fallback error:", err);
+    return false;
   }
 }

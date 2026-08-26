@@ -181,14 +181,14 @@ export function AdminPengaturanView() {
       return;
     }
 
-    sendBrowserPushNotification({
+    await sendBrowserPushNotification({
       title: "Laporan Kerusakan Baru Masuk!",
-      body: "Tiket #TRK-2026-0825: Budi Santoso (Unit Stasiun Gilingan) melaporkan kebocoran pipa uap.",
-      onClickUrl: "/admin/laporan",
+      body: "Tiket #TRK-2026-0826: Budi Santoso (Stasiun Gilingan) melaporkan kendala pipa uap.",
+      onClickUrl: "/admin/riwayat",
     });
 
     toast.success("Uji Coba Notifikasi Push Berhasil Dikirim!", {
-      description: "Periksa layar desktop atau bilah notifikasi browser Anda.",
+      description: "Periksa bilah notifikasi HP / browser Anda.",
     });
 
     setIsTestingNotif(false);
