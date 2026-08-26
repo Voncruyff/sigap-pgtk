@@ -112,18 +112,18 @@ export function SelesaiPenangananModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg p-5 sm:p-6 rounded-3xl bg-white border border-emerald-100 shadow-2xl space-y-4">
+      <DialogContent className="max-w-lg p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-lg space-y-4">
         {/* Header Dialog */}
-        <DialogHeader className="space-y-1.5 pb-2 border-b border-slate-100">
+        <DialogHeader className="space-y-1.5 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200/80 shadow-2xs">
+            <div className="p-2.5 rounded-xl bg-sky-50 text-sky-700 border border-sky-200/80 shrink-0">
               <CheckCircle2 className="h-5 w-5" />
             </div>
             <div>
-              <DialogTitle className="text-base sm:text-lg font-black tracking-tight text-slate-900">
+              <DialogTitle className="text-base sm:text-lg font-bold tracking-tight text-slate-900">
                 Selesaikan Penanganan Laporan
               </DialogTitle>
-              <DialogDescription className="text-xs text-slate-500 font-medium">
+              <DialogDescription className="text-xs text-slate-500 font-medium mt-0.5">
                 Tuliskan deskripsi tindakan perbaikan fasilitas sebelum menandai tiket selesai.
               </DialogDescription>
             </div>
@@ -132,23 +132,23 @@ export function SelesaiPenangananModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Ringkasan Tiket & Pelapor */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 space-y-2 text-xs">
+          <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-2 text-xs">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 Nomor Tiket
               </span>
-              <span className="font-mono font-black text-xs text-sky-800 bg-white px-2.5 py-0.5 rounded-lg border border-sky-200 shadow-2xs">
+              <span className="font-mono font-bold text-xs text-sky-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
                 {report.ticket_number}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/60 text-[11px]">
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60 text-[11px]">
               <div className="flex items-center gap-1.5 text-slate-600 truncate">
-                <User className="h-3.5 w-3.5 text-sky-600 shrink-0" />
+                <User className="h-3.5 w-3.5 text-sky-700 shrink-0" />
                 <span className="font-bold text-slate-800 truncate">{report.nama_pelapor}</span>
               </div>
               <div className="flex items-center gap-1.5 text-slate-600 truncate">
-                <Building className="h-3.5 w-3.5 text-sky-600 shrink-0" />
+                <Building className="h-3.5 w-3.5 text-sky-700 shrink-0" />
                 <span className="font-medium text-slate-700 truncate">
                   {report.bagian} - {report.unit_kerja}
                 </span>
@@ -157,16 +157,16 @@ export function SelesaiPenangananModal({
           </div>
 
           {/* Textarea Deskripsi Penanganan */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label
                 htmlFor="deskripsi-penanganan"
-                className="text-xs font-black text-slate-800 flex items-center gap-1.5"
+                className="text-xs font-bold text-slate-700 flex items-center gap-1.5"
               >
-                <Wrench className="h-3.5 w-3.5 text-emerald-600" />
-                Deskripsi Tindakan Penanganan / Perbaikan <span className="text-rose-500">*</span>
+                <Wrench className="h-3.5 w-3.5 text-sky-700" />
+                Deskripsi Tindakan Penanganan / Perbaikan <span className="text-rose-500 font-bold">*</span>
               </Label>
-              <span className="text-[10px] text-slate-400 font-medium">Wajib diisi</span>
+              <span className="text-[10.5px] text-slate-400 font-medium">Wajib diisi</span>
             </div>
 
             <Textarea
@@ -178,13 +178,13 @@ export function SelesaiPenangananModal({
                 if (error) setError(null);
               }}
               placeholder="Contoh: Telah dilakukan pembongkaran dan penggantian seal valve No. 3 yang bocor. Dilanjutkan pengetesan tekanan uap pada 15 bar, hasil normal dan tidak ada kebocoran lagi."
-              className={`text-xs font-medium rounded-2xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20 bg-white shadow-2xs leading-relaxed resize-none ${
-                error ? "border-rose-400 focus:border-rose-500 focus:ring-rose-500/20" : ""
+              className={`text-xs font-medium rounded-xl border-slate-200 focus-visible:ring-sky-500/20 focus-visible:border-sky-500 bg-white shadow-2xs leading-relaxed resize-none ${
+                error ? "border-rose-400 focus-visible:border-rose-500 focus-visible:ring-rose-500/20" : ""
               }`}
             />
 
             {error && (
-              <p className="text-[11px] text-rose-600 font-semibold flex items-center gap-1 pt-0.5">
+              <p className="text-[11px] text-rose-600 font-medium flex items-center gap-1 pt-0.5">
                 <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                 {error}
               </p>
@@ -194,7 +194,7 @@ export function SelesaiPenangananModal({
           {/* Quick Presets / Template Catatan */}
           <div className="space-y-1.5 pt-0.5">
             <span className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-              <Sparkles className="h-3 w-3 text-amber-500" />
+              <Sparkles className="h-3 w-3 text-sky-600" />
               Template Cepat Tindakan (Klik untuk Menambahkan):
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -203,7 +203,7 @@ export function SelesaiPenangananModal({
                   key={idx}
                   type="button"
                   onClick={() => handleApplyPreset(preset)}
-                  className="text-[10.5px] font-medium bg-slate-100/90 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200/80 hover:border-emerald-200 px-2.5 py-1 rounded-xl transition-all text-left cursor-pointer active:scale-95"
+                  className="text-[11px] font-medium bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 border border-slate-200/80 hover:border-sky-200 px-2.5 py-1 rounded-lg transition-all text-left cursor-pointer active:scale-95 shadow-2xs"
                 >
                   + {preset}
                 </button>
@@ -218,14 +218,14 @@ export function SelesaiPenangananModal({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
-              className="h-10 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 border-slate-200 cursor-pointer"
+              className="h-10 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-900 border-slate-200 cursor-pointer shadow-2xs"
             >
               Batal
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !penanganan.trim()}
-              className="h-10 px-5 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5"
+              className="h-10 px-5 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex items-center gap-1.5 transition-all"
             >
               {isSubmitting ? (
                 <>

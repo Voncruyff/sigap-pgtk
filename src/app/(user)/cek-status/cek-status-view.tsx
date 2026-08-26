@@ -6,11 +6,9 @@ import { useRouter } from "next/navigation";
 import {
   Search,
   Wrench,
-  Clock,
   ExternalLink,
   Building,
   User,
-  MapPin,
   Calendar,
   Sparkles,
   Filter,
@@ -20,7 +18,7 @@ import {
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FadeIn, FadeInScale } from "@/components/ui/motion";
@@ -115,7 +113,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
 
       {/* Main Search & Realtime Counter Bar */}
       <FadeInScale delay={0.05} className="space-y-4">
-        <Card className="border border-slate-200/80 bg-white rounded-3xl shadow-2xs overflow-hidden">
+        <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
           <CardContent className="p-4 sm:p-6 space-y-4">
             {/* Search Input Bar */}
             <form onSubmit={handleDirectSearch} className="space-y-2">
@@ -125,15 +123,15 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cari nomor tiket (contoh: SIGAP-20260825-...) atau nama unit kerja / pelapor..."
-                    className="pl-10 h-11 text-xs sm:text-sm font-medium rounded-2xl border-slate-200 focus:border-sky-500 bg-white shadow-2xs"
+                    placeholder="Cari nomor tiket atau nama unit kerja / pelapor..."
+                    className="pl-10 h-11 text-xs sm:text-sm font-medium rounded-xl border-slate-200 focus-visible:ring-sky-500/20 focus-visible:border-sky-500 bg-white shadow-2xs"
                   />
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <Button
                     type="submit"
-                    className="h-11 px-5 rounded-2xl text-xs sm:text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex-1 sm:flex-initial"
+                    className="h-11 px-5 rounded-xl text-xs sm:text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex-1 sm:flex-initial"
                   >
                     <Search className="mr-1.5 h-4 w-4" />
                     Cari Tiket
@@ -145,7 +143,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                     onClick={handleRefresh}
                     disabled={isRefreshing}
                     title="Refresh data langsung dari server"
-                    className="h-11 w-11 p-0 rounded-2xl border-slate-200 text-slate-600 hover:text-sky-700 hover:bg-sky-50 cursor-pointer shrink-0"
+                    className="h-11 w-11 p-0 rounded-xl border-slate-200 text-slate-600 hover:text-sky-700 hover:bg-sky-50 cursor-pointer shrink-0"
                   >
                     <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin text-sky-600" : ""}`} />
                   </Button>
@@ -165,9 +163,9 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                     key={dept}
                     type="button"
                     onClick={() => setSelectedBagian(dept)}
-                    className={`h-7 px-3 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                    className={`h-7 px-3 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                       selectedBagian === dept
-                        ? "bg-sky-700 text-white shadow-2xs shadow-sky-700/20"
+                        ? "bg-sky-700 text-white shadow-2xs"
                         : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
                     }`}
                   >
@@ -184,7 +182,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                 <button
                   type="button"
                   onClick={() => setSelectedStatus("ALL")}
-                  className={`h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                  className={`h-7 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                     selectedStatus === "ALL"
                       ? "bg-slate-800 text-white shadow-2xs"
                       : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
@@ -195,7 +193,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                 <button
                   type="button"
                   onClick={() => setSelectedStatus("MENUNGGU")}
-                  className={`h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                  className={`h-7 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                     selectedStatus === "MENUNGGU"
                       ? "bg-amber-600 text-white shadow-2xs"
                       : "bg-amber-50 text-amber-800 hover:bg-amber-100/80 border border-amber-200/60"
@@ -206,7 +204,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                 <button
                   type="button"
                   onClick={() => setSelectedStatus("DIPROSES")}
-                  className={`h-7 px-2.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                  className={`h-7 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                     selectedStatus === "DIPROSES"
                       ? "bg-sky-700 text-white shadow-2xs"
                       : "bg-sky-50 text-sky-800 hover:bg-sky-100/80 border border-sky-200/60"
@@ -227,7 +225,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
             <Sparkles className="h-4 w-4" />
           </div>
           <div>
-            <h2 className="text-sm sm:text-base font-black text-slate-900">
+            <h2 className="text-sm sm:text-base font-bold text-slate-900">
               Laporan Yang Belum Selesai
             </h2>
             <p className="text-[11px] text-slate-500 font-medium">
@@ -242,8 +240,8 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
 
       {/* Cards List of Active Reports */}
       {filteredReports.length === 0 ? (
-        <Card className="border border-dashed border-slate-200 bg-white/90 rounded-3xl p-8 sm:p-12 text-center shadow-2xs space-y-3">
-          <div className="mx-auto w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center">
+        <Card className="border border-dashed border-slate-200 bg-white rounded-2xl p-8 sm:p-12 text-center shadow-2xs space-y-3">
+          <div className="mx-auto w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center">
             <CheckCircle2 className="h-6 w-6" />
           </div>
           <div className="space-y-1">
@@ -280,13 +278,13 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
             return (
               <Card
                 key={report.id}
-                className="border border-slate-200/90 hover:border-sky-300 bg-white rounded-3xl shadow-2xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group"
+                className="border border-slate-200/80 hover:border-sky-300 bg-white rounded-2xl shadow-2xs hover:shadow-sm transition-all overflow-hidden flex flex-col justify-between"
               >
                 <div>
                   {/* Card Header: Ticket Number & Status Badge */}
                   <CardHeader className="p-4 pb-3 bg-slate-50/70 border-b border-slate-100 flex flex-row items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-mono text-xs font-black text-sky-800 truncate">
+                      <span className="font-mono text-xs font-bold text-sky-800 truncate">
                         {report.ticket_number}
                       </span>
                       <button
@@ -304,8 +302,8 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                   {/* Card Content: Details */}
                   <CardContent className="p-4 space-y-3 text-xs">
                     <div>
-                      <span className="font-extrabold text-sm text-slate-900 block flex items-center gap-1.5">
-                        <Wrench className="h-3.5 w-3.5 text-sky-600 shrink-0" />
+                      <span className="font-bold text-sm text-slate-900 block flex items-center gap-1.5">
+                        <Wrench className="h-3.5 w-3.5 text-sky-700 shrink-0" />
                         {report.unit_kerja}
                       </span>
                       <p className="text-slate-600 text-xs font-medium mt-1 line-clamp-2 leading-relaxed bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
