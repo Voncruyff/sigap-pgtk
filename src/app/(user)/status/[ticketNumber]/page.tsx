@@ -2,6 +2,9 @@ import React from "react";
 import { getReportByTicket } from "@/lib/report-services";
 import { StatusDetailView, StatusDetailReportItem } from "./status-detail-view";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface StatusDetailPageProps {
   params: Promise<{
     ticketNumber: string;
@@ -16,8 +19,17 @@ export default async function StatusDetailPage({ params }: StatusDetailPageProps
     const data = await getReportByTicket(ticketNumber);
     if (data) {
       report = {
-        ...data,
-        created_at: data.created_at.toISOString(),
+        id: data.id,
+        ticket_number: data.ticket_number,
+        nama_pelapor: data.nama_pelapor,
+        bagian: data.bagian,
+        unit_kerja: data.unit_kerja,
+        lokasi_kerusakan: data.lokasi_kerusakan,
+        deskripsi: data.deskripsi,
+        foto_url: data.foto_url,
+        status: data.status,
+        penanganan: data.penanganan,
+        created_at: data.created_at ? data.created_at.toISOString() : undefined,
       };
     }
   } catch (err) {

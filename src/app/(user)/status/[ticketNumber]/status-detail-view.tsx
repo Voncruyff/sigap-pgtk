@@ -57,10 +57,10 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
     { id: 4, name: "Perbaikan Selesai", desc: "Tuntas & verifikasi", icon: CheckCircle2 },
   ];
 
-  const formattedDate = formatDateIndonesian(report?.created_at || new Date());
+  const formattedDate = report?.created_at ? formatDateIndonesian(report.created_at) : "-";
 
   return (
-    <div className="max-w-3xl mx-auto space-y-5 pb-12">
+    <div suppressHydrationWarning className="max-w-3xl mx-auto space-y-5 pb-12">
       {/* Header Halaman Dynamic */}
       <PageHeader
         title="Status Penanganan Tiket"
@@ -101,7 +101,7 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
         {/* Stepper Progress Bar */}
         <CardContent className="p-5 sm:p-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 relative">
-            {steps.map((step, index) => {
+            {steps.map((step) => {
               const Icon = step.icon;
               const isCompleted = step.id < currentStep;
               const isCurrent = step.id === currentStep;
@@ -165,16 +165,16 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
 
       {/* Card Hasil Tindakan Penanganan (Jika Status SELESAI & Memiliki Catatan Penanganan) */}
       {report?.penanganan && (
-        <Card className="border border-emerald-200 bg-emerald-50/40 rounded-2xl shadow-2xs overflow-hidden">
-          <CardHeader className="p-4 sm:p-5 border-b border-emerald-100 bg-emerald-100/30 flex flex-row items-center justify-between gap-2">
+        <div className="border border-emerald-200 bg-emerald-50/40 rounded-2xl shadow-2xs overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-emerald-100 bg-emerald-100/30 flex flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-xl bg-emerald-100 text-emerald-700">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
               <div>
-                <CardTitle className="text-xs sm:text-sm font-black text-emerald-900">
+                <h3 className="text-xs sm:text-sm font-bold text-emerald-900">
                   Hasil Tindakan Penanganan Teknisi
-                </CardTitle>
+                </h3>
                 <span className="text-[10px] text-emerald-700 font-medium">
                   Catatan perbaikan resmi dari petugas SIGAP
                 </span>
@@ -183,13 +183,13 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
             <span className="text-[10.5px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
               Selesai Dikerjakan
             </span>
-          </CardHeader>
-          <CardContent className="p-4 sm:p-5">
+          </div>
+          <div className="p-4 sm:p-5">
             <div className="bg-white p-4 rounded-xl border border-emerald-200/80 shadow-2xs text-xs sm:text-sm text-emerald-950 font-medium whitespace-pre-wrap leading-relaxed">
               {report.penanganan}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Details Grid: Left Metadata & Right Description / Photo */}
@@ -197,7 +197,7 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
         {/* Left Card: Metadata Informasi Tiket */}
         <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
           <CardHeader className="p-4 border-b border-slate-100 bg-slate-50/50">
-            <CardTitle className="text-xs font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
               <Tag className="h-4 w-4 text-sky-700 shrink-0" />
               Detail Informasi Tiket
             </CardTitle>
@@ -209,7 +209,7 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
                 <span className="text-[11px] text-slate-400 font-medium block">
                   Tanggal Pengajuan
                 </span>
-                <span className="font-bold text-slate-800">{formattedDate}</span>
+                <span suppressHydrationWarning className="font-bold text-slate-800">{formattedDate}</span>
               </div>
             </div>
 
