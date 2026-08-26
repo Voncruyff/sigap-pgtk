@@ -218,11 +218,25 @@
   font-weight: 600 !important;
 }
 
-[data-sonner-toast][data-type="success"] [data-title] {
-  color: #064e3b !important; /* emerald-900 */
-}
-
 [data-sonner-toast][data-type="success"] [data-description] {
   color: #047857 !important; /* emerald-700 */
   font-weight: 600 !important;
+}
+
+/* Ensure Sonner Toaster is 100% centered and compact on all mobile screens */
+[data-sonner-toaster][data-position="top-center"] {
+  top: 14px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  justify-content: center !important;
+  width: auto !important;
+  max-width: 90vw !important;
+  z-index: 9999 !important;
+}
+
+[data-sonner-toast] {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: left !important;
 }

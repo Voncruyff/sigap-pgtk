@@ -33,7 +33,7 @@ export function UserDockbar() {
     <nav
       suppressHydrationWarning
       aria-label="User Mobile Navigation Dockbar"
-      className="md:hidden fixed bottom-3 left-2.5 right-2.5 sm:left-6 sm:right-6 max-w-md mx-auto z-50 bg-white/80 backdrop-blur-2xl border border-white/80 shadow-[0_12px_36px_rgba(2,132,199,0.16)] ring-1 ring-black/5 rounded-3xl p-1.5 flex items-center justify-around transition-all"
+      className="md:hidden fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-1.25rem)] max-w-md z-[60] bg-white/90 backdrop-blur-2xl border border-slate-200/80 shadow-[0_10px_35px_rgba(2,132,199,0.18)] rounded-3xl p-1 flex items-center justify-around transition-all pointer-events-auto"
     >
       {USER_DOCKBAR_ITEMS.map((item) => {
         const Icon = item.icon;
