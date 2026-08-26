@@ -4,6 +4,7 @@
 ![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)
 ![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=flat-square&logo=mysql)
+![XAMPP](https://img.shields.io/badge/XAMPP-Local_Server-FB7A24?style=flat-square&logo=xampp)
 ![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-Vanilla-38BDF8?style=flat-square&logo=tailwindcss)
 
@@ -22,7 +23,7 @@
 ### 🛡️ Modul Panel Admin SIGAP (Admin Side)
 * **Dashboard Analitik (`/admin/dashboard`)**: Ringkasan 5 statistik utama (*Total Laporan, Menunggu, Diproses, Selesai, Petugas Admin*) dan feed Log Aktivitas terbaru.
 * **Manajemen Laporan Aktif (`/admin/laporan`)**: Pengelolaan laporan berstatus `MENUNGGU` & `DIPROSES`. Laporan yang telah berstatus `SELESAI` otomatis dipindahkan ke arsip riwayat.
-* **Riwayat & Arsip Perbaikan (`/admin/riwayat`)**: Pengarsipan data laporan tuntas dengan filter tanggal, pencarian kata kunci, serta opsi ekspor dokumen (PDF/Excel).
+* **Riwayat & Arsip Perbaikan (`/admin/riwayat`)**: Pengarsipan data laporan tuntas dengan filter tanggal, pencarian kata kunci, serta opsi ekspor dokumen (PDF/Excel/Word).
 * **Kelola Akun Admin (`/admin/kelola-admin`)**: Manajemen pengguna admin oleh Super Admin, termasuk fitur penonaktifan/banned berjangka maupun permanen.
 * **Audit Log Aktivitas (`/admin/log-aktivitas`)**: Pencatatan riwayat tindakan admin (perubahan status laporan, pembaruan profil, penambahan/banned admin).
 * **Pengaturan Profil (`/admin/pengaturan`)**: Pembaruan profil dengan verifikasi keamanan kata sandi saat menyimpan perubahan.
@@ -34,6 +35,7 @@
 * **Framework**: [Next.js 15](https://nextjs.org/) (App Router, React Server Components, API Routes)
 * **Bahasa**: [TypeScript](https://www.typescriptlang.org/)
 * **Database & ORM**: Database [MySQL](https://www.mysql.com/) dengan [Prisma ORM](https://www.prisma.io/)
+* **Server Lokal**: **XAMPP** (Apache & MySQL Control Panel / phpMyAdmin)
 * **Desain & UI**: [TailwindCSS](https://tailwindcss.com/), Radix UI, Lucide Icons, dan Motion Animation
 * **Tipografi**: Google Font `Poppins` (Font Utama) & `JetBrains Mono` (Nomor Tiket & Kode Log)
 * **Autentikasi**: JWT (JSON Web Token) dengan penyimpanan HttpOnly Cookie & Bcrypt Password Hashing
@@ -51,8 +53,8 @@ Aplikasi ini menggunakan standar panduan visual resmi **PT Kebon Agung PG Trangk
 ## 🚀 Cara Menjalankan Proyek (Getting Started)
 
 ### 1. Prasyarat Sistem
-* Node.js v18.0.0 atau versi yang lebih baru
-* Server Database MySQL
+* **Node.js**: v18.0.0 atau versi yang lebih baru
+* **Server Database MySQL**: Dapat dijalankan menggunakan **XAMPP Control Panel** (Aktifkan modul MySQL & Apache/phpMyAdmin)
 
 ### 2. Instalasi Dependensi
 ```bash
