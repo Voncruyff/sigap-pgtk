@@ -2,14 +2,15 @@ import React from "react";
 import Link from "next/link";
 import {
   FileText,
-  Wrench,
-  Building,
-  Sprout,
-  Briefcase,
+  Calendar,
+  CalendarDays,
+  CalendarRange,
+  Clock,
   ArrowUpRight,
   Sparkles,
   Users,
   Activity,
+  TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
@@ -45,11 +46,11 @@ export interface DashboardLogItem {
 }
 
 export interface DashboardViewProps {
+  todayCount: number;
+  thisWeekCount: number;
+  thisMonthCount: number;
+  thisYearCount: number;
   totalCount: number;
-  teknikCount: number;
-  pabrikasiCount: number;
-  tanamanCount: number;
-  tukCount: number;
   totalAdminCount: number;
   recentReports: DashboardReportItem[];
   recentLogs: DashboardLogItem[];
@@ -57,15 +58,18 @@ export interface DashboardViewProps {
 
 export function DashboardView(props: DashboardViewProps) {
   const {
+    todayCount,
+    thisWeekCount,
+    thisMonthCount,
+    thisYearCount,
     totalCount,
-    teknikCount,
-    pabrikasiCount,
-    tanamanCount,
-    tukCount,
     totalAdminCount,
     recentReports,
     recentLogs,
   } = props;
+
+  const currentYear = new Date().getFullYear();
+  const currentMonthName = new Date().toLocaleDateString("id-ID", { month: "long" });
 
   const stats: Array<{
     title: string;
@@ -75,38 +79,38 @@ export function DashboardView(props: DashboardViewProps) {
     colorScheme: StatColorScheme;
   }> = [
     {
-      title: "Total Laporan",
-      value: totalCount,
-      subtext: "Catatan Kerusakan",
-      icon: FileText,
+      title: "Hari Ini",
+      value: todayCount,
+      subtext: "Laporan Masuk",
+      icon: Clock,
       colorScheme: "sky",
     },
     {
-      title: "Bagian Teknik",
-      value: teknikCount,
-      subtext: "Fasilitas & Mesin",
-      icon: Wrench,
-      colorScheme: "blue",
-    },
-    {
-      title: "Bagian Pabrikasi",
-      value: pabrikasiCount,
-      subtext: "Pengolahan & Pabrik",
-      icon: Building,
+      title: "Minggu Ini",
+      value: thisWeekCount,
+      subtext: "7 Hari Terakhir",
+      icon: CalendarRange,
       colorScheme: "amber",
     },
     {
-      title: "Bagian Tanaman",
-      value: tanamanCount,
-      subtext: "Bahan Baku Tebu",
-      icon: Sprout,
+      title: "Bulan Ini",
+      value: thisMonthCount,
+      subtext: `Bulan ${currentMonthName}`,
+      icon: CalendarDays,
+      colorScheme: "blue",
+    },
+    {
+      title: "Tahun Ini",
+      value: thisYearCount,
+      subtext: `Tahun ${currentYear}`,
+      icon: TrendingUp,
       colorScheme: "emerald",
     },
     {
-      title: "Bagian TUK",
-      value: tukCount,
-      subtext: "Tata Usaha & Umum",
-      icon: Briefcase,
+      title: "Total Laporan",
+      value: totalCount,
+      subtext: "Semua Catatan",
+      icon: FileText,
       colorScheme: "indigo",
     },
     {
@@ -123,8 +127,8 @@ export function DashboardView(props: DashboardViewProps) {
       {/* Header Halaman Minimalis */}
       <PageHeader
         title="Dashboard Overview"
-        description="Ringkasan catatan kerusakan fasilitas & aktivitas petugas PT Kebon Agung PG Trangkil."
-        badgeText="SIGAP Summary"
+        description="Ringkasan statistik catatan kerusakan fasilitas berdasarkan periode waktu & aktivitas sistem."
+        badgeText="SIGAP Analytics"
       />
 
       {/* 🖥️ Tampilan Utama Desktop / PC */}
@@ -151,7 +155,7 @@ export function DashboardView(props: DashboardViewProps) {
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-sky-600" />
                 <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                  Laporan Kerusakan Terbaru
+                  Catatan Kerusakan Terbaru
                 </h3>
               </div>
               <Link href="/admin/riwayat">

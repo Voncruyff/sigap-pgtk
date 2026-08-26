@@ -2,29 +2,32 @@ import React from "react";
 import Link from "next/link";
 import {
   FileText,
-  Wrench,
-  Building,
-  Sprout,
-  Briefcase,
+  CalendarRange,
+  CalendarDays,
+  Clock,
   ArrowRight,
   Sparkles,
   Users,
   Activity,
+  TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatCard, type StatColorScheme } from "@/components/admin/stat-card";
 import { DashboardViewProps } from "@/app/admin/(dashboard)/dashboard/dashboard-view";
 
 export function DashboardMobileView({
+  todayCount,
+  thisWeekCount,
+  thisMonthCount,
+  thisYearCount,
   totalCount,
-  teknikCount,
-  pabrikasiCount,
-  tanamanCount,
-  tukCount,
   totalAdminCount,
   recentReports,
   recentLogs,
 }: DashboardViewProps) {
+  const currentYear = new Date().getFullYear();
+  const currentMonthName = new Date().toLocaleDateString("id-ID", { month: "short" });
+
   const stats: Array<{
     title: string;
     value: number;
@@ -33,38 +36,38 @@ export function DashboardMobileView({
     colorScheme: StatColorScheme;
   }> = [
     {
-      title: "Total Laporan",
-      value: totalCount,
-      subtext: "Catatan",
-      icon: FileText,
+      title: "Hari Ini",
+      value: todayCount,
+      subtext: "Laporan Masuk",
+      icon: Clock,
       colorScheme: "sky",
     },
     {
-      title: "Teknik",
-      value: teknikCount,
-      subtext: "Fasilitas & Mesin",
-      icon: Wrench,
-      colorScheme: "blue",
-    },
-    {
-      title: "Pabrikasi",
-      value: pabrikasiCount,
-      subtext: "Pabrik Gula",
-      icon: Building,
+      title: "Minggu Ini",
+      value: thisWeekCount,
+      subtext: "7 Hari Terakhir",
+      icon: CalendarRange,
       colorScheme: "amber",
     },
     {
-      title: "Tanaman",
-      value: tanamanCount,
-      subtext: "Bahan Baku Tebu",
-      icon: Sprout,
+      title: "Bulan Ini",
+      value: thisMonthCount,
+      subtext: `${currentMonthName} ${currentYear}`,
+      icon: CalendarDays,
+      colorScheme: "blue",
+    },
+    {
+      title: "Tahun Ini",
+      value: thisYearCount,
+      subtext: `Tahun ${currentYear}`,
+      icon: TrendingUp,
       colorScheme: "emerald",
     },
     {
-      title: "TUK",
-      value: tukCount,
-      subtext: "Tata Usaha",
-      icon: Briefcase,
+      title: "Total Laporan",
+      value: totalCount,
+      subtext: "Semua Catatan",
+      icon: FileText,
       colorScheme: "indigo",
     },
     {
