@@ -151,9 +151,21 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
         </div>
       ) : preview ? (
         /* State 2: Uploaded Preview with Actions */
-        <div className="relative rounded-2xl border border-sky-100 bg-white p-3.5 sm:p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all">
-          <div className="flex items-center gap-3.5 overflow-hidden">
-            <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl overflow-hidden border border-sky-100 bg-slate-100 shadow-2xs">
+        <div className="relative rounded-2xl border border-sky-100 bg-white p-3.5 sm:p-4 shadow-sm hover:shadow-md transition-all">
+          {/* Quick Delete / Cancel Button (Top Right) */}
+          <button
+            type="button"
+            onClick={handleRemove}
+            className="absolute top-2.5 right-2.5 p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all border border-transparent hover:border-rose-100 cursor-pointer"
+            title="Hapus / Batalkan Foto"
+            aria-label="Hapus Foto"
+          >
+            <X className="h-4 w-4" />
+          </button>
+
+          <div className="flex items-center gap-3 pr-8 min-w-0">
+            {/* Thumbnail */}
+            <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl overflow-hidden border border-sky-100 bg-slate-100 shadow-2xs">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={preview}
@@ -161,45 +173,32 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="truncate text-xs space-y-1">
+
+            {/* File Info & Inline Change Trigger */}
+            <div className="min-w-0 flex-1 space-y-1">
               <p className="font-bold text-slate-900 truncate text-xs sm:text-sm">{value?.name}</p>
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80 text-[11px]">
+                <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80 text-[10px] sm:text-[11px]">
                   <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                   {value ? formatFileSize(value.size) : ""}
                 </span>
                 {originalSize && originalSize > (value?.size || 0) && (
-                  <span className="text-slate-400 line-through text-[11px]">
+                  <span className="text-slate-400 line-through text-[10px] sm:text-[11px]">
                     {formatFileSize(originalSize)}
                   </span>
                 )}
+                <button
+                  type="button"
+                  onClick={() => setIsOptionModalOpen(true)}
+                  className="text-[11px] font-bold text-sky-600 hover:text-sky-800 hover:underline ml-1 cursor-pointer"
+                >
+                  Ganti Foto
+                </button>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium">
+              <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium truncate">
                 Terkompresi otomatis &le; 50 KB (Siap diunggah)
               </p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setIsOptionModalOpen(true)}
-              className="h-8 text-xs px-3 rounded-xl border-sky-200 text-sky-700 hover:bg-sky-50 font-bold"
-            >
-              Ganti
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleRemove}
-              className="h-8 text-xs px-3 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl font-bold"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Hapus
-            </Button>
           </div>
         </div>
       ) : (
