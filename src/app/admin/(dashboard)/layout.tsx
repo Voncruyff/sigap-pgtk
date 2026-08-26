@@ -4,6 +4,7 @@ import { getAdminSession } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminReportNotifier } from "@/components/admin/admin-report-notifier";
+import { AdminDockbar } from "@/components/mobile/admin-dockbar";
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getAdminSession();
@@ -12,7 +13,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col lg:flex-row bg-slate-50/70 text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-700 relative">
+    <div className="h-screen h-[100dvh] w-screen overflow-hidden flex flex-col lg:flex-row bg-slate-50/70 text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-700 relative">
       {/* Background Push Notifier Listener */}
       <AdminReportNotifier />
 
@@ -28,15 +29,18 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
       <AdminSidebar />
 
       {/* Main Content Wrapper Column */}
-      <div className="relative z-10 flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      <div className="relative z-10 flex-1 min-h-0 flex flex-col min-w-0 h-full overflow-hidden">
         {/* Fixed Desktop Top Header Bar */}
         <AdminHeader />
 
         {/* Main Content Area (Strictly Only This Scrolls) */}
-        <main className="flex-1 overflow-y-auto p-3.5 sm:p-5 lg:p-6 pb-32 lg:pb-6">
+        <main className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-5 lg:p-6 pb-24 lg:pb-6">
           {children}
         </main>
       </div>
+
+      {/* 📱 Mobile Fixed Floating Dockbar (Always Top Level on Root Layout) */}
+      <AdminDockbar />
     </div>
   );
 }

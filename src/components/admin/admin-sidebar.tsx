@@ -291,9 +291,6 @@ export function AdminSidebar() {
           )}
         </div>
       </header>
-
-      {/* Mobile Bottom Navigation Bar (Shopee Style) */}
-      <AdminBottomNav />
     </>
   );
 }
