@@ -44,13 +44,6 @@ export const WORK_UNITS: WorkUnit[] = [
   { kobag: "46030", name: "46030 - B.U. ANGKUTAN TEBU", department: "Tanaman" },
 ];
 
-export const IMPACTS = [
-  "Tidak mengganggu pekerjaan",
-  "Menghambat sebagian pekerjaan",
-  "Pekerjaan tidak dapat dilakukan",
-  "Berpotensi membahayakan",
-];
-
 export const reportSchema = z.object({
   namaPelapor: z
     .string()
@@ -60,15 +53,12 @@ export const reportSchema = z.object({
   unitKerja: z.string().min(1, { message: "Unit / Bagian Kerja wajib dipilih" }),
   nomorHp: z.string().optional(),
   lokasiKerusakan: z.string().optional(),
-  peralatan: z
-    .string()
-    .min(1, { message: "Peralatan / Fasilitas wajib diisi" }),
+  peralatan: z.string().optional(),
   deskripsi: z
     .string()
     .min(1, { message: "Deskripsi Kerusakan wajib diisi" })
     .min(10, { message: "Deskripsi Kerusakan minimal 10 karakter" }),
   foto: z.any().optional(),
-  dampak: z.string().optional(),
 });
 
 export type ReportFormValues = z.infer<typeof reportSchema>;

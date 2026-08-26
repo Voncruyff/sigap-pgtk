@@ -1,0 +1,54 @@
+// Prisma Schema for SIGAP Application (MySQL Database)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Report {
+  id               String   @id @default(uuid())
+  ticket_number    String   @unique
+  nama_pelapor     String
+  bagian           String
+  unit_kerja       String
+  nomor_hp         String?
+  lokasi_kerusakan String
+  deskripsi        String   @db.Text
+  foto_url         String?  @db.LongText
+  status           String   @default("MENUNGGU")
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@map("reports")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  waktu     DateTime @default(now())
+  admin     String
+  role      String   @default("SUPER_ADMIN")
+  aktivitas String
+  target    String
+  deskripsi String   @db.Text
+
+  @@map("activity_logs")
+}
+
+model AdminUser {
+  id            String    @id @default(uuid())
+  username      String    @unique
+  password      String
+  nama          String
+  role          String    @default("ADMIN")
+  is_banned     Boolean   @default(false)
+  banned_until  DateTime?
+  banned_reason String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  @@map("admin_users")
+}

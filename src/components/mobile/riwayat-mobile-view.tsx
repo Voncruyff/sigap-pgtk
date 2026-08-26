@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
 import { CompletedReportItem } from "@/app/admin/(dashboard)/riwayat/riwayat-view";
+import { ExportDialog } from "@/components/admin/export-dialog";
 
 export interface RiwayatMobileViewProps {
   completedReports: CompletedReportItem[];
@@ -14,13 +15,16 @@ export interface RiwayatMobileViewProps {
 export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) {
   return (
     <div className="space-y-3.5">
-      {/* Mobile Search Bar */}
-      <div className="relative w-full">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-        <Input
-          placeholder="Cari arsip tiket / pelapor..."
-          className="pl-9 h-10 text-xs font-medium rounded-2xl border-sky-200/90 focus:border-sky-500 bg-white shadow-2xs"
-        />
+      {/* Mobile Search & Export Bar */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+          <Input
+            placeholder="Cari arsip tiket / pelapor..."
+            className="pl-9 h-10 text-xs font-medium rounded-2xl border-sky-200/90 focus:border-sky-500 bg-white shadow-2xs"
+          />
+        </div>
+        <ExportDialog completedReports={completedReports} />
       </div>
 
       {/* Mobile Cards List */}
@@ -54,7 +58,7 @@ export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) 
                 <div>
                   <span className="font-extrabold text-sm text-slate-900 block flex items-center gap-1.5">
                     <Wrench className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                    {report.peralatan}
+                    {report.unit_kerja}
                   </span>
                 </div>
 

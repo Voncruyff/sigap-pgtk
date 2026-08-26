@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LockKeyhole, Wrench, Search, Building, Menu, Home } from "lucide-react";
+import { LockKeyhole, Wrench, Search, Building, Menu, Home, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -20,6 +20,7 @@ export default function UserLayout({
     { label: "Beranda", href: "/", icon: Home },
     { label: "Buat Laporan", href: "/lapor", icon: Wrench },
     { label: "Cek Status", href: "/cek-status", icon: Search },
+    { label: "Pengaturan", href: "/pengaturan", icon: Settings },
   ];
 
   return (
@@ -39,7 +40,7 @@ export default function UserLayout({
           <Link href="/" className="flex items-center gap-2.5 shrink-0 group py-1">
             <div className="relative h-8 sm:h-11 w-auto max-w-[200px] sm:max-w-[290px] flex items-center transition-transform group-hover:scale-[1.01]">
               <Image
-                src="/logo-pg-trangkil.png"
+                src="/assets/images/logo-pg-trangkil.png"
                 alt="Logo PT Kebon Agung Pabrik Gula Trangkil"
                 width={300}
                 height={60}
@@ -59,7 +60,7 @@ export default function UserLayout({
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1.5 p-1.5 rounded-full bg-slate-100/80 border border-slate-200/60 shadow-inner">
+          <nav className="hidden md:flex items-center gap-1 p-1 rounded-full bg-slate-100/80 border border-slate-200/60 shadow-inner">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -67,13 +68,13 @@ export default function UserLayout({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
+                  className={`px-3 lg:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-1.5 sm:gap-2 ${
                     isActive
                       ? "bg-gradient-to-r from-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/25 scale-[1.02]"
                       : "text-slate-600 hover:text-sky-700 hover:bg-white/80"
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-sky-600"}`} />
+                  <Icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isActive ? "text-white" : "text-sky-600"}`} />
                   {item.label}
                 </Link>
               );
@@ -81,14 +82,14 @@ export default function UserLayout({
 
             <Link
               href="/admin/login"
-              className="ml-1 px-4 py-2 rounded-full text-xs font-bold text-slate-700 hover:text-sky-700 bg-white hover:bg-sky-50 transition-all flex items-center gap-1.5 border border-slate-200/80 shadow-2xs hover:border-sky-300"
+              className="ml-0.5 px-3 lg:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold text-slate-700 hover:text-sky-700 bg-white hover:bg-sky-50 transition-all flex items-center gap-1.5 border border-slate-200/80 shadow-2xs hover:border-sky-300"
             >
               <LockKeyhole className="h-3.5 w-3.5 text-sky-600" />
               Login Admin
             </Link>
           </nav>
 
-          {/* Mobile Navigation Drawer Trigger (Square Box Shape, Slightly Larger) */}
+          {/* Mobile Navigation Drawer Trigger */}
           <div className="flex md:hidden items-center gap-2">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger render={
@@ -105,7 +106,7 @@ export default function UserLayout({
                 <SheetHeader className="text-left border-b pb-4 mb-6">
                   <SheetTitle className="text-sky-700 font-extrabold flex items-center gap-2">
                     <Image
-                      src="/logo-pg-trangkil.png"
+                      src="/assets/images/logo-pg-trangkil.png"
                       alt="Logo PT Kebon Agung PG Trangkil"
                       width={240}
                       height={50}

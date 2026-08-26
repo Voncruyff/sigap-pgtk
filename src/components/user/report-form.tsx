@@ -11,9 +11,7 @@ import {
   reportSchema,
   ReportFormValues,
   WORK_UNITS,
-  IMPACTS,
 } from "./report-schema";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,13 +33,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ImageUpload } from "./image-upload";
-
 import { saveReportToLocalHistory } from "@/lib/my-reports-storage";
 
-function generateFileName(fileExt?: string) {
-  const timestamp = Date.now();
-  const randomStr = Math.random().toString(36).substring(2, 7);
-  return `${timestamp}-${randomStr}.${fileExt || "jpg"}`;
+function generateTicketNumber(bagian?: string) {
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const timeEntropy = Date.now().toString().slice(-4);
+  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  let prefix = "TRK";
+  if (bagian) {
+    const cleaned = bagian.trim().toUpperCase();
+    if (cleaned === "TUK" || cleaned.startsWith("TUK")) {
+      prefix = "TUK";
+    } else if (cleaned.startsWith("TEK")) {
+      prefix = "TNK";
+    } else if (cleaned.startsWith("PAB")) {
+      prefix = "PBK";
+    } else if (cleaned.startsWith("TAN")) {
+      prefix = "TNM";
+    } else {
+      prefix = cleaned.replace(/[^A-Z0-9]/g, "").slice(0, 3) || "TRK";
+    }
+  }
+  return `${prefix}-${dateStr}-${timeEntropy}${randomNum}`;
 }
 
 export function ReportForm() {
@@ -55,10 +68,8 @@ export function ReportForm() {
       bagian: "",
       unitKerja: "",
       nomorHp: "",
-      peralatan: "",
       deskripsi: "",
       foto: null,
-      dampak: "",
     },
   });
 
@@ -71,76 +82,59 @@ export function ReportForm() {
   const onSubmit = async (data: ReportFormValues) => {
     setIsSubmitting(true);
     try {
-      const supabase = createClient();
       let fotoUrl: string | null = null;
 
-      // 1. Upload Foto jika ada
+      // Handle image if provided (base64 data url for MySQL storage)
       if (data.foto instanceof File) {
-        const fileExt = data.foto.name.split(".").pop();
-        const fileName = generateFileName(fileExt);
-        const filePath = `reports/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("report-photos")
-          .upload(filePath, data.foto);
-
-        if (!uploadError) {
-          const { data: publicUrlData } = supabase.storage
-            .from("report-photos")
-            .getPublicUrl(filePath);
-          fotoUrl = publicUrlData.publicUrl;
-        }
-      }
-
-      // 2. Insert ke tabel reports
-      const { data: insertData, error: insertError } = await supabase
-        .from("reports")
-        .insert({
-          nama_pelapor: data.namaPelapor,
-          bagian: data.bagian,
-          unit_kerja: data.unitKerja,
-          nomor_hp: data.nomorHp || null,
-          lokasi_kerusakan: data.unitKerja,
-          peralatan: data.peralatan,
-          deskripsi: data.deskripsi,
-          foto_url: fotoUrl,
-          dampak: data.dampak || null,
-        })
-        .select("ticket_number")
-        .single();
-
-      if (insertError) {
-        // Fallback jika database Supabase belum terhubung / belum dikonfigurasi env
-        console.warn("Supabase insert warning:", insertError);
-        const fallbackTicket = `SIGAP-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-001`;
-        saveReportToLocalHistory({
-          ticket_number: fallbackTicket,
-          peralatan: data.peralatan,
-          unit_kerja: data.unitKerja,
-        });
-        toast.success("Laporan berhasil dikirim!", {
-          description: `Nomor laporan Anda: ${fallbackTicket}`,
-        });
-        router.push(`/status/${fallbackTicket}`);
-        return;
-      }
-
-      const generatedTicket = insertData?.ticket_number;
-      if (generatedTicket) {
-        saveReportToLocalHistory({
-          ticket_number: generatedTicket,
-          peralatan: data.peralatan,
-          unit_kerja: data.unitKerja,
+        fotoUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(data.foto as File);
         });
       }
 
-      toast.success("Laporan berhasil dikirim!", {
-        description: `Nomor laporan Anda: ${generatedTicket}`,
+      const ticketNumber = generateTicketNumber(data.bagian);
+
+      const payload = {
+        ticket_number: ticketNumber,
+        nama_pelapor: data.namaPelapor,
+        bagian: data.bagian,
+        unit_kerja: data.unitKerja,
+        nomor_hp: data.nomorHp || null,
+        lokasi_kerusakan: data.unitKerja,
+        deskripsi: data.deskripsi,
+        foto_url: fotoUrl,
+      };
+
+      const res = await fetch("/api/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
-      router.push(`/status/${generatedTicket}`);
-    } catch (err) {
+
+      const resData = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(resData.error || "Gagal menyimpan laporan ke database MySQL.");
+      }
+
+      const finalTicketNumber = resData.ticket_number || ticketNumber;
+
+      // Save to local device history
+      saveReportToLocalHistory({
+        ticket_number: finalTicketNumber,
+        unit_kerja: data.unitKerja,
+      });
+
+      toast.success("Laporan berhasil terkirim ke Database!", {
+        description: `Nomor tiket resmi: ${finalTicketNumber}`,
+      });
+
+      router.push(`/status/${finalTicketNumber}`);
+    } catch (err: unknown) {
       console.error("Error submitting report:", err);
-      toast.error("Terjadi kesalahan saat mengirim laporan.");
+      const msg = err instanceof Error ? err.message : "Terjadi kesalahan saat mengirim laporan.";
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -227,10 +221,10 @@ export function ReportForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="TUK">TUK (Tata Usaha & Keuangan)</SelectItem>
-                        <SelectItem value="Teknik">Teknik & Pemeliharaan</SelectItem>
-                        <SelectItem value="Pabrikasi">Pabrikasi & Pengolahan</SelectItem>
-                        <SelectItem value="Tanaman">Tanaman & Budi Daya</SelectItem>
+                        <SelectItem value="TUK">TUK</SelectItem>
+                        <SelectItem value="Teknik">Teknik</SelectItem>
+                        <SelectItem value="Pabrikasi">Pabrikasi</SelectItem>
+                        <SelectItem value="Tanaman">Tanaman</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -277,22 +271,7 @@ export function ReportForm() {
               />
             </div>
 
-            {/* Row 3: Peralatan / Fasilitas */}
-            <FormField
-              control={form.control}
-              name="peralatan"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-bold text-slate-700">
-                    Peralatan / Fasilitas <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="Contoh: AC, printer, pompa nira, klep steam" {...field} className="rounded-xl h-11 text-xs sm:text-sm border-sky-200/90 focus-visible:ring-sky-500" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
 
             {/* Row 4: Deskripsi Kerusakan */}
             <FormField
@@ -344,36 +323,7 @@ export function ReportForm() {
               )}
             />
 
-            {/* Row 6: Dampak Kerusakan (Opsional) */}
-            <FormField
-              control={form.control}
-              name="dampak"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-bold text-slate-700">
-                    Dampak Kerusakan{" "}
-                    <span className="text-xs text-slate-400 font-normal">
-                      (Opsional)
-                    </span>
-                  </FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger className="w-full rounded-xl h-11 text-xs sm:text-sm border-sky-200/90 focus-visible:ring-sky-500">
-                        <SelectValue placeholder="Pilih dampak jika diperlukan" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {IMPACTS.map((imp) => (
-                        <SelectItem key={imp} value={imp}>
-                          {imp}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
           </CardContent>
         </Card>
 

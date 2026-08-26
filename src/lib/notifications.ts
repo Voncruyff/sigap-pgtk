@@ -1,0 +1,137 @@
+"use client";
+
+export type NotificationPermissionState = "granted" | "denied" | "default" | "unsupported";
+
+const NOTIF_STORAGE_KEY = "sigap_admin_notif_settings";
+
+export interface NotificationSettings {
+  pushEnabled: boolean;
+  soundEnabled: boolean;
+}
+
+export function getNotificationSettings(): NotificationSettings {
+  if (typeof window === "undefined") {
+    return { pushEnabled: true, soundEnabled: true };
+  }
+  try {
+    const raw = localStorage.getItem(NOTIF_STORAGE_KEY);
+    if (!raw) return { pushEnabled: true, soundEnabled: true };
+    return JSON.parse(raw);
+  } catch (err) {
+    return { pushEnabled: true, soundEnabled: true };
+  }
+}
+
+export function setNotificationSettings(settings: Partial<NotificationSettings>): NotificationSettings {
+  if (typeof window === "undefined") return { pushEnabled: true, soundEnabled: true };
+  try {
+    const current = getNotificationSettings();
+    const updated = { ...current, ...settings };
+    localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(updated));
+    return updated;
+  } catch (err) {
+    return { pushEnabled: true, soundEnabled: true };
+  }
+}
+
+export function getNotificationPermissionState(): NotificationPermissionState {
+  if (typeof window === "undefined" || !("Notification" in window)) {
+    return "unsupported";
+  }
+  return Notification.permission as NotificationPermissionState;
+}
+
+export async function requestNotificationPermission(): Promise<NotificationPermissionState> {
+  if (typeof window === "undefined" || !("Notification" in window)) {
+    return "unsupported";
+  }
+  try {
+    const perm = await Notification.requestPermission();
+    return perm as NotificationPermissionState;
+  } catch (err) {
+    return "denied";
+  }
+}
+
+// Synthesize pleasant chime using Web Audio API (Zero external file dependencies)
+export function playNotificationSound(_type: "new-report" | "status-change" = "new-report"): void {
+  if (typeof window === "undefined") return;
+  const settings = getNotificationSettings();
+  if (!settings.soundEnabled) return;
+
+  try {
+    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    const ctx = new AudioContextClass();
+    const now = ctx.currentTime;
+
+    // Dual-tone harmonic bell (YouTube / Modern notification style)
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+
+    osc1.type = "sine";
+    osc2.type = "sine";
+
+    // F#5 (739.99 Hz) to A#5 (932.33 Hz) chime
+    osc1.frequency.setValueAtTime(740, now);
+    osc1.frequency.exponentialRampToValueAtTime(932, now + 0.12);
+
+    osc2.frequency.setValueAtTime(1108, now);
+    osc2.frequency.exponentialRampToValueAtTime(1396, now + 0.12);
+
+    gainNode.gain.setValueAtTime(0.01, now);
+    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.04);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+    osc1.connect(gainNode);
+    osc2.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.55);
+    osc2.stop(now + 0.55);
+  } catch (err) {
+    console.warn("Audio playback error:", err);
+  }
+}
+
+export function sendBrowserPushNotification(options: {
+  title: string;
+  body: string;
+  iconUrl?: string;
+  badgeUrl?: string;
+  onClickUrl?: string;
+}): Notification | null {
+  if (typeof window === "undefined" || !("Notification" in window)) return null;
+
+  const settings = getNotificationSettings();
+  if (!settings.pushEnabled) return null;
+
+  if (Notification.permission !== "granted") return null;
+
+  try {
+    playNotificationSound("new-report");
+
+    const notif = new Notification(options.title, {
+      body: options.body,
+      icon: options.iconUrl || "/logo.png",
+      badge: options.badgeUrl || "/logo.png",
+      tag: "sigap-report-notification",
+    });
+
+    if (options.onClickUrl) {
+      notif.onclick = () => {
+        window.focus();
+        window.location.href = options.onClickUrl!;
+      };
+    }
+
+    return notif;
+  } catch (err) {
+    console.warn("Push notification error:", err);
+    return null;
+  }
+}

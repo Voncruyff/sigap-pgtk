@@ -1,10 +1,14 @@
 import React from "react";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminHeader } from "@/components/admin/admin-header";
+import { AdminReportNotifier } from "@/components/admin/admin-report-notifier";
 
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-slate-50/70 text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-700 relative overflow-x-hidden">
+    <div className="h-screen w-screen overflow-hidden flex flex-col lg:flex-row bg-slate-50/70 text-slate-800 antialiased selection:bg-sky-500/20 selection:text-sky-700 relative">
+      {/* Background Push Notifier Listener */}
+      <AdminReportNotifier />
+
       {/* Premium Background Decorative Ambient Mesh & Dots */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1100px] h-[550px] bg-gradient-to-b from-sky-300/25 via-indigo-100/20 to-transparent blur-3xl rounded-full animate-pulse-glow" />
@@ -17,16 +21,15 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       <AdminSidebar />
 
       {/* Main Content Wrapper Column */}
-      <div className="relative z-10 flex-1 flex flex-col min-w-0 min-h-screen">
-        {/* Sticky Desktop Top Header Bar */}
+      <div className="relative z-10 flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        {/* Fixed Desktop Top Header Bar */}
         <AdminHeader />
 
-        {/* Main Content Area */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 overflow-y-auto">
+        {/* Main Content Area (Strictly Only This Scrolls) */}
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-5 lg:p-6 pb-24 lg:pb-6">
           {children}
         </main>
       </div>
     </div>
   );
 }
-

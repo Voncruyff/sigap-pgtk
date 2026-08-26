@@ -1,80 +1,44 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
-function isValidUrl(urlStr?: string): boolean {
-  if (!urlStr) return false;
-  try {
-    const parsed = new URL(urlStr);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "sigap-pg-trangkil-secret-jwt-key-2026"
+);
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+  const response = NextResponse.next({ request });
+  const pathname = request.nextUrl.pathname;
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  // Check admin session cookie
+  const token = request.cookies.get("sigap_admin_session")?.value;
+  let isAuthenticated = false;
 
-  if (
-    !supabaseUrl ||
-    !supabaseAnonKey ||
-    !isValidUrl(supabaseUrl) ||
-    supabaseUrl.includes("your-supabase-project") ||
-    supabaseUrl.includes("placeholder")
-  ) {
-    return supabaseResponse;
+  if (token) {
+    try {
+      await jwtVerify(token, JWT_SECRET);
+      isAuthenticated = true;
+    } catch {
+      isAuthenticated = false;
+    }
   }
 
-  try {
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    });
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    const pathname = request.nextUrl.pathname;
-
-    // Protect /admin/(dashboard) routes, excluding /admin/login
-    if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-      if (!user) {
-        const url = request.nextUrl.clone();
-        url.pathname = "/admin/login";
-        return NextResponse.redirect(url);
-      }
-    }
-
-    // Redirect authenticated admin from /admin/login to /admin/dashboard
-    if (pathname === "/admin/login" && user) {
+  // Protect /admin routes (except /admin/login)
+  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+    if (!isAuthenticated) {
       const url = request.nextUrl.clone();
-      url.pathname = "/admin/dashboard";
+      url.pathname = "/admin/login";
       return NextResponse.redirect(url);
     }
-  } catch (err) {
-    console.warn("Proxy Supabase auth error:", err);
   }
 
-  return supabaseResponse;
+  // Redirect logged-in admin from /admin/login to /admin/dashboard
+  if (pathname === "/admin/login" && isAuthenticated) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  return response;
 }
 
 export const config = {

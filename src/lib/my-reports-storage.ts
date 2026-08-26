@@ -2,7 +2,7 @@
 
 export interface LocalReportItem {
   ticket_number: string;
-  peralatan: string;
+  peralatan?: string;
   unit_kerja: string;
   created_at: string;
 }
@@ -23,7 +23,7 @@ export function getLocalReportHistory(): LocalReportItem[] {
 
 export function saveReportToLocalHistory(report: {
   ticket_number: string;
-  peralatan: string;
+  peralatan?: string;
   unit_kerja: string;
   created_at?: string;
 }): void {

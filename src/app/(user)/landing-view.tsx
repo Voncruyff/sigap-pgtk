@@ -144,7 +144,7 @@ export function LandingView() {
                   Isi Form Laporan
                 </h4>
                 <p className="text-xs text-slate-500 leading-snug font-medium">
-                  Pilih Bagian & Unit Kerja, masukkan peralatan & deskripsi kerusakan.
+                  Pilih Bagian & Unit Kerja, masukkan lokasi & deskripsi kerusakan.
                 </p>
               </div>
             </StaggerItem>

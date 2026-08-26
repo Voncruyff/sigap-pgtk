@@ -1,5 +1,5 @@
 import React from "react";
-import { createClient } from "@/lib/supabase/server";
+import { getReportById, getReportByTicket } from "@/lib/report-services";
 import { LaporanDetailView, LaporanDetailItem } from "./laporan-detail-view";
 
 interface ReportDetailPageProps {
@@ -8,39 +8,39 @@ interface ReportDetailPageProps {
   }>;
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminLaporanDetailPage({ params }: ReportDetailPageProps) {
   const { id } = await params;
-  const supabase = await createClient();
-
   let report: LaporanDetailItem | null = null;
 
   try {
-    const { data } = await supabase
-      .from("reports")
-      .select("*")
-      .or(`id.eq.${id},ticket_number.eq.${id}`)
-      .single();
+    const data = (await getReportById(id)) || (await getReportByTicket(id));
 
     if (data) {
-      report = data;
+      report = {
+        ...data,
+        nomor_hp: data.nomor_hp || undefined,
+        foto_url: data.foto_url || undefined,
+        created_at: data.created_at.toISOString(),
+      };
     }
   } catch (err) {
-    console.warn("Supabase fetch report detail warning:", err);
+    console.warn("MySQL fetch report detail error:", err);
   }
 
   // Fallback sample data if query finds no report
   if (!report) {
     report = {
       id: id,
-      ticket_number: "SIGAP-20260821-001",
-      nama_pelapor: "Ahmad Subagyo",
+      ticket_number: "SIGAP-20260825-001",
+      nama_pelapor: "Budi Santoso",
       bagian: "Teknik",
-      unit_kerja: "25002 - GILINGAN",
+      unit_kerja: "25010 - KETEL",
       nomor_hp: "081234567890",
-      lokasi_kerusakan: "Stasiun Gilingan Stasiun 1",
-      peralatan: "Pompa Nira No. 2",
-      deskripsi: "Kebocoran pada seal gland pompa menyebabkan tekanan nira merosot drastis.",
-      dampak: "Menghambat sebagian pekerjaan",
+      lokasi_kerusakan: "Stasiun Ketel Uap No. 3",
+      deskripsi: "Tekanan air pengisi ketel mengalami penurunan dan terdapat kebocoran pada valve utama.",
       status: "MENUNGGU",
       created_at: new Date().toISOString(),
     };

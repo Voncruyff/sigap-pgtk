@@ -76,10 +76,6 @@ export function MyReportsList() {
                   </span>
                 </div>
                 <div className="text-xs font-bold text-slate-800 truncate">
-                  {item.peralatan}
-                </div>
-                <div className="text-[11px] text-slate-500 font-medium truncate flex items-center gap-1">
-                  <FileText className="h-3 w-3 text-slate-400 shrink-0" />
                   {item.unit_kerja}
                 </div>
               </div>

@@ -10,6 +10,8 @@ import {
   FileText,
   History,
   Activity,
+  Users,
+  Settings,
   LogOut,
   Loader2,
   ShieldCheck,
@@ -17,14 +19,15 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 export const ADMIN_NAV_ITEMS = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Daftar Laporan", href: "/admin/laporan", icon: FileText },
+  { label: "Manage Laporan", href: "/admin/laporan", icon: FileText },
   { label: "Riwayat Laporan", href: "/admin/riwayat", icon: History },
+  { label: "Daftar Admin", href: "/admin/kelola-admin", icon: Users },
+  { label: "Pengaturan", href: "/admin/pengaturan", icon: Settings },
   { label: "Log Aktivitas", href: "/admin/log-aktivitas", icon: Activity },
 ];
 
@@ -52,7 +55,7 @@ export function AdminNavLinks({ onItemClick, isCollapsed = false }: NavLinksProp
   };
 
   return (
-    <nav className="space-y-2">
+    <nav className="space-y-1.5">
       {ADMIN_NAV_ITEMS.map((item) => {
         const Icon = item.icon;
         const isActive =
@@ -66,13 +69,13 @@ export function AdminNavLinks({ onItemClick, isCollapsed = false }: NavLinksProp
             href={item.href}
             onClick={(e) => handleNavigate(item.href, e)}
             title={isCollapsed ? item.label : undefined}
-            className={`flex items-center rounded-2xl text-sm font-bold transition-all duration-200 ${
+            className={`flex items-center rounded-2xl text-xs sm:text-sm font-bold transition-colors ${
               isCollapsed
-                ? "justify-center h-11 w-11 mx-auto"
-                : "justify-between px-4 py-3"
+                ? "justify-center h-10 w-10 mx-auto"
+                : "justify-between px-3.5 py-2.5"
             } ${
               isActive
-                ? "bg-gradient-to-r from-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/25 scale-[1.02]"
+                ? "bg-gradient-to-r from-sky-600 to-sky-700 text-white shadow-md shadow-sky-600/20"
                 : "text-slate-600 hover:bg-sky-50/80 hover:text-sky-700"
             }`}
           >
@@ -176,8 +179,7 @@ export function AdminSidebar() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
+      await fetch("/api/admin/logout", { method: "POST" });
       router.push("/admin/login");
       router.refresh();
     } catch (err) {
@@ -191,59 +193,55 @@ export function AdminSidebar() {
     <>
       {/* Desktop Floating Non-Stick/Fixed Card Sidebar (lg+) */}
       <aside
-        className={`hidden lg:flex flex-col border border-sky-100/90 bg-white/95 backdrop-blur-2xl p-4 space-y-6 shrink-0 fixed top-3 left-3 bottom-3 z-30 shadow-[0_10px_35px_rgba(2,132,199,0.08)] rounded-3xl transition-all duration-300 ease-in-out h-[calc(100vh-1.5rem)] ${
+        className={`hidden lg:flex flex-col border border-sky-100/90 bg-white/95 backdrop-blur-2xl p-3.5 space-y-4 shrink-0 fixed top-3 left-3 bottom-3 z-30 shadow-[0_10px_35px_rgba(2,132,199,0.08)] rounded-3xl transition-all duration-300 ease-in-out h-[calc(100vh-1.5rem)] ${
           isCollapsed ? "w-20" : "w-64"
         }`}
       >
-        {/* Header & Toggle Button */}
-        <div className="border-b border-sky-100/80 pb-4">
-          <div className="flex items-center justify-between gap-2">
-            {!isCollapsed ? (
-              <Link href="/admin/dashboard" className="block group">
-                <div className="relative h-9 w-auto flex items-center mb-1">
-                  <Image
-                    src="/logo-pg-trangkil.png"
-                    alt="Logo PT Kebon Agung PG Trangkil"
-                    width={220}
-                    height={45}
-                    priority
-                    className="h-7 w-auto object-contain drop-shadow-xs"
-                  />
-                </div>
-                <div className="flex items-center gap-2 bg-sky-50/80 border border-sky-100 px-2.5 py-0.5 rounded-full">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-600"></span>
-                  </span>
-                  <span className="font-extrabold text-[11px] tracking-wide text-sky-800">
-                    SIGAP Admin
-                  </span>
-                </div>
-              </Link>
-            ) : (
-              <Link href="/admin/dashboard" className="mx-auto" title="SIGAP Admin Panel">
-                <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-700 text-white flex items-center justify-center shadow-md shadow-sky-600/30">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-              </Link>
-            )}
+        {/* Floating Expand/Collapse Button on Edge (Guaranteed Never Clipped) */}
+        <button
+          type="button"
+          onClick={toggleCollapse}
+          className="absolute -right-3.5 top-6 z-50 h-7 w-7 rounded-full bg-white border border-sky-200/90 shadow-md text-sky-700 hover:text-sky-900 hover:bg-sky-50 hover:scale-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+          title={isCollapsed ? "Buka Sidebar (Expand)" : "Sembunyikan Sidebar (Collapse)"}
+        >
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </button>
 
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleCollapse}
-              className={`h-8 w-8 rounded-full border border-sky-200/80 bg-white hover:bg-sky-50 text-sky-700 shadow-2xs shrink-0 transition-transform ${
-                isCollapsed ? "mx-auto mt-2" : ""
-              }`}
-              title={isCollapsed ? "Buka Sidebar (Expand)" : "Sembunyikan Sidebar (Collapse)"}
-            >
-              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </Button>
-          </div>
+        {/* Header & Logo */}
+        <div className="border-b border-sky-100/80 pb-3">
+          {!isCollapsed ? (
+            <Link href="/admin/dashboard" className="block group pr-2">
+              <div className="relative h-8 w-auto flex items-center mb-1">
+                <Image
+                  src="/assets/images/logo-pg-trangkil.png"
+                  alt="Logo PT Kebon Agung PG Trangkil"
+                  width={200}
+                  height={40}
+                  priority
+                  className="h-6.5 w-auto object-contain drop-shadow-xs"
+                />
+              </div>
+              <div className="inline-flex items-center gap-1.5 bg-sky-50/80 border border-sky-100 px-2 py-0.5 rounded-full">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-600"></span>
+                </span>
+                <span className="font-extrabold text-[10px] tracking-wide text-sky-800">
+                  SIGAP Admin
+                </span>
+              </div>
+            </Link>
+          ) : (
+            <Link href="/admin/dashboard" className="mx-auto block" title="SIGAP Admin Panel">
+              <div className="h-10 w-10 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-700 text-white flex items-center justify-center shadow-md shadow-sky-600/30 mx-auto">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+            </Link>
+          )}
         </div>
 
         {/* Navigation Links */}
-        <div className="flex-1 overflow-y-auto pt-2">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden pt-2">
           <AdminNavLinks isCollapsed={isCollapsed} />
         </div>
 
@@ -285,7 +283,7 @@ export function AdminSidebar() {
       {/* Layout Spacer for Flex Container so Main Content respects the fixed floating sidebar */}
       <div
         className={`hidden lg:block shrink-0 transition-all duration-300 ease-in-out ${
-          isCollapsed ? "w-[92px]" : "w-[268px]"
+          isCollapsed ? "w-[92px]" : "w-[272px]"
         }`}
       />
 
@@ -293,7 +291,7 @@ export function AdminSidebar() {
       <header className="lg:hidden flex items-center justify-between h-14 px-4 border-b border-sky-100/90 bg-white/95 backdrop-blur-xl sticky top-0 z-40 shadow-xs">
         <Link href="/admin/dashboard" className="flex items-center gap-2">
           <Image
-            src="/logo-pg-trangkil.png"
+            src="/assets/images/logo-pg-trangkil.png"
             alt="Logo PT Kebon Agung PG Trangkil"
             width={180}
             height={38}

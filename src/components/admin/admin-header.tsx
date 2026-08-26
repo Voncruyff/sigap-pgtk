@@ -1,19 +1,33 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ExternalLink, ShieldCheck, Clock } from "lucide-react";
+import { ShieldCheck, Clock, Crown, Wrench } from "lucide-react";
+import { AdminJwtPayload } from "@/lib/auth";
 
 export function AdminHeader() {
   const pathname = usePathname();
+  const [userSession, setUserSession] = useState<AdminJwtPayload | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated && data.user) {
+          setUserSession(data.user);
+        }
+      })
+      .catch((err) => console.warn("Failed to fetch session:", err));
+  }, []);
 
   // Determine active page title for header dynamically
   let pageTitle = "Dashboard Overview";
   if (pathname.includes("/admin/laporan/")) pageTitle = "Detail Laporan Kerusakan";
-  else if (pathname.startsWith("/admin/laporan")) pageTitle = "Daftar Laporan Kerusakan";
+  else if (pathname.startsWith("/admin/laporan")) pageTitle = "Manage Laporan";
   else if (pathname.startsWith("/admin/riwayat")) pageTitle = "Riwayat & Arsip Laporan";
   else if (pathname.startsWith("/admin/log-aktivitas")) pageTitle = "Log Aktivitas Petugas";
+  else if (pathname.startsWith("/admin/pengaturan")) pageTitle = "Pengaturan Admin";
+  else if (pathname.startsWith("/admin/kelola-admin")) pageTitle = "Daftar Admin";
 
   const currentDate = new Date().toLocaleDateString("id-ID", {
     weekday: "long",
@@ -22,8 +36,11 @@ export function AdminHeader() {
     year: "numeric",
   });
 
+  const isSuperAdmin = userSession?.role === "SUPER_ADMIN";
+  const roleLabel = isSuperAdmin ? "Super Admin" : "Admin Teknis";
+
   return (
-    <header className="hidden lg:flex items-center justify-between h-16 px-6 lg:px-8 border-b border-sky-100/90 bg-white/85 backdrop-blur-xl sticky top-0 z-20 shadow-2xs shrink-0 w-full">
+    <header className="hidden lg:flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 border-b border-l border-sky-100/90 bg-white/95 backdrop-blur-xl shrink-0 w-full z-20 shadow-2xs rounded-tl-3xl rounded-bl-2xl">
       {/* Left: Active Page Title & Company Tag */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2.5">
@@ -43,30 +60,34 @@ export function AdminHeader() {
         </div>
       </div>
 
-      {/* Right: Date, Status Badge, & Quick Actions */}
-      <div className="flex items-center gap-3.5">
+      {/* Right: Nama Lengkap : Role Badge & Date Display */}
+      <div className="flex items-center gap-3">
+        {/* Dynamic Name and Role Badge */}
+        {userSession && (
+          <div
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border shadow-2xs ${
+              isSuperAdmin
+                ? "bg-purple-50 text-purple-800 border-purple-200"
+                : "bg-sky-50 text-sky-800 border-sky-200"
+            }`}
+            title={`Username: @${userSession.username || userSession.nama}`}
+          >
+            {isSuperAdmin ? (
+              <Crown className="h-3.5 w-3.5 text-purple-600 shrink-0" />
+            ) : (
+              <Wrench className="h-3.5 w-3.5 text-sky-600 shrink-0" />
+            )}
+            <span>
+              {userSession.nama} : {roleLabel}
+            </span>
+          </div>
+        )}
+
         {/* Date Display */}
         <div className="hidden xl:flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-50/80 px-3 py-1.5 rounded-full border border-slate-200/60">
           <Clock className="h-3.5 w-3.5 text-sky-600" />
           <span suppressHydrationWarning>{currentDate}</span>
         </div>
-
-        {/* System Online Status Pill */}
-        <div className="flex items-center gap-1.5 text-emerald-700 font-bold bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200/80 text-xs">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Sistem SIGAP Online</span>
-        </div>
-
-        {/* View Public Portal Button */}
-        <Link
-          href="/"
-          target="_blank"
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-sky-700 bg-white hover:bg-sky-50 px-3.5 py-1.5 rounded-full border border-slate-200/80 hover:border-sky-300 transition-all shadow-2xs"
-          title="Buka Halaman Utama Publik SIGAP"
-        >
-          <span>Lihat Web User</span>
-          <ExternalLink className="h-3.5 w-3.5 text-sky-600" />
-        </Link>
       </div>
     </header>
   );

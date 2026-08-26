@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, User, Wrench, MapPin, Calendar, Clock, Phone, AlertCircle } from "lucide-react";
+import { ArrowLeft, User, Wrench, MapPin, Calendar, Clock, Phone } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
@@ -13,10 +13,9 @@ export interface LaporanDetailItem {
   unit_kerja: string;
   nomor_hp?: string;
   lokasi_kerusakan: string;
-  peralatan: string;
+  peralatan?: string;
   deskripsi: string;
   foto_url?: string;
-  dampak?: string;
   status: string;
   created_at: string;
 }
@@ -38,7 +37,7 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
   });
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-12">
+    <div className="w-full space-y-6 pb-12">
       {/* Header Halaman */}
       <div className="space-y-4">
         <Link href="/admin/laporan">
@@ -116,25 +115,13 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
             </CardHeader>
             <CardContent className="pt-5 space-y-4 text-sm">
               <div>
-                <span className="text-xs text-slate-400 font-medium block">Peralatan / Fasilitas</span>
-                <span className="font-black text-base text-slate-900">{report.peralatan}</span>
-              </div>
-
-              <div>
                 <span className="text-xs text-slate-400 font-medium block mb-1.5">Deskripsi Kerusakan</span>
                 <p className="text-sm text-slate-800 bg-slate-50/80 p-4 rounded-2xl border border-slate-200/60 whitespace-pre-wrap leading-relaxed">
                   {report.deskripsi}
                 </p>
               </div>
 
-              {report.dampak && (
-                <div>
-                  <span className="text-xs text-slate-400 font-medium block flex items-center gap-1.5 mb-1">
-                    <AlertCircle className="h-3.5 w-3.5 text-amber-500" /> Dampak Kerusakan
-                  </span>
-                  <span className="font-semibold text-slate-800">{report.dampak}</span>
-                </div>
-              )}
+
 
               {/* Lampiran Foto */}
               {report.foto_url ? (

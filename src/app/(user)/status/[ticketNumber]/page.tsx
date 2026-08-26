@@ -1,5 +1,5 @@
 import React from "react";
-import { createClient } from "@/lib/supabase/server";
+import { getReportByTicket } from "@/lib/report-services";
 import { StatusDetailView, StatusDetailReportItem } from "./status-detail-view";
 
 interface StatusDetailPageProps {
@@ -10,22 +10,18 @@ interface StatusDetailPageProps {
 
 export default async function StatusDetailPage({ params }: StatusDetailPageProps) {
   const { ticketNumber } = await params;
-  const supabase = await createClient();
-
   let report: StatusDetailReportItem | null = null;
 
   try {
-    const { data } = await supabase
-      .from("reports")
-      .select("*")
-      .eq("ticket_number", ticketNumber)
-      .single();
-
+    const data = await getReportByTicket(ticketNumber);
     if (data) {
-      report = data;
+      report = {
+        ...data,
+        created_at: data.created_at.toISOString(),
+      };
     }
   } catch (err) {
-    console.warn("Supabase fetch report warning:", err);
+    console.warn("MySQL fetch report error:", err);
   }
 
   return <StatusDetailView ticketNumber={ticketNumber} report={report} />;

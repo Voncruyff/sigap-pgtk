@@ -1,9 +1,13 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, FileText, Clock, Wrench, CheckCircle2, Search, AlertCircle } from "lucide-react";
+import { FileText, Clock, Wrench, CheckCircle2, Search, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
+import { NotificationPermissionButton } from "@/components/ui/notification-permission-button";
 
 export interface StatusDetailReportItem {
   id?: string;
@@ -50,29 +54,16 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
       });
 
   return (
-    <div className="max-w-xl mx-auto space-y-6 pb-12">
-      {/* Header Halaman */}
-      <div className="space-y-4">
-        <Link href="/cek-status">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="-ml-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50/80 rounded-full"
-          >
-            <ArrowLeft className="mr-1.5 h-4 w-4" />
-            Kembali
-          </Button>
-        </Link>
-
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-600 bg-sky-100/60 px-3 py-1 rounded-full border border-sky-200/50 mb-1">
-            SIGAP Status
-          </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">
-            Perkembangan Laporan
-          </h1>
-        </div>
-      </div>
+    <div className="max-w-2xl mx-auto space-y-6 pb-12">
+      {/* Header Halaman Dynamic */}
+      <PageHeader
+        title="Perkembangan Laporan"
+        badgeText="SIGAP Status"
+        backUrl="/cek-status"
+        backLabel="Kembali"
+      >
+        <NotificationPermissionButton />
+      </PageHeader>
 
       {/* Notice jika tiket tidak ditemukan di database */}
       {!report && (
@@ -109,11 +100,7 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
             </div>
           </div>
 
-          <div className="border-t border-sky-100/80 pt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <span className="text-xs text-slate-400 block font-medium">Peralatan / Fasilitas</span>
-              <span className="font-semibold text-slate-800">{report?.peralatan || "-"}</span>
-            </div>
+          <div className="border-t border-sky-100/80 pt-3">
             <div>
               <span className="text-xs text-slate-400 block font-medium">Unit / Bagian Kerja</span>
               <span className="font-semibold text-slate-800">

@@ -110,7 +110,7 @@ export function LandingMobileView() {
       <section className="space-y-3 pt-1">
         <FadeIn className="text-center space-y-0.5">
           <h2 className="text-base font-black text-slate-900">
-            3 Langkah Pelaporan HP
+            3 Langkah Pelaporan
           </h2>
           <p className="text-[11px] text-slate-500 font-medium">
             Proses pelaporan praktis lewat smartphone

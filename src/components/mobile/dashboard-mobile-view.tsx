@@ -16,7 +16,7 @@ export interface DashboardReportItem {
   ticket_number: string;
   nama_pelapor: string;
   unit_kerja: string;
-  peralatan: string;
+  peralatan?: string;
   status: string;
   created_at: string;
 }
@@ -103,10 +103,10 @@ export function DashboardMobileView({
               </div>
               <div>
                 <span className="font-bold text-xs text-slate-900 block truncate">
-                  {report.peralatan}
+                  {report.nama_pelapor}
                 </span>
                 <span className="text-[11px] text-slate-500 font-medium truncate block">
-                  {report.nama_pelapor} &bull; {report.unit_kerja}
+                  {report.unit_kerja}
                 </span>
               </div>
               <div className="pt-1 flex justify-end">

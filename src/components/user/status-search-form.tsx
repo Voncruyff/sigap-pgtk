@@ -24,8 +24,8 @@ const statusSearchSchema = z.object({
   ticketNumber: z
     .string()
     .min(1, { message: "Nomor laporan wajib diisi" })
-    .regex(/^SIGAP-\d{8}-\d{3}$/, {
-      message: "Format nomor laporan tidak valid. Contoh: SIGAP-20260821-001",
+    .regex(/^[A-Z0-9]+-\d{8}-\d{3}$/i, {
+      message: "Format nomor laporan tidak valid. Contoh: TUK-20260825-001 atau SIGAP-20260821-001",
     }),
 });
 
@@ -59,13 +59,13 @@ export function StatusSearchForm() {
                   <FormLabel className="text-xs font-bold text-slate-700 flex items-center justify-between flex-wrap gap-1">
                     <span>Nomor Laporan Tiket <span className="text-destructive">*</span></span>
                     <span className="text-[11px] font-mono font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
-                      Contoh: SIGAP-20260821-001
+                      Contoh: TUK-20260825-001
                     </span>
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="SIGAP-20260821-001"
+                        placeholder="TUK-20260825-001"
                         {...field}
                         onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                         className="font-mono uppercase tracking-wider h-13 text-base sm:text-lg rounded-2xl border-sky-200/90 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500 bg-white/80 shadow-inner pl-4 pr-11 font-bold text-slate-900"

@@ -22,7 +22,7 @@ export function LoginView() {
           <CardHeader className="space-y-3 text-center pb-5 border-b border-sky-100/80 bg-gradient-to-r from-sky-50/70 via-white to-sky-50/70">
             <div className="mx-auto h-12 w-auto max-w-[240px] flex items-center justify-center pt-2">
               <Image
-                src="/logo-pg-trangkil.png"
+                src="/assets/images/logo-pg-trangkil.png"
                 alt="Logo PT Kebon Agung PG Trangkil"
                 width={260}
                 height={55}

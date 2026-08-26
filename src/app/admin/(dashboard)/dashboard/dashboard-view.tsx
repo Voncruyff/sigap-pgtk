@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
 import {
   Table,
@@ -27,7 +28,7 @@ export interface DashboardReportItem {
   ticket_number: string;
   nama_pelapor: string;
   unit_kerja: string;
-  peralatan: string;
+  peralatan?: string;
   status: string;
   created_at: string;
 }
@@ -45,33 +46,24 @@ export function DashboardView(props: DashboardViewProps) {
 
   return (
     <div className="space-y-4 sm:space-y-6 pb-12">
-      {/* Header Halaman */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-b border-sky-100/80 pb-4 sm:pb-5">
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-sky-600 bg-sky-100/60 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-sky-200/50 mb-1.5">
-            SIGAP System Summary
-          </div>
-          <h1 className="text-xl sm:text-3xl font-black tracking-tight text-slate-900">
-            Dashboard Admin
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 sm:mt-1">
-            Ringkasan data gangguan & penanganan fasilitas PT Kebon Agung PG Trangkil.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Link href="/admin/laporan">
-            <Button size="sm" className="rounded-full bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white font-bold text-xs shadow-md shadow-sky-600/20 active:scale-[0.98]">
-              <FileText className="mr-1.5 h-3.5 w-3.5" />
-              Kelola Laporan
-            </Button>
-          </Link>
-        </div>
-      </div>
+      {/* Header Halaman Dynamic */}
+      <PageHeader
+        title="Dashboard Admin"
+        description="Ringkasan data gangguan & penanganan fasilitas PT Kebon Agung PG Trangkil."
+        badgeText="SIGAP System Summary"
+      >
+        <Link href="/admin/laporan">
+          <Button size="sm" className="rounded-full bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white font-bold text-xs shadow-md shadow-sky-600/20 active:scale-[0.98]">
+            <FileText className="mr-1.5 h-3.5 w-3.5" />
+            Manage Laporan
+          </Button>
+        </Link>
+      </PageHeader>
 
       {/* 🖥️ Tampilan Utama Desktop / PC */}
       <div className="hidden lg:block space-y-6">
         {/* Stat Cards 4 Columns */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
           <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 p-2">
             <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
               <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -108,7 +100,7 @@ export function DashboardView(props: DashboardViewProps) {
           <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 p-2">
             <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
               <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Dipproses
+                Diproses
               </CardTitle>
               <div className="p-2.5 rounded-2xl bg-sky-50 text-sky-600 border border-sky-100/80 shadow-xs">
                 <Wrench className="h-4 w-4" />
@@ -158,40 +150,38 @@ export function DashboardView(props: DashboardViewProps) {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/80 border-b border-sky-100/80">
-                    <TableHead className="w-[140px] font-bold text-slate-700 text-xs py-2.5">Nomor Tiket</TableHead>
-                    <TableHead className="font-bold text-slate-700 text-xs py-2.5">Pelapor & Unit</TableHead>
-                    <TableHead className="font-bold text-slate-700 text-xs py-2.5">Peralatan</TableHead>
-                    <TableHead className="w-[120px] font-bold text-slate-700 text-xs py-2.5">Status</TableHead>
-                    <TableHead className="text-right w-[80px] font-bold text-slate-700 text-xs py-2.5">Aksi</TableHead>
+                  <TableRow className="bg-slate-50/90 border-b border-sky-100/80">
+                    <TableHead className="w-[150px] font-bold text-slate-700 text-xs py-3.5 pl-5">Nomor Tiket</TableHead>
+                    <TableHead className="font-bold text-slate-700 text-xs py-3.5">Pelapor & Unit Kerja</TableHead>
+                    <TableHead className="w-[130px] font-bold text-slate-700 text-xs py-3.5">Status</TableHead>
+                    <TableHead className="text-center w-[100px] font-bold text-slate-700 text-xs py-3.5">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {recentReports.map((report) => (
-                    <TableRow key={report.id} className="hover:bg-sky-50/40 transition-colors">
-                      <TableCell className="font-mono text-xs font-bold text-sky-700 py-3">
+                    <TableRow key={report.id} className="hover:bg-sky-50/40 transition-colors border-b border-slate-100">
+                      <TableCell className="font-mono text-xs font-bold text-sky-700 py-4 pl-5">
                         {report.ticket_number}
                       </TableCell>
-                      <TableCell className="py-3">
+                      <TableCell className="py-4">
                         <div className="font-bold text-xs text-slate-800">
                           {report.nama_pelapor}
                         </div>
-                        <div className="text-[11px] text-slate-500 font-medium truncate max-w-[180px]">
+                        <div className="text-[11px] text-slate-500 font-medium truncate max-w-[220px]">
                           {report.unit_kerja}
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs font-semibold text-slate-700 py-3">
-                        {report.peralatan}
-                      </TableCell>
-                      <TableCell className="py-3">
+                      <TableCell className="py-4">
                         <ReportStatusBadge status={report.status} />
                       </TableCell>
-                      <TableCell className="text-right py-3">
-                        <Link href={`/admin/laporan/${report.id}`}>
-                          <Button variant="outline" size="sm" className="h-7 text-xs px-3 rounded-full border-sky-200 text-sky-700 hover:bg-sky-50 font-bold">
-                            Detail
-                          </Button>
-                        </Link>
+                      <TableCell className="text-center py-4">
+                        <div className="flex items-center justify-center">
+                          <Link href={`/admin/laporan/${report.id}`}>
+                            <Button variant="outline" size="sm" className="h-8 text-xs px-3.5 rounded-full border-sky-200 text-sky-700 hover:bg-sky-50 font-bold shadow-2xs">
+                              Detail
+                            </Button>
+                          </Link>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -202,7 +192,7 @@ export function DashboardView(props: DashboardViewProps) {
         </Card>
       </div>
 
-      {/* 📱 Tampilan Khusus Mobile HP (Disimpan di Folder src/components/mobile/) */}
+      {/* 📱 Tampilan Khusus Mobile HP */}
       <div className="block lg:hidden">
         <DashboardMobileView {...props} />
       </div>
