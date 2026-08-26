@@ -3,6 +3,7 @@
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)
+![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=flat-square&logo=mysql)
 ![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-Vanilla-38BDF8?style=flat-square&logo=tailwindcss)
 
@@ -32,7 +33,7 @@
 
 * **Framework**: [Next.js 15](https://nextjs.org/) (App Router, React Server Components, API Routes)
 * **Bahasa**: [TypeScript](https://www.typescriptlang.org/)
-* **Database & ORM**: [Prisma ORM](https://www.prisma.io/) dengan Database PostgreSQL
+* **Database & ORM**: Database [MySQL](https://www.mysql.com/) dengan [Prisma ORM](https://www.prisma.io/)
 * **Desain & UI**: [TailwindCSS](https://tailwindcss.com/), Radix UI, Lucide Icons, dan Motion Animation
 * **Tipografi**: Google Font `Poppins` (Font Utama) & `JetBrains Mono` (Nomor Tiket & Kode Log)
 * **Autentikasi**: JWT (JSON Web Token) dengan penyimpanan HttpOnly Cookie & Bcrypt Password Hashing
@@ -51,7 +52,7 @@ Aplikasi ini menggunakan standar panduan visual resmi **PT Kebon Agung PG Trangk
 
 ### 1. Prasyarat Sistem
 * Node.js v18.0.0 atau versi yang lebih baru
-* Database PostgreSQL
+* Server Database MySQL
 
 ### 2. Instalasi Dependensi
 ```bash
@@ -63,13 +64,8 @@ cd sigap-pgtk
 npm install
 ```
 
-### 3. Konfigurasi Environment Variable (`.env`)
-Buat file `.env` di root proyek dan lengkapi konfigurasi variabel berikut:
-```env
-DATABASE_URL="postgresql://username:password@localhost:5432/sigap_db?schema=public"
-JWT_SECRET="sigap_secret_key_change_in_production"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-```
+### 3. Konfigurasi Environment Variable
+Buat file `.env` di root proyek dan lengkapi konfigurasi variabel lingkungan yang dibutuhkan sesuai dengan environment database dan rahasia JWT server Anda.
 
 ### 4. Migrasi & Seed Database
 ```bash
