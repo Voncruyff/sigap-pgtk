@@ -12,8 +12,17 @@ export default async function AdminLaporanPage() {
     const data = await getActiveReports();
 
     if (data && data.length > 0) {
-      reports = data.map((item: { created_at: Date; [key: string]: unknown }) => ({
-        ...(item as unknown as LaporanItem),
+      reports = data.map((item) => ({
+        id: item.id,
+        ticket_number: item.ticket_number,
+        nama_pelapor: item.nama_pelapor,
+        bagian: item.bagian,
+        unit_kerja: item.unit_kerja,
+        nomor_hp: item.nomor_hp || undefined,
+        lokasi_kerusakan: item.lokasi_kerusakan,
+        deskripsi: item.deskripsi,
+        status: item.status,
+        penanganan: item.penanganan || undefined,
         created_at: item.created_at.toISOString(),
       }));
     }

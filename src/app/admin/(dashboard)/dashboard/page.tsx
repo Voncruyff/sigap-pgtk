@@ -27,8 +27,12 @@ export default async function AdminDashboardPage() {
       waitingCount = reportsData.filter((r: { status: string }) => r.status === "MENUNGGU").length;
       processingCount = reportsData.filter((r: { status: string }) => r.status === "DIPROSES").length;
       completedCount = reportsData.filter((r: { status: string }) => r.status === "SELESAI").length;
-      recentReports = reportsData.slice(0, 5).map((r: { created_at: Date; [key: string]: unknown }) => ({
-        ...(r as unknown as DashboardReportItem),
+      recentReports = reportsData.slice(0, 5).map((r) => ({
+        id: r.id,
+        ticket_number: r.ticket_number,
+        nama_pelapor: r.nama_pelapor,
+        unit_kerja: r.unit_kerja,
+        status: r.status,
         created_at: r.created_at.toISOString(),
       }));
     }

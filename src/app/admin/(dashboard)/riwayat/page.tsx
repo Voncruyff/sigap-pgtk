@@ -12,8 +12,16 @@ export default async function AdminRiwayatPage() {
     const data = await getCompletedReports();
 
     if (data && data.length > 0) {
-      completedReports = data.map((item: { created_at: Date; updated_at: Date; [key: string]: unknown }) => ({
-        ...(item as unknown as CompletedReportItem),
+      completedReports = data.map((item) => ({
+        id: item.id,
+        ticket_number: item.ticket_number,
+        nama_pelapor: item.nama_pelapor,
+        bagian: item.bagian,
+        unit_kerja: item.unit_kerja,
+        lokasi_kerusakan: item.lokasi_kerusakan,
+        deskripsi: item.deskripsi,
+        penanganan: item.penanganan,
+        status: item.status,
         created_at: item.created_at.toISOString(),
         updated_at: item.updated_at.toISOString(),
       }));
