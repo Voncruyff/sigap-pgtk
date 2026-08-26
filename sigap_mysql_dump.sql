@@ -49,26 +49,25 @@ CREATE TABLE `activity_logs` (
 DROP TABLE IF EXISTS `admin_users`;
 CREATE TABLE `admin_users` (
   `id` VARCHAR(36) NOT NULL,
-  `username` VARCHAR(50) DEFAULT NULL,
-  `email` VARCHAR(150) NOT NULL,
+  `username` VARCHAR(50) NOT NULL,
   `password` VARCHAR(255) NOT NULL,
   `nama` VARCHAR(150) NOT NULL,
   `role` VARCHAR(50) NOT NULL DEFAULT 'ADMIN',
+  `is_banned` TINYINT(1) NOT NULL DEFAULT 0,
+  `banned_until` DATETIME(3) DEFAULT NULL,
+  `banned_reason` TEXT DEFAULT NULL,
   `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `admin_users_email_unique` (`email`),
   UNIQUE KEY `admin_users_username_unique` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Default Seed Accounts for Multi-Role Auth:
--- 1. Super Admin: superadmin / superadmin@sigap.id (Password: super123)
--- 2. Admin Teknis: admin / admin@sigap.id (Password: admin123)
+-- 1. Super Admin: superadmin (Password: super123)
 -- ---------------------------------------------------------
-INSERT INTO `admin_users` (`id`, `username`, `email`, `password`, `nama`, `role`) VALUES
-('adm-super-001', 'superadmin', 'superadmin@sigap.id', '$2a$10$wT2M.xO5bW.O1c/gD4M0..aZzO3B5d7kE2lP6Q0R2S4T6U8V1W2X3', 'Super Admin SIGAP', 'SUPER_ADMIN'),
-('adm-teknis-002', 'admin', 'admin@sigap.id', '$2a$10$wT2M.xO5bW.O1c/gD4M0..aZzO3B5d7kE2lP6Q0R2S4T6U8V1W2X3', 'Admin Teknis SIGAP', 'ADMIN');
+INSERT INTO `admin_users` (`id`, `username`, `password`, `nama`, `role`, `is_banned`) VALUES
+('adm-super-001', 'superadmin', '$2a$10$wT2M.xO5bW.O1c/gD4M0..aZzO3B5d7kE2lP6Q0R2S4T6U8V1W2X3', 'Super Admin SIGAP', 'SUPER_ADMIN', 0);
 
 -- =========================================================
 -- END OF MYSQL DUMP SCRIPT

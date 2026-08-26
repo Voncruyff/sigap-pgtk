@@ -15,6 +15,14 @@ async function handleStatusUpdate(request: Request) {
       return NextResponse.json({ error: "ID dan status wajib diisi" }, { status: 400 });
     }
 
+    const ALLOWED_STATUSES = ["MENUNGGU", "DIPROSES", "SELESAI"];
+    if (!ALLOWED_STATUSES.includes(status)) {
+      return NextResponse.json(
+        { error: `Status tidak valid. Pilihan status yang diperbolehkan: ${ALLOWED_STATUSES.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
     const updated = await updateReportStatus(id, status, adminName || session.nama || "Admin SIGAP");
     return NextResponse.json(updated);
   } catch (err: any) {
