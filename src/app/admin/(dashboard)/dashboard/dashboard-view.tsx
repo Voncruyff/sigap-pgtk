@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { StatCard, type StatColorScheme } from "@/components/admin/stat-card";
 import { DashboardMobileView } from "@/components/mobile/dashboard-mobile-view";
 
 export interface DashboardReportItem {
@@ -64,46 +65,47 @@ export function DashboardView(props: DashboardViewProps) {
     recentLogs,
   } = props;
 
-  const stats = [
+  const stats: Array<{
+    title: string;
+    value: number;
+    subtext: string;
+    icon: any;
+    colorScheme: StatColorScheme;
+  }> = [
     {
       title: "Total Laporan",
       value: totalCount,
       subtext: "Terverifikasi",
       icon: FileText,
-      iconBg: "bg-sky-50 text-sky-600 border-sky-100",
-      valueColor: "text-slate-900",
+      colorScheme: "sky",
     },
     {
       title: "Menunggu",
       value: waitingCount,
       subtext: "Perlu disposisi",
       icon: Clock,
-      iconBg: "bg-amber-50 text-amber-600 border-amber-100",
-      valueColor: "text-amber-600",
+      colorScheme: "amber",
     },
     {
       title: "Diproses",
       value: processingCount,
       subtext: "Dalam perbaikan",
       icon: Wrench,
-      iconBg: "bg-blue-50 text-blue-600 border-blue-100",
-      valueColor: "text-blue-600",
+      colorScheme: "blue",
     },
     {
       title: "Selesai",
       value: completedCount,
       subtext: "Perbaikan tuntas",
       icon: CheckCircle2,
-      iconBg: "bg-emerald-50 text-emerald-600 border-emerald-100",
-      valueColor: "text-emerald-600",
+      colorScheme: "emerald",
     },
     {
       title: "Petugas Admin",
       value: totalAdminCount,
       subtext: "Akun terdaftar",
       icon: Users,
-      iconBg: "bg-purple-50 text-purple-600 border-purple-100",
-      valueColor: "text-purple-700",
+      colorScheme: "purple",
     },
   ];
 
@@ -120,30 +122,16 @@ export function DashboardView(props: DashboardViewProps) {
       <div className="hidden lg:block space-y-5">
         {/* Sleek Minimalist Stat Cards 5 Columns Grid */}
         <div className="grid grid-cols-5 gap-3.5">
-          {stats.map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={idx}
-                className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-2xs hover:shadow-xs transition-shadow flex items-center justify-between"
-              >
-                <div className="space-y-0.5">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                    {stat.title}
-                  </span>
-                  <div className={`text-2xl font-black tracking-tight ${stat.valueColor}`}>
-                    {stat.value}
-                  </div>
-                  <span className="text-[11px] font-semibold text-slate-400 block">
-                    {stat.subtext}
-                  </span>
-                </div>
-                <div className={`p-3 rounded-xl border ${stat.iconBg} shrink-0`}>
-                  <Icon className="h-5 w-5" />
-                </div>
-              </div>
-            );
-          })}
+          {stats.map((stat, idx) => (
+            <StatCard
+              key={idx}
+              title={stat.title}
+              value={stat.value}
+              description={stat.subtext}
+              icon={stat.icon}
+              colorScheme={stat.colorScheme}
+            />
+          ))}
         </div>
 
         {/* Layout Grid 12 Kolom Simetris: Left Table Laporan (8 cols), Right Log Activity Feed (4 cols) */}

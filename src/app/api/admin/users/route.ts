@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import {
   getAllAdminUsers,
   createAdminUser,
@@ -30,10 +31,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Hanya Super Admin yang berhak menambahkan akun admin baru" }, { status: 403 });
     }
 
-    const { nama, username, password, role } = await request.json();
+    const { nama, username, password, role, confirmPassword } = await request.json();
 
     if (!nama || !username || !password) {
       return NextResponse.json({ error: "Nama, username, dan password wajib diisi" }, { status: 400 });
+    }
+
+    if (!confirmPassword || typeof confirmPassword !== "string" || !confirmPassword.trim()) {
+      return NextResponse.json({ error: "Password konfirmasi Super Admin wajib dimasukkan" }, { status: 400 });
+    }
+
+    // Verify Super Admin Password
+    const superAdminUsers = await db.$queryRawUnsafe<Array<{ id: string; password: string }>>(
+      `SELECT id, password FROM admin_users WHERE id = ? LIMIT 1`,
+      session.id
+    );
+
+    if (!superAdminUsers || superAdminUsers.length === 0) {
+      return NextResponse.json({ error: "Akun Super Admin tidak ditemukan di database" }, { status: 401 });
+    }
+
+    const isPasswordValid = await bcrypt.compare(confirmPassword, superAdminUsers[0].password);
+    if (!isPasswordValid) {
+      return NextResponse.json({ error: "Password konfirmasi Super Admin yang Anda masukkan salah" }, { status: 400 });
     }
 
     const newUser = await createAdminUser({

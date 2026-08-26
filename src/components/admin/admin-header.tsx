@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ShieldCheck, Clock, Crown, Wrench } from "lucide-react";
 import { AdminJwtPayload } from "@/lib/auth";
+import { formatFullDayDateIndonesian } from "@/lib/date-utils";
 
 export function AdminHeader() {
   const pathname = usePathname();
@@ -29,12 +30,7 @@ export function AdminHeader() {
   else if (pathname.startsWith("/admin/pengaturan")) pageTitle = "Pengaturan Admin";
   else if (pathname.startsWith("/admin/kelola-admin")) pageTitle = "Daftar Admin";
 
-  const currentDate = new Date().toLocaleDateString("id-ID", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const currentDate = formatFullDayDateIndonesian(new Date());
 
   const isSuperAdmin = userSession?.role === "SUPER_ADMIN";
   const roleLabel = isSuperAdmin ? "Super Admin" : "Admin Teknis";

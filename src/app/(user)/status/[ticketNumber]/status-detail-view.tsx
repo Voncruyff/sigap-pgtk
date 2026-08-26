@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
 import { NotificationPermissionButton } from "@/components/ui/notification-permission-button";
+import { formatDateIndonesian } from "@/lib/date-utils";
 
 export interface StatusDetailReportItem {
   id?: string;
@@ -55,17 +56,7 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
     { id: 4, name: "Perbaikan Selesai", desc: "Tuntas & verifikasi", icon: CheckCircle2 },
   ];
 
-  const formattedDate = report?.created_at
-    ? new Date(report.created_at).toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : new Date().toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
+  const formattedDate = formatDateIndonesian(report?.created_at || new Date());
 
   return (
     <div className="max-w-3xl mx-auto space-y-5 pb-12">

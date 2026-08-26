@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
+import { StatCard, type StatColorScheme } from "@/components/admin/stat-card";
 import { DashboardReportItem, DashboardLogItem } from "@/app/admin/(dashboard)/dashboard/dashboard-view";
 
 export interface DashboardMobileViewProps {
@@ -33,46 +34,47 @@ export function DashboardMobileView({
   recentReports,
   recentLogs,
 }: DashboardMobileViewProps) {
-  const stats = [
+  const stats: Array<{
+    title: string;
+    value: number;
+    subtext: string;
+    icon: any;
+    colorScheme: StatColorScheme;
+  }> = [
     {
       title: "Total",
       value: totalCount,
       subtext: "Terverifikasi",
       icon: FileText,
-      iconBg: "bg-sky-50 text-sky-600 border-sky-100",
-      valueColor: "text-slate-900",
+      colorScheme: "sky",
     },
     {
       title: "Menunggu",
       value: waitingCount,
       subtext: "Disposisi",
       icon: Clock,
-      iconBg: "bg-amber-50 text-amber-600 border-amber-100",
-      valueColor: "text-amber-600",
+      colorScheme: "amber",
     },
     {
       title: "Diproses",
       value: processingCount,
       subtext: "Perbaikan",
       icon: Wrench,
-      iconBg: "bg-blue-50 text-blue-600 border-blue-100",
-      valueColor: "text-blue-600",
+      colorScheme: "blue",
     },
     {
       title: "Selesai",
       value: completedCount,
       subtext: "Tuntas",
       icon: CheckCircle2,
-      iconBg: "bg-emerald-50 text-emerald-600 border-emerald-100",
-      valueColor: "text-emerald-600",
+      colorScheme: "emerald",
     },
     {
       title: "Akun Admin",
       value: totalAdminCount,
       subtext: "Petugas",
       icon: Users,
-      iconBg: "bg-purple-50 text-purple-600 border-purple-100",
-      valueColor: "text-purple-700",
+      colorScheme: "purple",
     },
   ];
 
@@ -81,33 +83,18 @@ export function DashboardMobileView({
       {/* Stat Cards 2 Columns Grid */}
       <div className="grid grid-cols-2 gap-2">
         {stats.map((stat, idx) => {
-          const Icon = stat.icon;
           const isLastSingle = idx === stats.length - 1 && stats.length % 2 !== 0;
 
           return (
-            <div
+            <StatCard
               key={idx}
-              className={`bg-white border border-slate-200/80 rounded-2xl p-3 shadow-2xs space-y-1 ${
-                isLastSingle ? "col-span-2 flex items-center justify-between space-y-0" : ""
-              }`}
-            >
-              <div className={isLastSingle ? "flex items-center gap-3" : ""}>
-                <div className={`p-1.5 rounded-lg border ${stat.iconBg} inline-block`}>
-                  <Icon className="h-3.5 w-3.5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                    {stat.title}
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-medium block">
-                    {stat.subtext}
-                  </span>
-                </div>
-              </div>
-              <div className={`text-xl font-black ${stat.valueColor}`}>
-                {stat.value}
-              </div>
-            </div>
+              title={stat.title}
+              value={stat.value}
+              description={stat.subtext}
+              icon={stat.icon}
+              colorScheme={stat.colorScheme}
+              className={isLastSingle ? "col-span-2" : ""}
+            />
           );
         })}
       </div>

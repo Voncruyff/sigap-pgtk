@@ -25,6 +25,8 @@ import {
   FileText,
   UserCheck,
   ShieldAlert,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -84,6 +86,9 @@ export function KelolaAdminView({
   const [users, setUsers] = useState<AdminUserItem[]>(initialUsers);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isAddConfirmDialogOpen, setIsAddConfirmDialogOpen] = useState(false);
+  const [addConfirmPassword, setAddConfirmPassword] = useState("");
+  const [showAddConfirmPassword, setShowAddConfirmPassword] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
 
@@ -166,7 +171,7 @@ export function KelolaAdminView({
     setIsBanDialogOpen(true);
   };
 
-  const handleAddAdmin = async (e: React.FormEvent) => {
+  const handleAddAdminStep1 = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSuperAdmin) {
       toast.error("Akses Ditolak", {
@@ -185,16 +190,29 @@ export function KelolaAdminView({
       return;
     }
 
+    setAddConfirmPassword("");
+    setShowAddConfirmPassword(false);
+    setIsAddConfirmDialogOpen(true);
+  };
+
+  const handleConfirmAddAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!addConfirmPassword) {
+      toast.error("Password akun Super Admin Anda wajib diisi untuk verifikasi.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const res = await fetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          nama,
+          nama: nama.trim(),
           username: username.trim(),
           password,
           role,
+          confirmPassword: addConfirmPassword,
         }),
       });
 
@@ -212,7 +230,7 @@ export function KelolaAdminView({
       setUsers((prev) => [
         {
           id: resData.id || `adm-${Date.now()}`,
-          nama,
+          nama: nama.trim(),
           username: username.trim(),
           role,
           is_banned: false,
@@ -221,11 +239,13 @@ export function KelolaAdminView({
         ...prev,
       ]);
 
-      // Reset & Close Dialog
+      // Reset & Close Dialogs
       setNama("");
       setUsername("");
       setPassword("");
+      setAddConfirmPassword("");
       setRole("ADMIN");
+      setIsAddConfirmDialogOpen(false);
       setIsAddDialogOpen(false);
     } catch (err) {
       console.error("Gagal menambah admin:", err);
@@ -549,7 +569,7 @@ export function KelolaAdminView({
                       </div>
                     </DialogHeader>
 
-                    <form onSubmit={handleAddAdmin} className="space-y-3.5 text-xs">
+                    <form onSubmit={handleAddAdminStep1} className="space-y-3.5 text-xs">
                       {/* Nama Lengkap */}
                       <div className="space-y-1">
                         <label className="font-bold text-slate-700 block flex items-center gap-1.5">
@@ -642,18 +662,87 @@ export function KelolaAdminView({
                         </Button>
                         <Button
                           type="submit"
+                          className="h-10 px-5 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer"
+                        >
+                          <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+                          Simpan &amp; Verifikasi
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
+
+              {/* Pop-up Dialog Verifikasi Sandi Super Admin Sebelum Simpan Admin Baru */}
+              {isSuperAdmin && (
+                <Dialog open={isAddConfirmDialogOpen} onOpenChange={setIsAddConfirmDialogOpen}>
+                  <DialogContent className="max-w-md p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-4">
+                    <DialogHeader className="space-y-1 pb-2 border-b border-slate-100">
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
+                          <Lock className="h-4 w-4 text-amber-700" />
+                        </div>
+                        <div>
+                          <DialogTitle className="text-base font-extrabold tracking-tight text-slate-900">
+                            Verifikasi Sandi Super Admin
+                          </DialogTitle>
+                          <DialogDescription className="text-xs text-slate-500 font-medium mt-0.5">
+                            Masukkan password akun Super Admin Anda untuk mengonfirmasi pendaftaran akun admin baru ({nama} - @{username}).
+                          </DialogDescription>
+                        </div>
+                      </div>
+                    </DialogHeader>
+
+                    <form onSubmit={handleConfirmAddAdmin} className="space-y-4 text-xs">
+                      <div className="space-y-1.5">
+                        <label className="font-bold text-slate-700 block">
+                          Password Super Admin Saat Ini <span className="text-rose-500 font-bold">*</span>
+                        </label>
+                        <div className="relative">
+                          <Input
+                            type={showAddConfirmPassword ? "text" : "password"}
+                            value={addConfirmPassword}
+                            onChange={(e) => setAddConfirmPassword(e.target.value)}
+                            placeholder="Masukkan password Super Admin"
+                            autoFocus
+                            required
+                            className="h-10 text-xs rounded-xl border-slate-200 focus:border-sky-500 bg-white shadow-2xs pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1 h-8 w-8 hover:bg-sky-50 text-slate-400 hover:text-sky-700 rounded-lg cursor-pointer"
+                            onClick={() => setShowAddConfirmPassword(!showAddConfirmPassword)}
+                          >
+                            {showAddConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </div>
+
+                      <DialogFooter className="gap-2 pt-2 border-t border-slate-100">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsAddConfirmDialogOpen(false)}
+                          className="h-10 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 border-slate-200 cursor-pointer"
+                        >
+                          Batal
+                        </Button>
+                        <Button
+                          type="submit"
                           disabled={isSubmitting}
-                          className="h-10 px-5 rounded-xl text-xs font-bold bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white shadow-md shadow-sky-600/20 cursor-pointer"
+                          className="h-10 px-5 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer"
                         >
                           {isSubmitting ? (
                             <>
                               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                              Mendaftarkan...
+                              Memverifikasi...
                             </>
                           ) : (
                             <>
-                              <UserPlus className="mr-1.5 h-3.5 w-3.5" />
-                              Simpan Akun Admin
+                              <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
+                              Konfirmasi &amp; Simpan Admin
                             </>
                           )}
                         </Button>

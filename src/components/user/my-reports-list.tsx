@@ -11,6 +11,7 @@ import {
   LocalReportItem,
 } from "@/lib/my-reports-storage";
 import { toast } from "sonner";
+import { formatDateIndonesian } from "@/lib/date-utils";
 
 export function MyReportsList() {
   const [history, setHistory] = useState<LocalReportItem[]>([]);
@@ -53,12 +54,7 @@ export function MyReportsList() {
       </CardHeader>
       <CardContent className="p-3 sm:p-4 space-y-2">
         {history.map((item) => {
-          const dateObj = new Date(item.created_at);
-          const formattedDate = dateObj.toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          });
+          const formattedDate = formatDateIndonesian(item.created_at);
 
           return (
             <div

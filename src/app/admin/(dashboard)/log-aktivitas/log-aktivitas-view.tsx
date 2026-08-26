@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
+import { formatDateIndonesian } from "@/lib/date-utils";
 import {
   Table,
   TableBody,
@@ -178,19 +180,18 @@ export function LogAktivitasView({ logs }: LogAktivitasViewProps) {
               <TableBody>
                 {sortedLogs.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-12 text-slate-400 italic text-xs">
-                      Tidak ada catatan log aktivitas yang cocok dengan pencarian.
+                    <TableCell colSpan={5} className="py-8">
+                      <EmptyState
+                        icon={Activity}
+                        title="Belum Ada Log Aktivitas"
+                        description="Tidak ada catatan jejak audit yang cocok dengan kata kunci pencarian Anda."
+                      />
                     </TableCell>
                   </TableRow>
                 ) : (
                   sortedLogs.map((log) => {
-                    const dateObj = new Date(log.waktu);
-                    const formattedDate = dateObj.toLocaleDateString("id-ID", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    });
-                    const formattedTime = dateObj.toLocaleTimeString("id-ID", {
+                    const formattedDate = formatDateIndonesian(log.waktu);
+                    const formattedTime = new Date(log.waktu).toLocaleTimeString("id-ID", {
                       hour: "2-digit",
                       minute: "2-digit",
                     });
