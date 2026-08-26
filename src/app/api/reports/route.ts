@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { createReport, getAllReports } from "@/lib/report-services";
+import { getAdminSession } from "@/lib/auth";
 
 export async function GET() {
   try {
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const reports = await getAllReports();
     return NextResponse.json(reports);
   } catch (err: unknown) {

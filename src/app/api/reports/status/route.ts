@@ -1,15 +1,21 @@
 import { NextResponse } from "next/server";
 import { updateReportStatus } from "@/lib/report-services";
+import { getAdminSession } from "@/lib/auth";
 
 async function handleStatusUpdate(request: Request) {
   try {
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized. Silakan login sebagai admin." }, { status: 401 });
+    }
+
     const { id, status, adminName } = await request.json();
 
     if (!id || !status) {
       return NextResponse.json({ error: "ID dan status wajib diisi" }, { status: 400 });
     }
 
-    const updated = await updateReportStatus(id, status, adminName || "Super Admin SIGAP");
+    const updated = await updateReportStatus(id, status, adminName || session.nama || "Admin SIGAP");
     return NextResponse.json(updated);
   } catch (err: any) {
     console.error("Status update error:", err);
