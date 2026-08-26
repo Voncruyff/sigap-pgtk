@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import {
   Camera,
   Image as ImageIcon,
@@ -8,8 +8,6 @@ import {
   X,
   Loader2,
   CheckCircle2,
-  RefreshCw,
-  Sparkles,
 } from "lucide-react";
 import {
   Dialog,
@@ -32,29 +30,11 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
   const [isCompressing, setIsCompressing] = useState(false);
   const [originalSize, setOriginalSize] = useState<number | null>(null);
 
-  // Modal selector for Camera vs Gallery
+  // Modal selector for Native Camera vs Gallery
   const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
 
-  // Live Camera Dialog State (Webcam for Laptop/PC)
-  const [isLiveCameraOpen, setIsLiveCameraOpen] = useState(false);
-  const [isCameraStarting, setIsCameraStarting] = useState(false);
-  const [cameraFacingMode, setCameraFacingMode] = useState<"user" | "environment">("user");
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const nativeCameraInputRef = useRef<HTMLInputElement>(null);
-
-  // Detect if user is accessing from a mobile smartphone or desktop laptop
-  const isMobileDevice = () => {
-    if (typeof window === "undefined") return false;
-    return (
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-      (window.innerWidth < 768 && "ontouchstart" in window)
-    );
-  };
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // Process selected or captured file with compression
   const processImageFile = async (file: File) => {
@@ -103,121 +83,14 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
     }
   };
 
-  // Trigger Camera (Smart handling: Native App on Mobile, Live Webcam on Laptop)
-  const handleTriggerCamera = () => {
+  // Trigger Native OS Camera Intent (Android / iOS / Windows Camera)
+  const handleOpenNativeCamera = () => {
     setIsOptionModalOpen(false);
-
-    if (isMobileDevice()) {
-      // 📱 On Mobile: Open native camera app directly for best sensor quality
-      if (nativeCameraInputRef.current) {
-        nativeCameraInputRef.current.value = "";
-        nativeCameraInputRef.current.click();
-      }
-    } else {
-      // 💻 On Laptop/PC: Open Live Webcam Viewfinder Dialog
-      setIsLiveCameraOpen(true);
-      startLiveWebcam("user");
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = "";
+      cameraInputRef.current.click();
     }
   };
-
-  // Start Live Webcam Stream for Laptop/Desktop
-  const startLiveWebcam = async (mode: "user" | "environment") => {
-    setIsCameraStarting(true);
-    stopLiveCamera();
-
-    try {
-      // Try with preferred facing mode first, with fallback to basic video constraint
-      let stream: MediaStream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: mode,
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-          audio: false,
-        });
-      } catch (modeErr) {
-        console.warn("Retrying webcam with default video constraint:", modeErr);
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false,
-        });
-      }
-
-      streamRef.current = stream;
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch((playErr) => console.warn("Webcam play error:", playErr));
-        };
-      }
-    } catch (err: any) {
-      console.error("Gagal mengakses webcam laptop:", err);
-      toast.error("Kamera Laptop Tidak Dapat Dibuka", {
-        description: "Pastikan izin akses kamera telah diizinkan di browser Anda.",
-      });
-      setIsLiveCameraOpen(false);
-    } finally {
-      setIsCameraStarting(false);
-    }
-  };
-
-  // Stop Live Webcam Stream
-  const stopLiveCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-  };
-
-  // Switch between front/back camera (if laptop has multiple cameras)
-  const toggleCameraFacing = () => {
-    const nextMode = cameraFacingMode === "user" ? "environment" : "user";
-    setCameraFacingMode(nextMode);
-    startLiveWebcam(nextMode);
-  };
-
-  // Capture Snapshot from Laptop Webcam
-  const captureSnapshot = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
-
-    canvas.width = video.videoWidth || 1280;
-    canvas.height = video.videoHeight || 720;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          const capturedFile = new File([blob], `kamera_laptop_${Date.now()}.jpg`, {
-            type: "image/jpeg",
-          });
-          stopLiveCamera();
-          setIsLiveCameraOpen(false);
-          processImageFile(capturedFile);
-        }
-      },
-      "image/jpeg",
-      0.9
-    );
-  };
-
-  // Cleanup webcam stream when component unmounts
-  useEffect(() => {
-    return () => {
-      stopLiveCamera();
-    };
-  }, []);
 
   const handleRemove = () => {
     onChange(null);
@@ -227,7 +100,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
     setPreview(null);
     setOriginalSize(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    if (nativeCameraInputRef.current) nativeCameraInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
   };
 
   const formatFileSize = (bytes: number) => {
@@ -244,17 +117,17 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       <input
         type="file"
         ref={fileInputRef}
-        accept="image/jpeg,image/png,image/webp,image/jpg"
+        accept="image/*"
         onChange={handleFileInputChange}
         className="hidden"
         id="foto-upload-file"
         disabled={isCompressing}
       />
 
-      {/* 2. Direct Native Device Camera Capture (Kamera Asli HP) */}
+      {/* 2. Native Camera Capture (Triggers OS Camera app: Just Once / Always -> snap -> tap OK) */}
       <input
         type="file"
-        ref={nativeCameraInputRef}
+        ref={cameraInputRef}
         accept="image/*"
         capture="environment"
         onChange={handleFileInputChange}
@@ -262,9 +135,6 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
         id="foto-upload-camera"
         disabled={isCompressing}
       />
-
-      {/* Hidden Canvas for Webcam Snapshot */}
-      <canvas ref={canvasRef} className="hidden" />
 
       {/* State 1: Compressing State */}
       {isCompressing ? (
@@ -347,12 +217,12 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
             Ambil / Upload Foto Kerusakan
           </span>
           <span className="text-xs text-slate-500 mt-1 font-medium">
-            Klik untuk membuka <b>Kamera</b> atau <b>Galeri / Berkas</b>
+            Klik untuk membuka <b>Kamera HP / Perangkat</b> atau <b>Galeri / Berkas</b>
           </span>
         </button>
       )}
 
-      {/* 📱 Modal 1: Option Modal (Kamera vs Galeri) */}
+      {/* 📱 Modal: Option Modal (Kamera Asli Perangkat vs Galeri) */}
       <Dialog open={isOptionModalOpen} onOpenChange={setIsOptionModalOpen}>
         <DialogContent className="max-w-sm sm:max-w-md p-5 sm:p-6 rounded-3xl bg-white border border-sky-100 shadow-2xl space-y-4">
           <DialogHeader>
@@ -363,23 +233,23 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
               Pilih Sumber Foto Kerusakan
             </DialogTitle>
             <DialogDescription className="text-xs text-slate-500 font-medium">
-              Gunakan kamera untuk mengambil foto kerusakan langsung atau pilih dari galeri berkas Anda.
+              Buka aplikasi kamera perangkat Anda untuk mengambil foto langsung atau pilih berkas dari galeri.
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            {/* Option 1: Kamera */}
+            {/* Option 1: Kamera Asli OS (Just once / Always -> Kamera -> OK) */}
             <button
               type="button"
-              onClick={handleTriggerCamera}
+              onClick={handleOpenNativeCamera}
               className="p-4 rounded-2xl border-2 border-sky-100 hover:border-sky-500 bg-sky-50/40 hover:bg-sky-50 text-slate-800 hover:text-sky-800 transition-all flex flex-col items-center justify-center gap-2.5 text-center cursor-pointer shadow-2xs group"
             >
               <div className="p-3 rounded-2xl bg-sky-600 text-white shadow-md shadow-sky-600/30 group-hover:scale-110 transition-transform">
                 <Camera className="h-6 w-6" />
               </div>
               <div>
-                <span className="text-sm font-extrabold block">Buka Kamera</span>
-                <span className="text-[11px] text-slate-500 font-medium">Ambil foto langsung</span>
+                <span className="text-sm font-extrabold block">Kamera Perangkat</span>
+                <span className="text-[11px] text-slate-500 font-medium">Buka aplikasi kamera asli</span>
               </div>
             </button>
 
@@ -397,75 +267,6 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                 <span className="text-[11px] text-slate-500 font-medium">Pilih dari memori perangkat</span>
               </div>
             </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* 📸 Modal 2: Live Webcam Viewfinder Dialog (For Laptop/Desktop PC) */}
-      <Dialog
-        open={isLiveCameraOpen}
-        onOpenChange={(open) => {
-          if (!open) stopLiveCamera();
-          setIsLiveCameraOpen(open);
-        }}
-      >
-        <DialogContent className="max-w-md sm:max-w-lg p-5 sm:p-6 rounded-3xl bg-white border border-sky-100 shadow-2xl space-y-4">
-          <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg font-black text-slate-900 flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Camera className="h-4 w-4 text-sky-600" />
-                Kamera Laptop
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={toggleCameraFacing}
-                className="h-8 text-xs font-bold rounded-xl border-sky-200 text-sky-700 hover:bg-sky-50"
-              >
-                <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-                Ganti Kamera
-              </Button>
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="relative rounded-2xl overflow-hidden bg-slate-950 aspect-4/3 flex items-center justify-center border border-slate-800 shadow-inner">
-            {isCameraStarting ? (
-              <div className="text-center text-white space-y-2 p-4">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto text-sky-400" />
-                <p className="text-xs font-medium text-slate-300">Menghubungkan ke kamera laptop...</p>
-              </div>
-            ) : (
-              <video
-                ref={videoRef}
-                playsInline
-                autoPlay
-                muted
-                className="w-full h-full object-cover"
-              />
-            )}
-          </div>
-
-          <div className="flex items-center justify-between gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                stopLiveCamera();
-                setIsLiveCameraOpen(false);
-              }}
-              className="h-10 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
-            >
-              Batal
-            </Button>
-            <Button
-              type="button"
-              onClick={captureSnapshot}
-              className="h-10 px-6 rounded-xl text-xs font-bold bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white shadow-md shadow-sky-600/25 flex items-center gap-2 cursor-pointer"
-            >
-              <Camera className="h-4 w-4" />
-              Ambil Foto
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
