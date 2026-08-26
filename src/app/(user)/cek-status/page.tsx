@@ -1,6 +1,5 @@
-import React from "react";
-import { CekStatusView } from "./cek-status-view";
+import { redirect } from "next/navigation";
 
-export default function CekStatusPage() {
-  return <CekStatusView />;
+export default function CekStatusRedirectPage() {
+  redirect("/lapor");
 }

@@ -8,9 +8,10 @@ export const revalidate = 0;
 
 export default async function AdminDashboardPage() {
   let totalCount = 0;
-  let waitingCount = 0;
-  let processingCount = 0;
-  let completedCount = 0;
+  let teknikCount = 0;
+  let pabrikasiCount = 0;
+  let tanamanCount = 0;
+  let tukCount = 0;
   let totalAdminCount = 0;
   let recentReports: DashboardReportItem[] = [];
   let recentLogs: DashboardLogItem[] = [];
@@ -24,10 +25,12 @@ export default async function AdminDashboardPage() {
 
     if (reportsData && reportsData.length > 0) {
       totalCount = reportsData.length;
-      waitingCount = reportsData.filter((r: { status: string }) => r.status === "MENUNGGU").length;
-      processingCount = reportsData.filter((r: { status: string }) => r.status === "DIPROSES").length;
-      completedCount = reportsData.filter((r: { status: string }) => r.status === "SELESAI").length;
-      recentReports = reportsData.slice(0, 5).map((r: { created_at: Date; [key: string]: unknown }) => ({
+      teknikCount = reportsData.filter((r: { bagian: string }) => r.bagian === "Teknik").length;
+      pabrikasiCount = reportsData.filter((r: { bagian: string }) => r.bagian === "Pabrikasi").length;
+      tanamanCount = reportsData.filter((r: { bagian: string }) => r.bagian === "Tanaman").length;
+      tukCount = reportsData.filter((r: { bagian: string }) => r.bagian === "TUK").length;
+      
+      recentReports = reportsData.slice(0, 6).map((r: { created_at: Date; [key: string]: unknown }) => ({
         ...(r as unknown as DashboardReportItem),
         created_at: r.created_at.toISOString(),
       }));
@@ -50,9 +53,10 @@ export default async function AdminDashboardPage() {
   return (
     <DashboardView
       totalCount={totalCount}
-      waitingCount={waitingCount}
-      processingCount={processingCount}
-      completedCount={completedCount}
+      teknikCount={teknikCount}
+      pabrikasiCount={pabrikasiCount}
+      tanamanCount={tanamanCount}
+      tukCount={tukCount}
       totalAdminCount={totalAdminCount}
       recentReports={recentReports}
       recentLogs={recentLogs}

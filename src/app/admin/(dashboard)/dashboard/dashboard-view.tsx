@@ -2,9 +2,10 @@ import React from "react";
 import Link from "next/link";
 import {
   FileText,
-  Clock,
   Wrench,
-  CheckCircle2,
+  Building,
+  Sprout,
+  Briefcase,
   ArrowUpRight,
   Sparkles,
   Users,
@@ -12,7 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
-import { ReportStatusBadge } from "@/components/user/report-status-badge";
 import {
   Table,
   TableBody,
@@ -28,9 +28,9 @@ export interface DashboardReportItem {
   id: string;
   ticket_number: string;
   nama_pelapor: string;
+  bagian: string;
   unit_kerja: string;
-  peralatan?: string;
-  status: string;
+  deskripsi: string;
   created_at: string;
 }
 
@@ -46,9 +46,10 @@ export interface DashboardLogItem {
 
 export interface DashboardViewProps {
   totalCount: number;
-  waitingCount: number;
-  processingCount: number;
-  completedCount: number;
+  teknikCount: number;
+  pabrikasiCount: number;
+  tanamanCount: number;
+  tukCount: number;
   totalAdminCount: number;
   recentReports: DashboardReportItem[];
   recentLogs: DashboardLogItem[];
@@ -57,9 +58,10 @@ export interface DashboardViewProps {
 export function DashboardView(props: DashboardViewProps) {
   const {
     totalCount,
-    waitingCount,
-    processingCount,
-    completedCount,
+    teknikCount,
+    pabrikasiCount,
+    tanamanCount,
+    tukCount,
     totalAdminCount,
     recentReports,
     recentLogs,
@@ -75,35 +77,42 @@ export function DashboardView(props: DashboardViewProps) {
     {
       title: "Total Laporan",
       value: totalCount,
-      subtext: "Terverifikasi",
+      subtext: "Catatan Kerusakan",
       icon: FileText,
       colorScheme: "sky",
     },
     {
-      title: "Menunggu",
-      value: waitingCount,
-      subtext: "Perlu disposisi",
-      icon: Clock,
-      colorScheme: "amber",
-    },
-    {
-      title: "Diproses",
-      value: processingCount,
-      subtext: "Dalam perbaikan",
+      title: "Bagian Teknik",
+      value: teknikCount,
+      subtext: "Fasilitas & Mesin",
       icon: Wrench,
       colorScheme: "blue",
     },
     {
-      title: "Selesai",
-      value: completedCount,
-      subtext: "Perbaikan tuntas",
-      icon: CheckCircle2,
+      title: "Bagian Pabrikasi",
+      value: pabrikasiCount,
+      subtext: "Pengolahan & Pabrik",
+      icon: Building,
+      colorScheme: "amber",
+    },
+    {
+      title: "Bagian Tanaman",
+      value: tanamanCount,
+      subtext: "Bahan Baku Tebu",
+      icon: Sprout,
       colorScheme: "emerald",
+    },
+    {
+      title: "Bagian TUK",
+      value: tukCount,
+      subtext: "Tata Usaha & Umum",
+      icon: Briefcase,
+      colorScheme: "indigo",
     },
     {
       title: "Petugas Admin",
       value: totalAdminCount,
-      subtext: "Akun terdaftar",
+      subtext: "Akun Terdaftar",
       icon: Users,
       colorScheme: "purple",
     },
@@ -114,14 +123,14 @@ export function DashboardView(props: DashboardViewProps) {
       {/* Header Halaman Minimalis */}
       <PageHeader
         title="Dashboard Overview"
-        description="Ringkasan status penanganan fasilitas & aktivitas petugas PT Kebon Agung PG Trangkil."
+        description="Ringkasan catatan kerusakan fasilitas & aktivitas petugas PT Kebon Agung PG Trangkil."
         badgeText="SIGAP Summary"
       />
 
       {/* 🖥️ Tampilan Utama Desktop / PC */}
       <div className="hidden lg:block space-y-5">
-        {/* Sleek Minimalist Stat Cards 5 Columns Grid */}
-        <div className="grid grid-cols-5 gap-3.5">
+        {/* Sleek Minimalist Stat Cards 6 Columns Grid */}
+        <div className="grid grid-cols-6 gap-3.5">
           {stats.map((stat, idx) => (
             <StatCard
               key={idx}
@@ -142,12 +151,12 @@ export function DashboardView(props: DashboardViewProps) {
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-sky-600" />
                 <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                  Laporan Terbaru
+                  Laporan Kerusakan Terbaru
                 </h3>
               </div>
-              <Link href="/admin/laporan">
+              <Link href="/admin/riwayat">
                 <Button variant="ghost" size="sm" className="text-xs text-sky-700 font-bold hover:bg-sky-50 rounded-xl px-2.5 h-7 gap-1 cursor-pointer">
-                  Lihat Semua <ArrowUpRight className="h-3.5 w-3.5" />
+                  Buka Riwayat <ArrowUpRight className="h-3.5 w-3.5" />
                 </Button>
               </Link>
             </div>
@@ -156,9 +165,9 @@ export function DashboardView(props: DashboardViewProps) {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50/70 border-b border-slate-100 hover:bg-slate-50/70">
-                    <TableHead className="w-[130px] font-bold text-slate-600 text-xs py-3 pl-5">Nomor Tiket</TableHead>
-                    <TableHead className="font-bold text-slate-600 text-xs py-3">Pelapor & Unit Kerja</TableHead>
-                    <TableHead className="w-[120px] font-bold text-slate-600 text-xs py-3">Status</TableHead>
+                    <TableHead className="w-[140px] font-bold text-slate-600 text-xs py-3 pl-5">Nomor Tiket</TableHead>
+                    <TableHead className="font-bold text-slate-600 text-xs py-3">Pelapor & Bagian</TableHead>
+                    <TableHead className="font-bold text-slate-600 text-xs py-3">Unit Kerja</TableHead>
                     <TableHead className="text-right w-[90px] font-bold text-slate-600 text-xs py-3 pr-5">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -166,7 +175,7 @@ export function DashboardView(props: DashboardViewProps) {
                   {recentReports.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="text-center py-10 text-xs text-slate-400 font-medium">
-                        Belum ada laporan kerusakan masuk
+                        Belum ada catatan kerusakan masuk
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -179,17 +188,17 @@ export function DashboardView(props: DashboardViewProps) {
                           <div className="font-bold text-xs text-slate-800 truncate">
                             {report.nama_pelapor}
                           </div>
-                          <div className="text-[11px] text-slate-500 font-medium truncate max-w-[220px]">
-                            {report.unit_kerja}
-                          </div>
+                          <span className="inline-flex items-center gap-1 font-semibold text-[10px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100 mt-0.5">
+                            Bagian {report.bagian}
+                          </span>
                         </TableCell>
-                        <TableCell className="py-3">
-                          <ReportStatusBadge status={report.status} />
+                        <TableCell className="py-3 text-xs text-slate-600 font-medium truncate max-w-[220px]">
+                          {report.unit_kerja}
                         </TableCell>
                         <TableCell className="text-right py-3 pr-5">
-                          <Link href={`/admin/laporan/${report.id}`}>
+                          <Link href="/admin/riwayat">
                             <Button variant="outline" size="sm" className="h-7 text-xs px-2.5 rounded-lg border-slate-200 text-slate-700 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 font-bold shadow-2xs cursor-pointer">
-                              Detail
+                              Lihat
                             </Button>
                           </Link>
                         </TableCell>

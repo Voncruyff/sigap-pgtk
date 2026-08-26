@@ -2,10 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Wrench, Search, ArrowRight, ShieldCheck, Clock, FileCheck, CheckCircle2 } from "lucide-react";
+import { Wrench, ArrowRight, ShieldCheck, Clock, FileCheck, LockKeyhole } from "lucide-react";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 import { LandingMobileView } from "@/components/mobile/landing-mobile-view";
 
@@ -34,7 +33,7 @@ export function LandingView() {
               </span>
             </h1>
             <p className="text-sm sm:text-base text-slate-600 max-w-xl mx-auto leading-relaxed font-medium">
-              Layanan terpadu pelaporan kerusakan alat atau fasilitas pabrik. Kirim laporan secara praktis dan lacak status penanganan teknisi secara realtime.
+              Layanan pencatatan dan pelaporan kerusakan fasilitas atau peralatan pabrik. Kirim laporan secara cepat, praktis, dan otomatis masuk ke riwayat penanganan.
             </p>
           </StaggerItem>
 
@@ -42,27 +41,27 @@ export function LandingView() {
             <Link href="/lapor">
               <Button
                 size="lg"
-                className="h-12 px-7 rounded-xl text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-xs transition-all cursor-pointer"
+                className="h-12 px-8 rounded-xl text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-xs transition-all cursor-pointer"
               >
                 <Wrench className="mr-2 h-4 w-4" />
-                Buat Laporan Baru
+                Buat Laporan Kerusakan
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/cek-status">
+            <Link href="/admin/login">
               <Button
                 variant="outline"
                 size="lg"
                 className="h-12 px-7 rounded-xl text-sm font-bold border-slate-200 text-sky-900 bg-white hover:bg-sky-50 hover:border-sky-300 transition-all shadow-2xs cursor-pointer"
               >
-                <Search className="mr-2 h-4 w-4 text-sky-600" />
-                Cek Status Tiket
+                <LockKeyhole className="mr-2 h-4 w-4 text-sky-600" />
+                Dashboard Admin
               </Button>
             </Link>
           </StaggerItem>
         </StaggerContainer>
 
-        {/* Desktop 2 Feature Action Cards Grid */}
+        {/* Desktop 2 Key Features Cards Grid */}
         <StaggerContainer className="grid grid-cols-2 gap-5 max-w-3xl mx-auto">
           <StaggerItem>
             <Link href="/lapor" className="group block">
@@ -74,12 +73,12 @@ export function LandingView() {
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center justify-between">
                       <h3 className="text-base font-bold text-slate-900 group-hover:text-sky-700 transition-colors">
-                        Buat Laporan Kerusakan
+                        Form Pelaporan Cepat
                       </h3>
                       <ArrowRight className="h-4 w-4 text-sky-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
                     </div>
                     <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed font-medium">
-                      Isi formulir online untuk melaporkan kendala fasilitas atau peralatan pabrik tanpa perlu login.
+                      Isi rincian kendala fasilitas, pilih unit kerja, dan lampirkan foto kerusakan langsung dari kamera.
                     </p>
                     <div className="pt-0.5">
                       <span className="inline-flex items-center gap-1 bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md text-[11px] font-bold border border-sky-100">
@@ -93,25 +92,25 @@ export function LandingView() {
           </StaggerItem>
 
           <StaggerItem>
-            <Link href="/cek-status" className="group block">
+            <Link href="/admin/login" className="group block">
               <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs hover:shadow-xs transition-all duration-200 group-hover:border-sky-400">
                 <CardContent className="p-5 flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-sky-700 text-white flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-sky-800 transition-colors">
-                    <Search className="h-5 w-5" />
+                  <div className="h-12 w-12 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 shadow-2xs group-hover:bg-slate-900 transition-colors">
+                    <LockKeyhole className="h-5 w-5" />
                   </div>
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center justify-between">
                       <h3 className="text-base font-bold text-slate-900 group-hover:text-sky-700 transition-colors">
-                        Cek Status Laporan
+                        Panel Petugas Admin
                       </h3>
                       <ArrowRight className="h-4 w-4 text-sky-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
                     </div>
                     <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed font-medium">
-                      Masukkan nomor tiket laporan untuk memantau perkembangan penanganan oleh tim teknisi.
+                      Masuk ke panel petugas untuk melihat seluruh riwayat catatan kerusakan dan ekspor data laporan.
                     </p>
                     <div className="pt-0.5">
-                      <span className="inline-flex items-center gap-1 bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md text-[11px] font-bold border border-sky-100">
-                        <CheckCircle2 className="h-3 w-3" /> Lacak Realtime
+                      <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md text-[11px] font-bold border border-slate-200">
+                        <ShieldCheck className="h-3 w-3" /> Khusus Petugas PG Trangkil
                       </span>
                     </div>
                   </div>
@@ -125,10 +124,10 @@ export function LandingView() {
         <section className="max-w-3xl mx-auto space-y-4 pt-4">
           <FadeIn className="text-center space-y-1">
             <h2 className="text-xl font-extrabold text-slate-900">
-              Alur Pelaporan Laporan Kerusakan
+              Alur Pelaporan Kerusakan
             </h2>
             <p className="text-xs text-slate-500 font-medium">
-              3 langkah praktis dari pengajuan hingga tindak lanjut penanganan teknis
+              3 langkah mudah mencatat kerusakan fasilitas pabrik
             </p>
           </FadeIn>
 
@@ -140,10 +139,10 @@ export function LandingView() {
                 </div>
                 <h4 className="font-bold text-slate-900 text-xs flex items-center justify-center gap-1.5">
                   <FileCheck className="h-4 w-4 text-sky-600 shrink-0" />
-                  Form Laporan
+                  Isi Formulir
                 </h4>
                 <p className="text-xs text-slate-500 leading-snug font-medium">
-                  Pilih Bagian &amp; Unit Kerja, deskripsikan kendala &amp; lokasi kerusakan.
+                  Pilih Bagian &amp; Unit Kerja serta jelaskan lokasi &amp; kondisi kerusakan.
                 </p>
               </div>
             </StaggerItem>
@@ -155,10 +154,10 @@ export function LandingView() {
                 </div>
                 <h4 className="font-bold text-slate-900 text-xs flex items-center justify-center gap-1.5">
                   <ShieldCheck className="h-4 w-4 text-sky-600 shrink-0" />
-                  Kode Tiket
+                  Nomor Tiket
                 </h4>
                 <p className="text-xs text-slate-500 leading-snug font-medium">
-                  Sistem menerbitkan nomor tiket resmi (<code className="font-mono text-sky-700">SIGAP-2026...</code>).
+                  Sistem otomatis menerbitkan nomor tiket resmi sebagai tanda terima laporan.
                 </p>
               </div>
             </StaggerItem>
@@ -170,10 +169,10 @@ export function LandingView() {
                 </div>
                 <h4 className="font-bold text-slate-900 text-xs flex items-center justify-center gap-1.5">
                   <Clock className="h-4 w-4 text-sky-600 shrink-0" />
-                  Penanganan
+                  Tercatat di Riwayat
                 </h4>
                 <p className="text-xs text-slate-500 leading-snug font-medium">
-                  Petugas teknis menindaklanjuti perbaikan hingga status laporan tuntas.
+                  Laporan tersimpan di sistem riwayat untuk ditinjau oleh petugas teknisi.
                 </p>
               </div>
             </StaggerItem>

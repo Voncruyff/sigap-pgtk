@@ -2,38 +2,29 @@ import React from "react";
 import Link from "next/link";
 import {
   FileText,
-  Clock,
   Wrench,
-  CheckCircle2,
+  Building,
+  Sprout,
+  Briefcase,
   ArrowRight,
   Sparkles,
   Users,
   Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ReportStatusBadge } from "@/components/user/report-status-badge";
 import { StatCard, type StatColorScheme } from "@/components/admin/stat-card";
-import { DashboardReportItem, DashboardLogItem } from "@/app/admin/(dashboard)/dashboard/dashboard-view";
-
-export interface DashboardMobileViewProps {
-  totalCount: number;
-  waitingCount: number;
-  processingCount: number;
-  completedCount: number;
-  totalAdminCount: number;
-  recentReports: DashboardReportItem[];
-  recentLogs: DashboardLogItem[];
-}
+import { DashboardViewProps } from "@/app/admin/(dashboard)/dashboard/dashboard-view";
 
 export function DashboardMobileView({
   totalCount,
-  waitingCount,
-  processingCount,
-  completedCount,
+  teknikCount,
+  pabrikasiCount,
+  tanamanCount,
+  tukCount,
   totalAdminCount,
   recentReports,
   recentLogs,
-}: DashboardMobileViewProps) {
+}: DashboardViewProps) {
   const stats: Array<{
     title: string;
     value: number;
@@ -42,32 +33,39 @@ export function DashboardMobileView({
     colorScheme: StatColorScheme;
   }> = [
     {
-      title: "Total",
+      title: "Total Laporan",
       value: totalCount,
-      subtext: "Terverifikasi",
+      subtext: "Catatan",
       icon: FileText,
       colorScheme: "sky",
     },
     {
-      title: "Menunggu",
-      value: waitingCount,
-      subtext: "Disposisi",
-      icon: Clock,
-      colorScheme: "amber",
-    },
-    {
-      title: "Diproses",
-      value: processingCount,
-      subtext: "Perbaikan",
+      title: "Teknik",
+      value: teknikCount,
+      subtext: "Fasilitas & Mesin",
       icon: Wrench,
       colorScheme: "blue",
     },
     {
-      title: "Selesai",
-      value: completedCount,
-      subtext: "Tuntas",
-      icon: CheckCircle2,
+      title: "Pabrikasi",
+      value: pabrikasiCount,
+      subtext: "Pabrik Gula",
+      icon: Building,
+      colorScheme: "amber",
+    },
+    {
+      title: "Tanaman",
+      value: tanamanCount,
+      subtext: "Bahan Baku Tebu",
+      icon: Sprout,
       colorScheme: "emerald",
+    },
+    {
+      title: "TUK",
+      value: tukCount,
+      subtext: "Tata Usaha",
+      icon: Briefcase,
+      colorScheme: "indigo",
     },
     {
       title: "Akun Admin",
@@ -82,21 +80,16 @@ export function DashboardMobileView({
     <div className="space-y-4">
       {/* Stat Cards 2 Columns Grid */}
       <div className="grid grid-cols-2 gap-2">
-        {stats.map((stat, idx) => {
-          const isLastSingle = idx === stats.length - 1 && stats.length % 2 !== 0;
-
-          return (
-            <StatCard
-              key={idx}
-              title={stat.title}
-              value={stat.value}
-              description={stat.subtext}
-              icon={stat.icon}
-              colorScheme={stat.colorScheme}
-              className={isLastSingle ? "col-span-2" : ""}
-            />
-          );
-        })}
+        {stats.map((stat, idx) => (
+          <StatCard
+            key={idx}
+            title={stat.title}
+            value={stat.value}
+            description={stat.subtext}
+            icon={stat.icon}
+            colorScheme={stat.colorScheme}
+          />
+        ))}
       </div>
 
       {/* Mobile Recent Reports List */}
@@ -105,29 +98,31 @@ export function DashboardMobileView({
           <div className="flex items-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5 text-sky-600" />
             <h2 className="text-xs font-black uppercase tracking-wider text-slate-700">
-              Laporan Terbaru
+              Catatan Kerusakan Terbaru
             </h2>
           </div>
-          <Link href="/admin/laporan" className="text-xs font-bold text-sky-700 flex items-center gap-0.5">
-            Semua <ArrowRight className="h-3 w-3" />
+          <Link href="/admin/riwayat" className="text-xs font-bold text-sky-700 flex items-center gap-0.5">
+            Buka Riwayat <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
 
         {recentReports.length === 0 ? (
           <div className="bg-white border border-slate-200/80 rounded-2xl p-6 text-center text-xs text-slate-400">
-            Belum ada laporan masuk
+            Belum ada catatan kerusakan masuk
           </div>
         ) : (
           recentReports.map((report) => (
             <div
               key={report.id}
-              className="bg-white border border-slate-200/80 rounded-2xl p-3 shadow-2xs space-y-2"
+              className="bg-white border border-slate-200/80 rounded-2xl p-3.5 shadow-2xs space-y-2"
             >
               <div className="flex items-center justify-between">
                 <span className="font-mono text-xs font-bold text-sky-700">
                   {report.ticket_number}
                 </span>
-                <ReportStatusBadge status={report.status} />
+                <span className="inline-flex items-center gap-1 font-semibold text-[10px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
+                  Bagian {report.bagian}
+                </span>
               </div>
               <div>
                 <span className="font-bold text-xs text-slate-800 block truncate">
@@ -138,9 +133,9 @@ export function DashboardMobileView({
                 </span>
               </div>
               <div className="pt-1 flex justify-end">
-                <Link href={`/admin/laporan/${report.id}`}>
+                <Link href="/admin/riwayat">
                   <Button variant="outline" size="sm" className="h-7 text-[11px] px-3 rounded-lg border-slate-200 text-slate-700 font-bold">
-                    Detail
+                    Buka di Riwayat
                   </Button>
                 </Link>
               </div>

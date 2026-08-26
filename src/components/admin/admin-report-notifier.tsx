@@ -32,11 +32,11 @@ export function AdminReportNotifier() {
         if (lastKnownReportId.current && latest.id !== lastKnownReportId.current) {
           lastKnownReportId.current = latest.id;
 
-          // Trigger YouTube-style Desktop Push Notification
+          // Trigger Desktop Push Notification
           sendBrowserPushNotification({
-            title: `Laporan Baru #${latest.ticket_number || "SIGAP"}`,
-            body: `${latest.nama_pelapor || "Pelapor"} (${latest.unit_kerja || latest.bagian || "Unit Kerja"}): ${latest.deskripsi || latest.lokasi_kerusakan || "Laporan kerusakan baru masuk"}`,
-            onClickUrl: `/admin/laporan/${latest.id}`,
+            title: `Laporan Kerusakan Baru #${latest.ticket_number || "SIGAP"}`,
+            body: `${latest.nama_pelapor || "Pelapor"} (${latest.unit_kerja || latest.bagian || "Unit"}): ${latest.deskripsi || "Catatan kerusakan baru masuk ke riwayat"}`,
+            onClickUrl: `/admin/riwayat`,
           });
         }
       } catch (err) {

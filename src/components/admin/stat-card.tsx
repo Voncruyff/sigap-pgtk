@@ -1,7 +1,7 @@
 import React from "react";
 import { type LucideIcon } from "lucide-react";
 
-export type StatColorScheme = "blue" | "amber" | "sky" | "emerald" | "purple";
+export type StatColorScheme = "blue" | "amber" | "sky" | "emerald" | "purple" | "indigo";
 
 export interface StatCardProps {
   title: string;
@@ -53,6 +53,12 @@ export function StatCard({
       iconColor: "text-purple-700",
       valueColor: "text-purple-900",
       borderColor: "border-purple-100",
+    },
+    indigo: {
+      iconBg: "bg-indigo-50",
+      iconColor: "text-indigo-700",
+      valueColor: "text-indigo-900",
+      borderColor: "border-indigo-100",
     },
   };
 

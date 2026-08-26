@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LockKeyhole, Wrench, Search, Building, Menu, Home, Settings } from "lucide-react";
+import { LockKeyhole, Wrench, Building, Menu, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { UserDockbar } from "@/components/mobile/user-dockbar";
@@ -20,8 +20,6 @@ export default function UserLayout({
   const navItems = [
     { label: "Beranda", href: "/", icon: Home },
     { label: "Buat Laporan", href: "/lapor", icon: Wrench },
-    { label: "Cek Status", href: "/cek-status", icon: Search },
-    { label: "Pengaturan", href: "/pengaturan", icon: Settings },
   ];
 
   return (
