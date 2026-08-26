@@ -245,13 +245,15 @@ export function AdminSidebar() {
           </span>
         </Link>
 
-        <Link
-          href="/admin/pengaturan"
-          className="p-1.5 rounded-xl text-slate-600 hover:text-sky-700 hover:bg-sky-50 transition-colors border border-slate-200/80 shadow-2xs"
-          title="Pengaturan Admin"
-        >
-          <Settings className="h-4 w-4" />
-        </Link>
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-sky-50 to-indigo-50 border border-sky-200/80 shadow-2xs">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-600"></span>
+          </span>
+          <span className="font-black text-xs tracking-wider text-sky-900">
+            SIGAP
+          </span>
+        </div>
       </header>
 
       {/* Mobile Bottom Navigation Bar (Shopee Style) */}

@@ -77,18 +77,21 @@ export function AdminPengaturanMobileView({
     <div className="space-y-4 pb-20">
       {/* 👤 Compact Profile Header Card */}
       <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
-        <CardContent className="p-4 space-y-3.5">
+        <CardContent className="p-4 space-y-3">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-700 text-white font-extrabold text-base flex items-center justify-center shadow-md shadow-sky-600/20 shrink-0">
+            <div className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-700 text-white font-extrabold text-sm flex items-center justify-center shadow-md shadow-sky-600/20 shrink-0">
               {nama ? nama.charAt(0).toUpperCase() : "A"}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="font-extrabold text-sm text-slate-900 truncate">
-                  {nama || "Petugas Administrator"}
-                </h3>
+              <h3 className="font-extrabold text-xs text-slate-900 truncate">
+                {nama || "Petugas Administrator"}
+              </h3>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <span className="font-mono text-[11px] font-bold text-sky-700">
+                  @{username || "admin"}
+                </span>
                 <span
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide border ${
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-extrabold uppercase tracking-wide border ${
                     isSuperAdmin
                       ? "bg-purple-50 text-purple-800 border-purple-200"
                       : "bg-sky-50 text-sky-800 border-sky-200"
@@ -102,9 +105,6 @@ export function AdminPengaturanMobileView({
                   {isSuperAdmin ? "Super Admin" : "Admin Teknis"}
                 </span>
               </div>
-              <span className="font-mono text-xs font-bold text-sky-700 block mt-0.5">
-                @{username || "admin"}
-              </span>
             </div>
           </div>
 
