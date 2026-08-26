@@ -39,13 +39,19 @@ export function LaporanMobileView({ reports: initialReports }: LaporanMobileView
 
       if (!res.ok) throw new Error("Gagal mengupdate status via API");
 
-      setReports((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
-      );
-
-      toast.success(`Status ${ticketNumber} Diperbarui!`, {
-        description: `Status diubah menjadi: ${newStatus}`,
-      });
+      if (newStatus === "SELESAI") {
+        setReports((prev) => prev.filter((item) => item.id !== id));
+        toast.success(`Tiket ${ticketNumber} Selesai!`, {
+          description: "Laporan tuntas dan dipindahkan ke Riwayat Laporan.",
+        });
+      } else {
+        setReports((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
+        );
+        toast.success(`Status ${ticketNumber} Diperbarui!`, {
+          description: `Status diubah menjadi: ${newStatus}`,
+        });
+      }
 
       router.refresh();
     } catch (err) {
@@ -79,7 +85,7 @@ export function LaporanMobileView({ reports: initialReports }: LaporanMobileView
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari tiket / pelapor / alat..."
-            className="pl-9 h-10 text-xs font-medium rounded-xl border-sky-200/90 focus:border-sky-500 bg-white shadow-2xs"
+            className="pl-9 h-10 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 bg-white shadow-2xs"
           />
         </div>
 
@@ -90,7 +96,7 @@ export function LaporanMobileView({ reports: initialReports }: LaporanMobileView
             <select
               value={bagianFilter}
               onChange={(e) => setBagianFilter(e.target.value)}
-              className="w-full pl-8 pr-7 h-9 text-[11px] font-bold rounded-xl border border-sky-200/90 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none truncate"
+              className="w-full pl-8 pr-7 h-9 text-[11px] font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none truncate"
               aria-label="Filter Bagian Laporan"
             >
               <option value="ALL">Semua Bagian</option>
@@ -108,13 +114,12 @@ export function LaporanMobileView({ reports: initialReports }: LaporanMobileView
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full pl-8 pr-7 h-9 text-[11px] font-bold rounded-xl border border-sky-200/90 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none truncate"
+              className="w-full pl-8 pr-7 h-9 text-[11px] font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none truncate"
               aria-label="Filter Status Laporan"
             >
-              <option value="ALL">Semua Status ({reports.length})</option>
+              <option value="ALL">Semua Aktif ({reports.length})</option>
               <option value="MENUNGGU">Menunggu ({reports.filter((r) => r.status === "MENUNGGU").length})</option>
               <option value="DIPROSES">Diproses ({reports.filter((r) => r.status === "DIPROSES").length})</option>
-              <option value="SELESAI">Selesai ({reports.filter((r) => r.status === "SELESAI").length})</option>
             </select>
             <div className="absolute right-2 pointer-events-none text-slate-400 text-[9px]">▼</div>
           </div>

@@ -96,8 +96,8 @@ export function LogAktivitasView({ logs }: LogAktivitasViewProps) {
       />
 
       {/* Main Table Card */}
-      <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-2xl lg:rounded-3xl shadow-md lg:shadow-xl shadow-sky-100/50 overflow-hidden">
-        <CardHeader className="p-3.5 sm:p-5 pb-3 sm:pb-4 border-b border-sky-100/80 bg-slate-50/50">
+      <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
+        <div className="p-3.5 sm:p-5 border-b border-slate-100 bg-slate-50/50">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div>
               <CardTitle className="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
@@ -115,13 +115,13 @@ export function LogAktivitasView({ logs }: LogAktivitasViewProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cari log / admin / tiket..."
-                  className="pl-8.5 h-9 text-xs font-medium rounded-xl border-sky-200/80 focus:border-sky-500 focus:ring-sky-500/20 bg-white/80"
+                  className="pl-8.5 h-9 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 focus:ring-sky-500/20 bg-white"
                 />
               </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
+        </div>
+        <div className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -247,8 +247,8 @@ export function LogAktivitasView({ logs }: LogAktivitasViewProps) {
               </TableBody>
             </Table>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

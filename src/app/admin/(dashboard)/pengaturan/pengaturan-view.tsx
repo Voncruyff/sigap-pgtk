@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Settings,
   User,
@@ -23,6 +24,9 @@ import {
   ArrowRight,
   Edit3,
   Lock,
+  LogOut,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,16 +52,21 @@ import {
 import { toast } from "sonner";
 
 export function AdminPengaturanView() {
+  const router = useRouter();
+
   // Admin Profile States
   const [nama, setNama] = useState("");
   const [username, setUsername] = useState("");
   const [role, setRole] = useState("ADMIN");
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Edit Profile Dialog Modal State
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [editNama, setEditNama] = useState("");
   const [editUsername, setEditUsername] = useState("");
+  const [profileConfirmPassword, setProfileConfirmPassword] = useState("");
+  const [showProfileConfirmPassword, setShowProfileConfirmPassword] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Change Password Dialog Modal State
@@ -72,6 +81,21 @@ export function AdminPengaturanView() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [permissionState, setPermissionState] = useState<NotificationPermissionState>("default");
   const [isTestingNotif, setIsTestingNotif] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+      toast.success("Berhasil logout dari sistem");
+      router.push("/admin/login");
+      router.refresh();
+    } catch (err) {
+      console.error("Logout error:", err);
+      toast.error("Gagal melakukan logout");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   useEffect(() => {
     // 1. Fetch active admin profile
@@ -172,6 +196,7 @@ export function AdminPengaturanView() {
   const handleOpenEditProfile = () => {
     setEditNama(nama);
     setEditUsername(username);
+    setProfileConfirmPassword("");
     setIsEditProfileOpen(true);
   };
 
@@ -179,6 +204,11 @@ export function AdminPengaturanView() {
     e.preventDefault();
     if (!editNama || !editUsername) {
       toast.error("Nama dan username wajib diisi.");
+      return;
+    }
+
+    if (!profileConfirmPassword) {
+      toast.error("Password login wajib dimasukkan untuk mengonfirmasi perubahan profil.");
       return;
     }
 
@@ -191,6 +221,7 @@ export function AdminPengaturanView() {
           action: "UPDATE_PROFILE",
           nama: editNama.trim(),
           username: editUsername.trim(),
+          confirmPassword: profileConfirmPassword,
         }),
       });
 
@@ -203,6 +234,7 @@ export function AdminPengaturanView() {
 
       setNama(editNama.trim());
       setUsername(editUsername.trim());
+      setProfileConfirmPassword("");
       toast.success("Profil Akun Berhasil Diperbarui!", {
         description: `Informasi akun ${editNama} (@${editUsername}) telah disimpan.`,
       });
@@ -280,8 +312,8 @@ export function AdminPengaturanView() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COLUMN: PUSH NOTIFICATIONS SETTINGS */}
         <div className="lg:col-span-7 space-y-6">
-          <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 overflow-hidden">
-            <CardHeader className="p-5 sm:p-6 border-b border-sky-100/80 bg-slate-50/50">
+          <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
+            <CardHeader className="p-5 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-2.5 rounded-2xl bg-sky-100 text-sky-700 ring-4 ring-sky-50 shadow-2xs">
@@ -409,13 +441,13 @@ export function AdminPengaturanView() {
 
         {/* RIGHT COLUMN: KELOLA AKUN & PROFIL ADMIN */}
         <div className="lg:col-span-5 space-y-6">
-          <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 overflow-hidden">
-            <CardHeader className="p-5 sm:p-6 border-b border-sky-100/80 bg-slate-50/50">
+          <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
+            <CardHeader className="p-5 border-b border-slate-100 bg-slate-50/50">
               <CardTitle className="text-base font-extrabold text-slate-900 flex items-center gap-2.5">
                 <div className="p-2 rounded-xl bg-purple-100 text-purple-700 ring-2 ring-purple-50">
                   <User className="h-4 w-4" />
                 </div>
-                Manajemen Akun Admin
+                Kelola Akun
               </CardTitle>
               <CardDescription className="text-xs text-slate-500 font-medium mt-0.5">
                 Informasi profil akun aktif dan tombol kontrol manajemen
@@ -476,7 +508,8 @@ export function AdminPengaturanView() {
                   >
                     <Key className="h-4 w-4 text-sky-600" />
                     Ubah Password
-                  </Button>                </div>
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -529,6 +562,32 @@ export function AdminPengaturanView() {
                 required
                 className="h-10 text-xs rounded-xl border-sky-200 focus:border-sky-500 bg-white shadow-2xs font-mono"
               />
+            </div>
+
+            {/* Konfirmasi Password Login saat ini untuk Keamanan */}
+            <div className="space-y-1 pt-1.5 border-t border-slate-100">
+              <label className="font-bold text-slate-700 block flex items-center gap-1.5">
+                <Lock className="h-3.5 w-3.5 text-rose-600" />
+                Password Login Akun Anda * <span className="text-[10px] text-rose-600 font-semibold">(Verifikasi Keamanan)</span>
+              </label>
+              <div className="relative">
+                <Input
+                  type={showProfileConfirmPassword ? "text" : "password"}
+                  placeholder="Masukkan password akun Anda saat ini"
+                  value={profileConfirmPassword}
+                  onChange={(e) => setProfileConfirmPassword(e.target.value)}
+                  required
+                  className="h-10 text-xs rounded-xl border-rose-200/90 focus:border-rose-500 bg-white shadow-2xs pr-9"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowProfileConfirmPassword(!showProfileConfirmPassword)}
+                  className="absolute right-2.5 top-2.5 text-slate-400 hover:text-sky-600 transition-colors"
+                  title={showProfileConfirmPassword ? "Sembunyikan" : "Tampilkan"}
+                >
+                  {showProfileConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             {/* Modal Actions */}

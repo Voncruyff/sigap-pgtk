@@ -492,8 +492,8 @@ export function KelolaAdminView({
       />
 
       {/* Main Full-Width Table Card */}
-      <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 overflow-hidden">
-        <CardHeader className="p-4 sm:p-5 pb-3 sm:pb-4 border-b border-sky-100/80 bg-slate-50/50">
+      <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
+        <CardHeader className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div>
               <CardTitle className="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">

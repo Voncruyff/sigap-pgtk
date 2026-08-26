@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const poppins = Poppins({
   variable: "--font-sans",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   title: "SIGAP - Sistem Informasi Gangguan dan Perbaikan",
   description:
     "Pelaporan kerusakan fasilitas dan peralatan PT Kebon Agung Pabrik Gula Trangkil secara cepat dan mudah.",
+  icons: {
+    icon: "/assets/images/logo-ka.png",
+    shortcut: "/assets/images/logo-ka.png",
+    apple: "/assets/images/logo-ka.png",
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${poppins.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         {children}

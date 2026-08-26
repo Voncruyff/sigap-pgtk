@@ -1,6 +1,7 @@
 import React from "react";
-import { getAllReports } from "@/lib/report-services";
-import { DashboardView, DashboardReportItem } from "./dashboard-view";
+import { getAllReports, getActivityLogs } from "@/lib/report-services";
+import { getAllAdminUsers } from "@/lib/admin-services";
+import { DashboardView, DashboardReportItem, DashboardLogItem } from "./dashboard-view";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -10,10 +11,16 @@ export default async function AdminDashboardPage() {
   let waitingCount = 0;
   let processingCount = 0;
   let completedCount = 0;
+  let totalAdminCount = 0;
   let recentReports: DashboardReportItem[] = [];
+  let recentLogs: DashboardLogItem[] = [];
 
   try {
-    const reportsData = await getAllReports();
+    const [reportsData, logsData, usersData] = await Promise.all([
+      getAllReports(),
+      getActivityLogs(),
+      getAllAdminUsers(),
+    ]);
 
     if (reportsData && reportsData.length > 0) {
       totalCount = reportsData.length;
@@ -25,6 +32,17 @@ export default async function AdminDashboardPage() {
         created_at: r.created_at.toISOString(),
       }));
     }
+
+    if (logsData && logsData.length > 0) {
+      recentLogs = logsData.slice(0, 4).map((l: { waktu: Date; [key: string]: unknown }) => ({
+        ...(l as unknown as DashboardLogItem),
+        waktu: l.waktu ? new Date(l.waktu).toISOString() : new Date().toISOString(),
+      }));
+    }
+
+    if (usersData) {
+      totalAdminCount = usersData.length;
+    }
   } catch (err) {
     console.warn("MySQL fetch warning in dashboard:", err);
   }
@@ -35,7 +53,9 @@ export default async function AdminDashboardPage() {
       waitingCount={waitingCount}
       processingCount={processingCount}
       completedCount={completedCount}
+      totalAdminCount={totalAdminCount}
       recentReports={recentReports}
+      recentLogs={recentLogs}
     />
   );
 }

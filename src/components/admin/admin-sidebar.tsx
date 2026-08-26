@@ -259,22 +259,21 @@ export function AdminSidebar() {
           )}
 
           <Button
-            variant="ghost"
             onClick={handleLogout}
             disabled={isLoggingOut}
-            title="Keluar Admin"
-            className={`w-full text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 rounded-2xl font-bold transition-colors ${
-              isCollapsed ? "justify-center p-0 h-11 w-11 mx-auto" : "justify-start px-3.5 py-2.5"
+            title="Logout"
+            className={`w-full bg-rose-50 hover:bg-rose-600 border border-rose-200/90 text-rose-700 hover:text-white rounded-2xl font-bold transition-all shadow-2xs hover:shadow-md cursor-pointer active:scale-[0.98] ${
+              isCollapsed ? "justify-center p-0 h-11 w-11 mx-auto" : "justify-center px-3.5 h-11 text-xs"
             }`}
             size="sm"
           >
             {isLoggingOut ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <>
-                <LogOut className={`h-4 w-4 ${!isCollapsed ? "mr-2" : ""}`} />
-                {!isCollapsed && <span>Keluar Admin</span>}
-              </>
+              <div className="flex items-center justify-center gap-2">
+                <LogOut className="h-4 w-4 shrink-0" />
+                {!isCollapsed && <span>Logout</span>}
+              </div>
             )}
           </Button>
         </div>
@@ -303,18 +302,17 @@ export function AdminSidebar() {
         </Link>
 
         <Button
-          variant="ghost"
           size="sm"
           onClick={handleLogout}
           disabled={isLoggingOut}
-          className="text-rose-600 hover:text-rose-700 hover:bg-rose-50/80 rounded-full font-bold text-xs px-3 h-8 border border-rose-100 flex items-center gap-1.5"
+          className="bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl font-bold text-xs px-3.5 h-8 border border-rose-200/90 flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors active:scale-95"
         >
           {isLoggingOut ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
             <>
-              <LogOut className="h-3.5 w-3.5 text-rose-600" />
-              <span>Keluar</span>
+              <LogOut className="h-3.5 w-3.5 shrink-0" />
+              <span>Logout</span>
             </>
           )}
         </Button>

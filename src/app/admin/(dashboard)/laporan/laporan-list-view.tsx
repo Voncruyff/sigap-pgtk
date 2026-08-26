@@ -92,13 +92,19 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
         throw new Error("Gagal mengupdate status");
       }
 
-      setReports((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
-      );
-
-      toast.success("Status Laporan Diperbarui!", {
-        description: `Status berhasil diubah menjadi ${newStatus}.`,
-      });
+      if (newStatus === "SELESAI") {
+        setReports((prev) => prev.filter((item) => item.id !== id));
+        toast.success("Laporan Selesai Perbaikan!", {
+          description: `Tiket ${ticketNumber} telah tuntas dan dipindahkan ke Riwayat Laporan.`,
+        });
+      } else {
+        setReports((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
+        );
+        toast.success("Status Laporan Diperbarui!", {
+          description: `Status berhasil diubah menjadi ${newStatus}.`,
+        });
+      }
 
       router.refresh();
     } catch (err) {
@@ -145,7 +151,6 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
   const totalCount = reports.length;
   const waitingCount = reports.filter((r) => r.status === "MENUNGGU").length;
   const processingCount = reports.filter((r) => r.status === "DIPROSES").length;
-  const completedCount = reports.filter((r) => r.status === "SELESAI").length;
 
   const renderSortIndicator = (field: SortField) => {
     const isActive = sortField === field;
@@ -163,23 +168,23 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
     <div className="space-y-4 sm:space-y-6 pb-12">
       {/* Header Halaman Dynamic */}
       <PageHeader
-        title="Manage Laporan"
-        description="Kelola data masuk, pantau progres perbaikan, dan ubah status laporan penanganan."
-        badgeText="SIGAP Reports Management"
+        title="Manage Laporan Aktif"
+        description="Kelola laporan aktif yang membutuhkan respon atau perbaikan teknis. Laporan selesai otomatis dipindahkan ke Riwayat Laporan."
+        badgeText="SIGAP Active Reports"
       />
 
       {/* 🖥️ Tampilan Utama Desktop / PC */}
       <div className="hidden lg:block">
-        <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 overflow-hidden">
+        <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
           {/* Header Card & Filter Bar */}
-          <CardHeader className="p-4 sm:p-5 pb-3 sm:pb-4 border-b border-sky-100/80 bg-slate-50/60">
+          <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <CardTitle className="text-base sm:text-lg font-extrabold text-slate-900">
-                  Data Laporan Kerusakan
+                  Data Laporan Aktif
                 </CardTitle>
                 <CardDescription className="text-xs text-slate-500 font-medium mt-0.5">
-                  Menampilkan {filteredReports.length} dari total {totalCount} laporan terdaftar
+                  Menampilkan {filteredReports.length} laporan aktif (Menunggu & Diproses)
                 </CardDescription>
               </div>
 
@@ -192,7 +197,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari tiket / pelapor..."
-                    className="pl-9 h-9 text-xs font-medium rounded-xl border-sky-200/80 focus:border-sky-500 focus:ring-sky-500/20 bg-white shadow-2xs"
+                    className="pl-9 h-9 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 focus:ring-sky-500/20 bg-white shadow-2xs"
                   />
                 </div>
 
@@ -202,7 +207,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                   <select
                     value={bagianFilter}
                     onChange={(e) => setBagianFilter(e.target.value)}
-                    className="pl-9 pr-8 h-9 text-xs font-bold rounded-xl border border-sky-200/90 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none"
+                    className="pl-9 pr-8 h-9 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none"
                     aria-label="Filter Bagian Laporan"
                   >
                     <option value="ALL">Semua Bagian</option>
@@ -220,13 +225,12 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="pl-9 pr-8 h-9 text-xs font-bold rounded-xl border border-sky-200/90 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none"
+                    className="pl-9 pr-8 h-9 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs cursor-pointer hover:border-sky-400 transition-all appearance-none"
                     aria-label="Filter Status Laporan"
                   >
-                    <option value="ALL">Semua Status ({totalCount})</option>
+                    <option value="ALL">Semua Status Aktif ({totalCount})</option>
                     <option value="MENUNGGU">Menunggu Penanganan ({waitingCount})</option>
                     <option value="DIPROSES">Sedang Diproses ({processingCount})</option>
-                    <option value="SELESAI">Selesai Perbaikan ({completedCount})</option>
                   </select>
                   <div className="absolute right-2.5 pointer-events-none text-slate-400 text-[9px]">▼</div>
                 </div>
@@ -246,10 +250,10 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                 </Button>
               </div>
             </div>
-          </CardHeader>
+          </div>
 
           {/* Table Container yang Rapi & Pas di Layar */}
-          <CardContent className="p-0">
+          <div className="p-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -422,8 +426,8 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* 📱 Tampilan Khusus Mobile HP */}

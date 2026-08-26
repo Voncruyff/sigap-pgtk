@@ -40,11 +40,11 @@ export function AdminHeader() {
   const roleLabel = isSuperAdmin ? "Super Admin" : "Admin Teknis";
 
   return (
-    <header className="hidden lg:flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 border-b border-l border-sky-100/90 bg-white/95 backdrop-blur-xl shrink-0 w-full z-20 shadow-2xs rounded-tl-3xl rounded-bl-2xl">
+    <header className="hidden lg:flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 border-b border-l border-slate-200/80 bg-white shrink-0 w-full z-20 shadow-2xs rounded-tl-2xl">
       {/* Left: Active Page Title & Company Tag */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-sky-50 text-sky-600 border border-sky-100/80 shadow-xs">
+          <div className="p-2 rounded-lg bg-sky-50 text-sky-700 border border-sky-100 shadow-2xs">
             <ShieldCheck className="h-4 w-4" />
           </div>
           <div>
@@ -54,7 +54,7 @@ export function AdminHeader() {
             <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium mt-1">
               <span>PT Kebon Agung PG Trangkil</span>
               <span>&bull;</span>
-              <span className="text-sky-700 font-semibold">SIGAP Panel Admin</span>
+              <span className="text-sky-700 font-bold">SIGAP Panel Admin</span>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ export function AdminHeader() {
         {/* Dynamic Name and Role Badge */}
         {userSession && (
           <div
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border shadow-2xs ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border shadow-2xs ${
               isSuperAdmin
                 ? "bg-purple-50 text-purple-800 border-purple-200"
                 : "bg-sky-50 text-sky-800 border-sky-200"
@@ -84,8 +84,8 @@ export function AdminHeader() {
         )}
 
         {/* Date Display */}
-        <div className="hidden xl:flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-50/80 px-3 py-1.5 rounded-full border border-slate-200/60">
-          <Clock className="h-3.5 w-3.5 text-sky-600" />
+        <div className="hidden xl:flex items-center gap-2 text-xs font-semibold text-slate-600 bg-slate-50 px-3 py-1 rounded-lg border border-slate-200/80">
+          <Clock className="h-3.5 w-3.5 text-sky-700" />
           <span suppressHydrationWarning>{currentDate}</span>
         </div>
       </div>

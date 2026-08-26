@@ -57,7 +57,8 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Sesi admin tidak ditemukan. Silakan login." }, { status: 401 });
     }
 
-    const { action, nama, username, currentPassword, newPassword } = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const { action, nama, username, currentPassword, confirmPassword, newPassword } = body;
 
     // Mode 1: Ubah Password Saja
     if (action === "CHANGE_PASSWORD") {
@@ -100,9 +101,33 @@ export async function PUT(request: Request) {
       return NextResponse.json({ success: true, message: "Password berhasil diubah!" });
     }
 
-    // Mode 2: Update Informasi Profil (Nama & Username)
+    // Mode 2: Update Informasi Profil (Nama & Username) - Memerlukan Verifikasi Password
     if (!nama || !username) {
       return NextResponse.json({ error: "Nama dan username wajib diisi" }, { status: 400 });
+    }
+
+    const passToVerify = confirmPassword || currentPassword;
+
+    if (!passToVerify || typeof passToVerify !== "string" || !passToVerify.trim()) {
+      return NextResponse.json(
+        { error: "Password akun Anda wajib dimasukkan untuk mengonfirmasi perubahan profil" },
+        { status: 400 }
+      );
+    }
+
+    // Verify Password Login Admin Saat Ini
+    const admins = await db.$queryRawUnsafe<Array<{ id: string; password: string }>>(
+      `SELECT id, password FROM admin_users WHERE id = ? LIMIT 1`,
+      session.id
+    );
+
+    if (!admins || admins.length === 0) {
+      return NextResponse.json({ error: "Akun admin tidak ditemukan di database" }, { status: 404 });
+    }
+
+    const isPasswordValid = await bcrypt.compare(passToVerify, admins[0].password);
+    if (!isPasswordValid) {
+      return NextResponse.json({ error: "Password konfirmasi yang Anda masukkan salah" }, { status: 400 });
     }
 
     const cleanUsername = username.trim().toLowerCase();

@@ -106,8 +106,8 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
 
       {/* 🖥️ Tampilan Utama Desktop / PC */}
       <div className="hidden lg:block">
-        <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 overflow-hidden">
-          <CardHeader className="p-5 pb-4 border-b border-sky-100/80 bg-slate-50/50">
+        <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <CardTitle className="text-base font-extrabold text-slate-900 flex items-center gap-2">
@@ -125,14 +125,14 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari riwayat tiket / pelapor..."
-                    className="pl-8.5 h-9 text-xs font-medium rounded-xl border-sky-200/80 focus:border-sky-500 focus:ring-sky-500/20 bg-white/80"
+                    className="pl-8.5 h-9 text-xs font-medium rounded-xl border-slate-200 focus:border-sky-500 focus:ring-sky-500/20 bg-white"
                   />
                 </div>
                 <ExportDialog completedReports={completedReports} />
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
+          </div>
+          <div className="p-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -248,8 +248,8 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* 📱 Tampilan Khusus Mobile HP */}

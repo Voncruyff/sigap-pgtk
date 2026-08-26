@@ -24,8 +24,8 @@ const statusSearchSchema = z.object({
   ticketNumber: z
     .string()
     .min(1, { message: "Nomor laporan wajib diisi" })
-    .regex(/^[A-Z0-9]+-\d{8}-\d{3}$/i, {
-      message: "Format nomor laporan tidak valid. Contoh: TUK-20260825-001 atau SIGAP-20260821-001",
+    .regex(/^[A-Z0-9]+-\d{8}-\d+$/i, {
+      message: "Format nomor laporan tidak valid. Contoh: TUK-20260825-1001",
     }),
 });
 
@@ -47,34 +47,31 @@ export function StatusSearchForm() {
   };
 
   return (
-    <Card className="border border-sky-100/90 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl shadow-sky-100/60 overflow-hidden">
-      <CardContent className="p-6 sm:p-8 space-y-4">
+    <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
+      <CardContent className="p-5 sm:p-7 space-y-4">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="ticketNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-bold text-slate-700 flex items-center justify-between flex-wrap gap-1">
-                    <span>Nomor Laporan Tiket <span className="text-destructive">*</span></span>
-                    <span className="text-[11px] font-mono font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
-                      Contoh: TUK-20260825-001
-                    </span>
+                  <FormLabel className="text-xs font-bold text-slate-700 block">
+                    Nomor Tiket Laporan <span className="text-rose-500 font-bold">*</span>
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="TUK-20260825-001"
+                        placeholder="Contoh: TUK-20260825-1001"
                         {...field}
                         onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                        className="font-mono uppercase tracking-wider h-13 text-base sm:text-lg rounded-2xl border-sky-200/90 focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:border-sky-500 bg-white/80 shadow-inner pl-4 pr-11 font-bold text-slate-900"
+                        className="font-mono uppercase tracking-wider h-11 text-xs sm:text-sm rounded-xl border-slate-200 focus-visible:ring-sky-500/20 focus-visible:border-sky-500 bg-white pl-3.5 pr-10 font-medium text-slate-900 placeholder:text-slate-400 placeholder:font-normal"
                       />
-                      <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-sky-500 pointer-events-none" />
+                      <Search className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                     </div>
                   </FormControl>
                   <FormDescription className="text-xs text-slate-500 font-medium">
-                    Nomor laporan diberikan otomatis setelah Anda berhasil membuat laporan.
+                    Nomor tiket diberikan otomatis setelah Anda berhasil mengirimkan laporan.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -84,10 +81,10 @@ export function StatusSearchForm() {
             <Button
               type="submit"
               size="lg"
-              className="w-full sm:w-auto h-13 px-8 text-base font-bold bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white rounded-full shadow-lg shadow-sky-600/30 transition-all hover:scale-[1.02] active:scale-95"
+              className="w-full sm:w-auto h-11 px-7 text-xs sm:text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white rounded-xl shadow-2xs cursor-pointer transition-all"
             >
               <Search className="mr-2 h-4 w-4" />
-              Cek Status Penanganan
+              Cek Status Tiket Laporan
             </Button>
           </form>
         </Form>

@@ -1,5 +1,5 @@
 import React from "react";
-import { getAllReports } from "@/lib/report-services";
+import { getActiveReports } from "@/lib/report-services";
 import { LaporanListView, LaporanItem } from "./laporan-list-view";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +9,7 @@ export default async function AdminLaporanPage() {
   let reports: LaporanItem[] = [];
 
   try {
-    const data = await getAllReports();
+    const data = await getActiveReports();
 
     if (data && data.length > 0) {
       reports = data.map((item: { created_at: Date; [key: string]: unknown }) => ({

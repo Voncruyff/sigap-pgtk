@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, User, Wrench, MapPin, Calendar, Clock, Phone } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
 
@@ -47,7 +46,7 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
           </Button>
         </Link>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-b border-sky-100/80 pb-4 sm:pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-b border-slate-100 pb-4 sm:pb-5">
           <div>
             <div className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">
               Nomor Tiket Laporan Resmi
@@ -67,14 +66,14 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
         {/* Main Details (2 Columns on Desktop) */}
         <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           {/* Card 1: Informasi Pelapor & Lokasi */}
-          <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-2xl lg:rounded-3xl shadow-md lg:shadow-xl shadow-sky-100/50 overflow-hidden">
-            <CardHeader className="p-3.5 sm:p-5 pb-3 border-b border-sky-100/80 bg-slate-50/70">
-              <CardTitle className="text-xs sm:text-sm font-extrabold flex items-center gap-2 text-sky-800">
+          <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
+              <h3 className="text-xs sm:text-sm font-extrabold flex items-center gap-2 text-slate-900">
                 <User className="h-4 w-4 text-sky-600" />
                 Informasi Pelapor & Lokasi
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-3.5 sm:p-5 pt-4 space-y-3.5 text-xs sm:text-sm">
+              </h3>
+            </div>
+            <div className="p-4 sm:p-5 space-y-3.5 text-xs sm:text-sm">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <span className="text-xs text-slate-400 font-medium block">Nama Pelapor</span>
@@ -88,7 +87,7 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
                 </div>
               </div>
 
-              <div className="border-t border-sky-100/80 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="border-t border-slate-100 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <span className="text-xs text-slate-400 font-medium block flex items-center gap-1.5">
                     <Phone className="h-3.5 w-3.5 text-sky-600" /> Nomor HP / Kontak
@@ -102,32 +101,30 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
                   <span className="font-semibold text-slate-800">{report.lokasi_kerusakan}</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Card 2: Detail Kerusakan & Foto */}
-          <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 overflow-hidden">
-            <CardHeader className="pb-3.5 border-b border-sky-100/80 bg-slate-50/70">
-              <CardTitle className="text-sm font-extrabold flex items-center gap-2 text-sky-800">
+          <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
+              <h3 className="text-xs sm:text-sm font-extrabold flex items-center gap-2 text-slate-900">
                 <Wrench className="h-4 w-4 text-sky-600" />
                 Detail Kerusakan & Lampiran Foto
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-5 space-y-4 text-sm">
+              </h3>
+            </div>
+            <div className="p-4 sm:p-5 space-y-4 text-sm">
               <div>
                 <span className="text-xs text-slate-400 font-medium block mb-1.5">Deskripsi Kerusakan</span>
-                <p className="text-sm text-slate-800 bg-slate-50/80 p-4 rounded-2xl border border-slate-200/60 whitespace-pre-wrap leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-800 bg-slate-50/80 p-4 rounded-xl border border-slate-200/60 whitespace-pre-wrap leading-relaxed">
                   {report.deskripsi}
                 </p>
               </div>
-
-
 
               {/* Lampiran Foto */}
               {report.foto_url ? (
                 <div className="pt-2">
                   <span className="text-xs text-slate-400 font-medium block mb-2">Foto Lampiran</span>
-                  <div className="relative max-w-sm rounded-2xl overflow-hidden border border-sky-100 shadow-md bg-white">
+                  <div className="relative max-w-sm rounded-xl overflow-hidden border border-slate-200 shadow-2xs bg-white">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={report.foto_url}
@@ -141,19 +138,19 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
                   Tidak ada lampiran foto untuk laporan ini.
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Side Panel: Informasi Waktu */}
         <div className="space-y-6">
-          <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 overflow-hidden">
-            <CardHeader className="pb-3.5 border-b border-sky-100/80 bg-slate-50/70">
-              <CardTitle className="text-sm font-extrabold text-slate-900">
+          <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
+              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900">
                 Informasi Waktu
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-5 space-y-4 text-sm">
+              </h3>
+            </div>
+            <div className="p-4 sm:p-5 space-y-4 text-sm">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
                   <Calendar className="h-4 w-4 shrink-0" />
@@ -163,7 +160,7 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
                   <span className="font-bold text-slate-800">{formattedDate}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3 border-t border-sky-100/80 pt-4">
+              <div className="flex items-center gap-3 border-t border-slate-100 pt-4">
                 <div className="p-2 rounded-xl bg-sky-50 text-sky-600 border border-sky-100">
                   <Clock className="h-4 w-4 shrink-0" />
                 </div>
@@ -172,8 +169,8 @@ export function LaporanDetailView({ report }: LaporanDetailViewProps) {
                   <span className="font-bold text-slate-800">{formattedTime} WIB</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

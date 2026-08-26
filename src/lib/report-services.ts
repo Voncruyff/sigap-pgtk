@@ -28,6 +28,21 @@ export async function getAllReports() {
   }
 }
 
+export async function getActiveReports() {
+  try {
+    return await db.report.findMany({
+      where: {
+        status: { in: ["MENUNGGU", "DIPROSES"] },
+      },
+      select: reportSelect,
+      orderBy: { created_at: "desc" },
+    });
+  } catch (err) {
+    console.error("Failed to fetch active reports from MySQL:", err);
+    return [];
+  }
+}
+
 export async function getReportByTicket(ticketNumber: string) {
   try {
     return await db.report.findUnique({

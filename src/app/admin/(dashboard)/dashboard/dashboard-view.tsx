@@ -6,10 +6,10 @@ import {
   Wrench,
   CheckCircle2,
   ArrowUpRight,
-  TrendingUp,
   Sparkles,
+  Users,
+  Activity,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
@@ -33,163 +33,235 @@ export interface DashboardReportItem {
   created_at: string;
 }
 
+export interface DashboardLogItem {
+  id: string;
+  waktu: string;
+  admin: string;
+  role: string;
+  aktivitas: string;
+  target: string;
+  deskripsi: string;
+}
+
 export interface DashboardViewProps {
   totalCount: number;
   waitingCount: number;
   processingCount: number;
   completedCount: number;
+  totalAdminCount: number;
   recentReports: DashboardReportItem[];
+  recentLogs: DashboardLogItem[];
 }
 
 export function DashboardView(props: DashboardViewProps) {
-  const { totalCount, waitingCount, processingCount, completedCount, recentReports } = props;
+  const {
+    totalCount,
+    waitingCount,
+    processingCount,
+    completedCount,
+    totalAdminCount,
+    recentReports,
+    recentLogs,
+  } = props;
+
+  const stats = [
+    {
+      title: "Total Laporan",
+      value: totalCount,
+      subtext: "Terverifikasi",
+      icon: FileText,
+      iconBg: "bg-sky-50 text-sky-600 border-sky-100",
+      valueColor: "text-slate-900",
+    },
+    {
+      title: "Menunggu",
+      value: waitingCount,
+      subtext: "Perlu disposisi",
+      icon: Clock,
+      iconBg: "bg-amber-50 text-amber-600 border-amber-100",
+      valueColor: "text-amber-600",
+    },
+    {
+      title: "Diproses",
+      value: processingCount,
+      subtext: "Dalam perbaikan",
+      icon: Wrench,
+      iconBg: "bg-blue-50 text-blue-600 border-blue-100",
+      valueColor: "text-blue-600",
+    },
+    {
+      title: "Selesai",
+      value: completedCount,
+      subtext: "Perbaikan tuntas",
+      icon: CheckCircle2,
+      iconBg: "bg-emerald-50 text-emerald-600 border-emerald-100",
+      valueColor: "text-emerald-600",
+    },
+    {
+      title: "Petugas Admin",
+      value: totalAdminCount,
+      subtext: "Akun terdaftar",
+      icon: Users,
+      iconBg: "bg-purple-50 text-purple-600 border-purple-100",
+      valueColor: "text-purple-700",
+    },
+  ];
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-12">
-      {/* Header Halaman Dynamic */}
+    <div className="space-y-5 pb-8">
+      {/* Header Halaman Minimalis */}
       <PageHeader
-        title="Dashboard Admin"
-        description="Ringkasan data gangguan & penanganan fasilitas PT Kebon Agung PG Trangkil."
-        badgeText="SIGAP System Summary"
-      >
-        <Link href="/admin/laporan">
-          <Button size="sm" className="rounded-full bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 text-white font-bold text-xs shadow-md shadow-sky-600/20 active:scale-[0.98]">
-            <FileText className="mr-1.5 h-3.5 w-3.5" />
-            Manage Laporan
-          </Button>
-        </Link>
-      </PageHeader>
+        title="Dashboard Overview"
+        description="Ringkasan status penanganan fasilitas & aktivitas petugas PT Kebon Agung PG Trangkil."
+        badgeText="SIGAP Summary"
+      />
 
       {/* 🖥️ Tampilan Utama Desktop / PC */}
-      <div className="hidden lg:block space-y-6">
-        {/* Stat Cards 4 Columns */}
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
-          <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 p-2">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
-              <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Total Laporan
-              </CardTitle>
-              <div className="p-2.5 rounded-2xl bg-sky-50 text-sky-600 border border-sky-100/80 shadow-xs">
-                <FileText className="h-4 w-4" />
+      <div className="hidden lg:block space-y-5">
+        {/* Sleek Minimalist Stat Cards 5 Columns Grid */}
+        <div className="grid grid-cols-5 gap-3.5">
+          {stats.map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={idx}
+                className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-2xs hover:shadow-xs transition-shadow flex items-center justify-between"
+              >
+                <div className="space-y-0.5">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                    {stat.title}
+                  </span>
+                  <div className={`text-2xl font-black tracking-tight ${stat.valueColor}`}>
+                    {stat.value}
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-400 block">
+                    {stat.subtext}
+                  </span>
+                </div>
+                <div className={`p-3 rounded-xl border ${stat.iconBg} shrink-0`}>
+                  <Icon className="h-5 w-5" />
+                </div>
               </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-3xl font-black text-slate-900">{totalCount}</div>
-              <p className="text-xs text-slate-500 flex items-center gap-1 mt-1 font-medium">
-                <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
-                <span className="text-emerald-600 font-bold">Terverifikasi</span>
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-amber-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-amber-100/30 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 p-2">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
-              <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Menunggu
-              </CardTitle>
-              <div className="p-2.5 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100/80 shadow-xs">
-                <Clock className="h-4 w-4" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-3xl font-black text-amber-600">{waitingCount}</div>
-              <p className="text-xs text-slate-500 mt-1 font-medium">Perlu disposisi</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 p-2">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
-              <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Diproses
-              </CardTitle>
-              <div className="p-2.5 rounded-2xl bg-sky-50 text-sky-600 border border-sky-100/80 shadow-xs">
-                <Wrench className="h-4 w-4" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-3xl font-black text-sky-600">{processingCount}</div>
-              <p className="text-xs text-slate-500 mt-1 font-medium">Dalam perbaikan</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-emerald-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-emerald-100/30 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 p-2">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 p-4">
-              <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Selesai
-              </CardTitle>
-              <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100/80 shadow-xs">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-3xl font-black text-emerald-600">{completedCount}</div>
-              <p className="text-xs text-slate-500 mt-1 font-medium">Perbaikan tuntas</p>
-            </CardContent>
-          </Card>
+            );
+          })}
         </div>
 
-        {/* Desktop Table Laporan Terbaru */}
-        <Card className="border border-sky-100/90 bg-white/95 backdrop-blur-md rounded-3xl shadow-xl shadow-sky-100/50 overflow-hidden w-full">
-          <CardHeader className="flex flex-row items-center justify-between p-5 pb-3 border-b border-sky-100/80 bg-slate-50/50">
-            <div>
-              <CardTitle className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+        {/* Layout Grid 12 Kolom Simetris: Left Table Laporan (8 cols), Right Log Activity Feed (4 cols) */}
+        <div className="grid grid-cols-12 gap-5 items-stretch">
+          {/* LEFT: Desktop Table Laporan Terbaru (8 Kolom) */}
+          <div className="col-span-8 bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/50 shrink-0">
+              <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-sky-600" />
-                Laporan Kerusakan Terbaru
-              </CardTitle>
-              <CardDescription className="text-xs text-slate-500 font-medium">
-                Daftar laporan masuk yang membutuhkan respon admin
-              </CardDescription>
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+                  Laporan Terbaru
+                </h3>
+              </div>
+              <Link href="/admin/laporan">
+                <Button variant="ghost" size="sm" className="text-xs text-sky-700 font-bold hover:bg-sky-50 rounded-xl px-2.5 h-7 gap-1 cursor-pointer">
+                  Lihat Semua <ArrowUpRight className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
             </div>
-            <Link href="/admin/laporan">
-              <Button variant="ghost" size="sm" className="text-xs text-sky-700 font-bold hover:bg-sky-50 rounded-full px-3 h-8">
-                Lihat Semua <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
+
+            <div className="overflow-x-auto flex-1">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/90 border-b border-sky-100/80">
-                    <TableHead className="w-[150px] font-bold text-slate-700 text-xs py-3.5 pl-5">Nomor Tiket</TableHead>
-                    <TableHead className="font-bold text-slate-700 text-xs py-3.5">Pelapor & Unit Kerja</TableHead>
-                    <TableHead className="w-[130px] font-bold text-slate-700 text-xs py-3.5">Status</TableHead>
-                    <TableHead className="text-center w-[100px] font-bold text-slate-700 text-xs py-3.5">Aksi</TableHead>
+                  <TableRow className="bg-slate-50/70 border-b border-slate-100 hover:bg-slate-50/70">
+                    <TableHead className="w-[130px] font-bold text-slate-600 text-xs py-3 pl-5">Nomor Tiket</TableHead>
+                    <TableHead className="font-bold text-slate-600 text-xs py-3">Pelapor & Unit Kerja</TableHead>
+                    <TableHead className="w-[120px] font-bold text-slate-600 text-xs py-3">Status</TableHead>
+                    <TableHead className="text-right w-[90px] font-bold text-slate-600 text-xs py-3 pr-5">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recentReports.map((report) => (
-                    <TableRow key={report.id} className="hover:bg-sky-50/40 transition-colors border-b border-slate-100">
-                      <TableCell className="font-mono text-xs font-bold text-sky-700 py-4 pl-5">
-                        {report.ticket_number}
+                  {recentReports.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-10 text-xs text-slate-400 font-medium">
+                        Belum ada laporan kerusakan masuk
                       </TableCell>
-                      <TableCell className="py-4">
-                        <div className="font-bold text-xs text-slate-800">
-                          {report.nama_pelapor}
-                        </div>
-                        <div className="text-[11px] text-slate-500 font-medium truncate max-w-[220px]">
-                          {report.unit_kerja}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <ReportStatusBadge status={report.status} />
-                      </TableCell>
-                      <TableCell className="text-center py-4">
-                        <div className="flex items-center justify-center">
+                    </TableRow>
+                  ) : (
+                    recentReports.map((report) => (
+                      <TableRow key={report.id} className="hover:bg-sky-50/30 transition-colors border-b border-slate-100/80">
+                        <TableCell className="font-mono text-xs font-bold text-sky-700 py-3 pl-5">
+                          {report.ticket_number}
+                        </TableCell>
+                        <TableCell className="py-3">
+                          <div className="font-bold text-xs text-slate-800 truncate">
+                            {report.nama_pelapor}
+                          </div>
+                          <div className="text-[11px] text-slate-500 font-medium truncate max-w-[220px]">
+                            {report.unit_kerja}
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-3">
+                          <ReportStatusBadge status={report.status} />
+                        </TableCell>
+                        <TableCell className="text-right py-3 pr-5">
                           <Link href={`/admin/laporan/${report.id}`}>
-                            <Button variant="outline" size="sm" className="h-8 text-xs px-3.5 rounded-full border-sky-200 text-sky-700 hover:bg-sky-50 font-bold shadow-2xs">
+                            <Button variant="outline" size="sm" className="h-7 text-xs px-2.5 rounded-lg border-slate-200 text-slate-700 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 font-bold shadow-2xs cursor-pointer">
                               Detail
                             </Button>
                           </Link>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          {/* RIGHT: Log Aktivitas Feed (4 Kolom) */}
+          <div className="col-span-4 bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/50 shrink-0">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-purple-600" />
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+                  Log Aktivitas
+                </h3>
+              </div>
+              <Link href="/admin/log-aktivitas">
+                <Button variant="ghost" size="sm" className="text-xs text-purple-700 font-bold hover:bg-purple-50 rounded-xl px-2.5 h-7 gap-1 cursor-pointer">
+                  Semua <ArrowUpRight className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="p-3 divide-y divide-slate-100/80 flex-1 overflow-y-auto">
+              {recentLogs.length === 0 ? (
+                <div className="text-center py-10 text-xs text-slate-400 font-medium">
+                  Belum ada catatan log aktivitas
+                </div>
+              ) : (
+                recentLogs.map((log) => {
+                  const dateObj = new Date(log.waktu);
+                  const timeStr = dateObj.toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
+
+                  return (
+                    <div key={log.id} className="p-2.5 hover:bg-slate-50/70 rounded-xl transition-colors space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-extrabold text-xs text-slate-900 truncate">
+                          {log.admin}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                          {timeStr} WIB
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 font-medium leading-snug line-clamp-2">
+                        {log.deskripsi || log.aktivitas}
+                      </p>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 📱 Tampilan Khusus Mobile HP */}
