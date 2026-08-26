@@ -260,7 +260,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50/90 border-b border-sky-100/80 select-none">
-                    <TableHead className="w-[150px] pl-5 pr-3 py-3.5">
+                    <TableHead className="w-[145px] pl-5 pr-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("ticket_number")}
@@ -271,7 +271,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                         {renderSortIndicator("ticket_number")}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[135px] px-3 py-3.5">
+                    <TableHead className="w-[130px] px-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("created_at")}
@@ -282,7 +282,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                         {renderSortIndicator("created_at")}
                       </button>
                     </TableHead>
-                    <TableHead className="px-3 py-3.5">
+                    <TableHead className="w-[160px] px-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("nama_pelapor")}
@@ -293,7 +293,10 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                         {renderSortIndicator("nama_pelapor")}
                       </button>
                     </TableHead>
-                    <TableHead className="px-3 py-3.5">
+                    <TableHead className="w-[200px] px-3 py-3.5 font-extrabold text-slate-700 text-xs">
+                      Deskripsi Kerusakan
+                    </TableHead>
+                    <TableHead className="w-[140px] px-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("lokasi_kerusakan")}
@@ -304,7 +307,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                         {renderSortIndicator("lokasi_kerusakan")}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[125px] px-3 py-3.5">
+                    <TableHead className="w-[115px] px-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("status")}
@@ -315,7 +318,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                         {renderSortIndicator("status")}
                       </button>
                     </TableHead>
-                    <TableHead className="text-center w-[130px] font-extrabold text-slate-700 text-xs pr-5 pl-3 py-3.5">
+                    <TableHead className="text-center w-[125px] font-extrabold text-slate-700 text-xs pr-5 pl-3 py-3.5">
                       Aksi
                     </TableHead>
                   </TableRow>
@@ -323,7 +326,7 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                 <TableBody>
                   {sortedReports.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-12 text-slate-400 italic text-xs">
+                      <TableCell colSpan={7} className="text-center py-12 text-slate-400 italic text-xs">
                         Tidak ada laporan kerusakan yang cocok dengan pencarian / filter ini.
                       </TableCell>
                     </TableRow>
@@ -351,16 +354,23 @@ export function LaporanListView({ reports: initialReports }: LaporanListViewProp
                             <div className="font-bold text-slate-800">{formattedDate}</div>
                             <div className="text-[11px] text-slate-400">{formattedTime} WIB</div>
                           </TableCell>
-                          <TableCell className="px-3 py-4">
-                            <div className="font-bold text-xs text-slate-900">
+                          <TableCell className="px-3 py-4 max-w-[160px]">
+                            <div className="font-bold text-xs text-slate-900 truncate" title={report.nama_pelapor}>
                               {report.nama_pelapor}
                             </div>
-                            <div className="text-[11px] text-slate-500 font-medium mt-0.5">
+                            <div className="text-[11px] text-slate-500 font-medium mt-0.5 truncate" title={`${report.bagian} • ${report.unit_kerja}`}>
                               {report.bagian} &bull; {report.unit_kerja}
                             </div>
                           </TableCell>
-                          <TableCell className="text-xs text-slate-600 font-medium px-3 py-4">
-                            {report.lokasi_kerusakan}
+                          <TableCell className="text-xs text-slate-700 font-medium px-3 py-4 max-w-[200px]">
+                            <div className="line-clamp-2 leading-relaxed" title={report.deskripsi || "-"}>
+                              {report.deskripsi || "-"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs text-slate-600 font-medium px-3 py-4 max-w-[140px]">
+                            <div className="truncate" title={report.lokasi_kerusakan}>
+                              {report.lokasi_kerusakan}
+                            </div>
                           </TableCell>
                           <TableCell className="px-3 py-4">
                             <ReportStatusBadge status={report.status} />

@@ -140,7 +140,7 @@ export function ExportDialog({ completedReports }: ExportDialogProps) {
         render={
           <Button
             size="sm"
-            className="h-9 px-3.5 sm:px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-98 cursor-pointer"
+            className="h-9 px-3.5 sm:px-4 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs transition-all cursor-pointer"
           >
             <Download className="mr-1.5 h-3.5 w-3.5" />
             Export Riwayat
@@ -148,15 +148,15 @@ export function ExportDialog({ completedReports }: ExportDialogProps) {
         }
       />
 
-      <DialogContent className="max-w-lg sm:max-w-xl p-4 sm:p-6 rounded-3xl bg-white border border-sky-100/80 shadow-2xl space-y-3.5 max-h-[calc(100dvh-2rem)] overflow-y-auto">
+      <DialogContent className="max-w-lg sm:max-w-xl p-4 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-lg space-y-3.5 max-h-[calc(100dvh-2rem)] overflow-y-auto">
         {/* Header Dialog */}
         <DialogHeader className="space-y-0.5 pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 ring-2 ring-emerald-100">
+            <div className="p-2 rounded-xl bg-sky-50 text-sky-700 border border-sky-200/80">
               <Download className="h-4 w-4" />
             </div>
             <div>
-              <DialogTitle className="text-base sm:text-lg font-black tracking-tight text-slate-900">
+              <DialogTitle className="text-base sm:text-lg font-bold tracking-tight text-slate-900">
                 Export Arsip Laporan
               </DialogTitle>
               <DialogDescription className="text-[11px] text-slate-500 font-medium">

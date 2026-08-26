@@ -78,21 +78,30 @@ export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) 
                   </div>
                   <ReportStatusBadge status={report.status} />
                 </CardHeader>
-                <CardContent className="p-3.5 space-y-2 text-xs">
+                <CardContent className="p-3.5 space-y-2.5 text-xs">
                   <div>
-                    <span className="font-extrabold text-xs text-slate-900 block flex items-center gap-1.5">
-                      <Wrench className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                    <span className="font-bold text-xs text-slate-900 block flex items-center gap-1.5">
+                      <Wrench className="h-3.5 w-3.5 text-sky-700 shrink-0" />
                       {report.unit_kerja}
                     </span>
                     {report.lokasi_kerusakan && (
-                      <p className="text-[11px] text-slate-500 font-medium mt-0.5 line-clamp-1">
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5 truncate">
                         Lokasi: {report.lokasi_kerusakan}
                       </p>
                     )}
                   </div>
 
+                  {report.deskripsi && (
+                    <div className="bg-slate-50 border border-slate-100 p-2.5 rounded-xl text-[11px] text-slate-700 font-medium line-clamp-2 leading-relaxed">
+                      <span className="font-bold text-slate-800 block text-[10px] uppercase tracking-wide mb-0.5">
+                        Deskripsi Kerusakan:
+                      </span>
+                      {report.deskripsi}
+                    </div>
+                  )}
+
                   {report.penanganan && (
-                    <div className="bg-emerald-50/70 border border-emerald-100 p-2 rounded-xl text-[11px] text-emerald-950 font-medium line-clamp-2">
+                    <div className="bg-emerald-50/70 border border-emerald-100 p-2.5 rounded-xl text-[11px] text-emerald-950 font-medium line-clamp-2 leading-relaxed">
                       <span className="font-bold text-emerald-800 block text-[10px] uppercase tracking-wide mb-0.5">
                         Tindakan Penanganan:
                       </span>

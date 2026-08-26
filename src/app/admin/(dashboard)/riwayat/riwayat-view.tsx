@@ -140,57 +140,60 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50/90 border-b border-sky-100/80 select-none">
-                    <TableHead className="w-[145px] pl-5 pr-3 py-3.5">
+                    <TableHead className="w-[140px] pl-5 pr-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("ticket_number")}
-                        className="inline-flex items-center gap-1.5 font-extrabold text-slate-700 text-xs hover:text-emerald-700 transition-colors group cursor-pointer"
+                        className="inline-flex items-center gap-1.5 font-extrabold text-slate-700 text-xs hover:text-sky-700 transition-colors group cursor-pointer"
                         title="Urutkan berdasarkan Nomor Tiket"
                       >
                         <span>Nomor Tiket</span>
                         {renderSortIndicator("ticket_number")}
                       </button>
                     </TableHead>
-                    <TableHead className="w-[130px] px-3 py-3.5">
+                    <TableHead className="w-[125px] px-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("updated_at")}
-                        className="inline-flex items-center gap-1.5 font-extrabold text-slate-700 text-xs hover:text-emerald-700 transition-colors group cursor-pointer"
+                        className="inline-flex items-center gap-1.5 font-extrabold text-slate-700 text-xs hover:text-sky-700 transition-colors group cursor-pointer"
                         title="Urutkan berdasarkan Waktu Selesai"
                       >
                         <span>Waktu Selesai</span>
                         {renderSortIndicator("updated_at")}
                       </button>
                     </TableHead>
-                    <TableHead className="px-3 py-3.5">
+                    <TableHead className="w-[160px] px-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("nama_pelapor")}
-                        className="inline-flex items-center gap-1.5 font-extrabold text-slate-700 text-xs hover:text-emerald-700 transition-colors group cursor-pointer"
+                        className="inline-flex items-center gap-1.5 font-extrabold text-slate-700 text-xs hover:text-sky-700 transition-colors group cursor-pointer"
                         title="Urutkan berdasarkan Nama Pelapor"
                       >
                         <span>Pelapor & Unit Kerja</span>
                         {renderSortIndicator("nama_pelapor")}
                       </button>
                     </TableHead>
-                    <TableHead className="px-3 py-3.5">
+                    <TableHead className="w-[180px] px-3 py-3.5 font-extrabold text-slate-700 text-xs">
+                      Deskripsi Kerusakan
+                    </TableHead>
+                    <TableHead className="w-[140px] px-3 py-3.5">
                       <button
                         type="button"
                         onClick={() => handleSort("lokasi_kerusakan")}
-                        className="inline-flex items-center gap-1.5 font-extrabold text-slate-700 text-xs hover:text-emerald-700 transition-colors group cursor-pointer"
+                        className="inline-flex items-center gap-1.5 font-extrabold text-slate-700 text-xs hover:text-sky-700 transition-colors group cursor-pointer"
                         title="Urutkan berdasarkan Lokasi Kerusakan"
                       >
                         <span>Lokasi Kerusakan</span>
                         {renderSortIndicator("lokasi_kerusakan")}
                       </button>
                     </TableHead>
-                    <TableHead className="px-3 py-3.5 font-extrabold text-slate-700 text-xs">
+                    <TableHead className="w-[190px] px-3 py-3.5 font-extrabold text-slate-700 text-xs">
                       Tindakan Penanganan
                     </TableHead>
-                    <TableHead className="w-[110px] font-extrabold text-slate-700 text-xs px-3 py-3.5">
+                    <TableHead className="w-[100px] font-extrabold text-slate-700 text-xs px-3 py-3.5">
                       Status
                     </TableHead>
-                    <TableHead className="text-center w-[100px] font-extrabold text-slate-700 text-xs pr-5 pl-3 py-3.5">
+                    <TableHead className="text-center w-[85px] font-extrabold text-slate-700 text-xs pr-5 pl-3 py-3.5">
                       Aksi
                     </TableHead>
                   </TableRow>
@@ -198,7 +201,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                 <TableBody>
                   {sortedReports.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-12 text-slate-400 italic text-xs">
+                      <TableCell colSpan={8} className="text-center py-12 text-slate-400 italic text-xs">
                         Tidak ada riwayat laporan yang cocok dengan pencarian.
                       </TableCell>
                     </TableRow>
@@ -216,7 +219,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                       });
 
                       return (
-                        <TableRow key={report.id} className="hover:bg-emerald-50/30 transition-colors border-b border-slate-100">
+                        <TableRow key={report.id} className="hover:bg-sky-50/40 transition-colors border-b border-slate-100">
                           <TableCell className="font-mono text-xs font-bold text-sky-700 pl-5 pr-3 py-4">
                             {report.ticket_number}
                           </TableCell>
@@ -224,20 +227,27 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                             <div className="font-semibold text-slate-800">{formattedDate}</div>
                             <div className="text-[11px] text-slate-400">{formattedTime} WIB</div>
                           </TableCell>
-                          <TableCell className="px-3 py-4">
-                            <div className="font-bold text-xs text-slate-800">
+                          <TableCell className="px-3 py-4 max-w-[160px]">
+                            <div className="font-bold text-xs text-slate-800 truncate" title={report.nama_pelapor}>
                               {report.nama_pelapor}
                             </div>
-                            <div className="text-[11px] text-slate-500 font-medium">
+                            <div className="text-[11px] text-slate-500 font-medium truncate" title={`${report.bagian} • ${report.unit_kerja}`}>
                               {report.bagian} &bull; {report.unit_kerja}
                             </div>
                           </TableCell>
-                          <TableCell className="text-xs text-slate-600 font-medium px-3 py-4">
-                            {report.lokasi_kerusakan}
+                          <TableCell className="text-xs text-slate-700 font-medium px-3 py-4 max-w-[180px]">
+                            <div className="line-clamp-2 leading-relaxed" title={report.deskripsi || "-"}>
+                              {report.deskripsi || "-"}
+                            </div>
                           </TableCell>
-                          <TableCell className="text-xs text-emerald-900 font-medium px-3 py-4 max-w-[240px]">
+                          <TableCell className="text-xs text-slate-600 font-medium px-3 py-4 max-w-[140px]">
+                            <div className="truncate" title={report.lokasi_kerusakan}>
+                              {report.lokasi_kerusakan}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs text-emerald-950 font-medium px-3 py-4 max-w-[190px]">
                             {report.penanganan ? (
-                              <div className="bg-emerald-50/80 border border-emerald-100 text-emerald-900 px-2.5 py-1.5 rounded-xl truncate text-[11px]" title={report.penanganan}>
+                              <div className="bg-emerald-50/80 border border-emerald-100 text-emerald-900 px-2.5 py-1.5 rounded-lg line-clamp-2 leading-snug text-[11px]" title={report.penanganan}>
                                 {report.penanganan}
                               </div>
                             ) : (
@@ -250,7 +260,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
                           <TableCell className="text-center pr-5 pl-3 py-4">
                             <div className="flex items-center justify-center">
                               <Link href={`/admin/laporan/${report.id}`}>
-                                <Button variant="outline" size="sm" className="h-7 text-[11px] px-3 rounded-full border-sky-200 text-sky-700 hover:bg-sky-50 font-bold shadow-2xs cursor-pointer">
+                                <Button variant="outline" size="sm" className="h-7 text-[11px] px-3 rounded-xl border-sky-200 text-sky-700 hover:bg-sky-50 font-bold shadow-2xs cursor-pointer">
                                   Detail
                                 </Button>
                               </Link>
