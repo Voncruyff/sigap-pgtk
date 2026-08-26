@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, Wrench, Loader2, Sparkles, AlertCircle, Building, User } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export interface SelesaiModalReportItem {
@@ -32,13 +32,6 @@ interface SelesaiPenangananModalProps {
   onSuccess: (reportId: string, ticketNumber: string, penanganan: string) => void;
 }
 
-const PRESET_PENANGANAN = [
-  "Perbaikan komponen & penggantian sparepart selesai dilakukan.",
-  "Pembersihan, pelumasan & kalibrasi ulang fasilitas operasional.",
-  "Pengelasan & perbaikan struktur pipa/mesin tuntas.",
-  "Penyetelan sistem elektrikal/kontrol & uji fungsi normal.",
-];
-
 export function SelesaiPenangananModal({
   report,
   open,
@@ -49,7 +42,7 @@ export function SelesaiPenangananModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Reset form when modal opens with a report
+  // Reset form when modal opens
   React.useEffect(() => {
     if (open) {
       setPenanganan("");
@@ -62,7 +55,7 @@ export function SelesaiPenangananModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!penanganan.trim()) {
-      setError("Deskripsi tindakan penanganan wajib diisi sebelum menyelesaikan laporan.");
+      setError("Deskripsi tindakan penanganan wajib diisi.");
       return;
     }
 
@@ -86,7 +79,7 @@ export function SelesaiPenangananModal({
       }
 
       toast.success("Laporan Berhasil Diselesaikan!", {
-        description: `Tiket ${report.ticket_number} telah ditandai selesai dengan catatan penanganan.`,
+        description: `Tiket ${report.ticket_number} telah ditandai selesai.`,
       });
 
       onSuccess(report.id, report.ticket_number, penanganan.trim());
@@ -101,142 +94,66 @@ export function SelesaiPenangananModal({
     }
   };
 
-  const handleApplyPreset = (preset: string) => {
-    if (!penanganan) {
-      setPenanganan(preset);
-    } else {
-      setPenanganan((prev) => `${prev.trim()} ${preset}`);
-    }
-    setError(null);
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 shadow-lg space-y-4">
-        {/* Header Dialog */}
-        <DialogHeader className="space-y-1.5 pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-sky-50 text-sky-700 border border-sky-200/80 shrink-0">
-              <CheckCircle2 className="h-5 w-5" />
-            </div>
-            <div>
-              <DialogTitle className="text-base sm:text-lg font-bold tracking-tight text-slate-900">
-                Selesaikan Penanganan Laporan
-              </DialogTitle>
-              <DialogDescription className="text-xs text-slate-500 font-medium mt-0.5">
-                Tuliskan deskripsi tindakan perbaikan fasilitas sebelum menandai tiket selesai.
-              </DialogDescription>
-            </div>
-          </div>
+      <DialogContent className="max-w-md p-6 rounded-2xl bg-white border border-slate-200 shadow-lg space-y-4">
+        <DialogHeader className="space-y-1">
+          <DialogTitle className="text-base font-bold text-slate-900">
+            Deskripsi Penanganan
+          </DialogTitle>
+          <DialogDescription className="text-xs text-slate-500 font-medium">
+            Tuliskan rincian perbaikan yang dilakukan untuk tiket <strong className="font-mono text-sky-700">{report.ticket_number}</strong>.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Ringkasan Tiket & Pelapor */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Nomor Tiket
-              </span>
-              <span className="font-mono font-bold text-xs text-sky-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
-                {report.ticket_number}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60 text-[11px]">
-              <div className="flex items-center gap-1.5 text-slate-600 truncate">
-                <User className="h-3.5 w-3.5 text-sky-700 shrink-0" />
-                <span className="font-bold text-slate-800 truncate">{report.nama_pelapor}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-slate-600 truncate">
-                <Building className="h-3.5 w-3.5 text-sky-700 shrink-0" />
-                <span className="font-medium text-slate-700 truncate">
-                  {report.bagian} - {report.unit_kerja}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Textarea Deskripsi Penanganan */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <Label
-                htmlFor="deskripsi-penanganan"
-                className="text-xs font-bold text-slate-700 flex items-center gap-1.5"
-              >
-                <Wrench className="h-3.5 w-3.5 text-sky-700" />
-                Deskripsi Tindakan Penanganan / Perbaikan <span className="text-rose-500 font-bold">*</span>
-              </Label>
-              <span className="text-[10.5px] text-slate-400 font-medium">Wajib diisi</span>
-            </div>
-
+            <Label htmlFor="penanganan" className="text-xs font-bold text-slate-700">
+              Tindakan Penanganan / Perbaikan <span className="text-rose-500">*</span>
+            </Label>
             <Textarea
-              id="deskripsi-penanganan"
+              id="penanganan"
               rows={4}
               value={penanganan}
               onChange={(e) => {
                 setPenanganan(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="Contoh: Telah dilakukan pembongkaran dan penggantian seal valve No. 3 yang bocor. Dilanjutkan pengetesan tekanan uap pada 15 bar, hasil normal dan tidak ada kebocoran lagi."
-              className={`text-xs font-medium rounded-xl border-slate-200 focus-visible:ring-sky-500/20 focus-visible:border-sky-500 bg-white shadow-2xs leading-relaxed resize-none ${
-                error ? "border-rose-400 focus-visible:border-rose-500 focus-visible:ring-rose-500/20" : ""
+              placeholder="Tuliskan deskripsi tindakan perbaikan di sini..."
+              className={`text-xs font-medium rounded-xl border-slate-200 focus-visible:ring-sky-500/20 focus-visible:border-sky-500 bg-white leading-relaxed resize-none ${
+                error ? "border-rose-400 focus-visible:border-rose-500" : ""
               }`}
+              autoFocus
             />
-
             {error && (
-              <p className="text-[11px] text-rose-600 font-medium flex items-center gap-1 pt-0.5">
-                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+              <p className="text-[11px] text-rose-600 font-medium pt-0.5">
                 {error}
               </p>
             )}
           </div>
 
-          {/* Quick Presets / Template Catatan */}
-          <div className="space-y-1.5 pt-0.5">
-            <span className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-              <Sparkles className="h-3 w-3 text-sky-600" />
-              Template Cepat Tindakan (Klik untuk Menambahkan):
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {PRESET_PENANGANAN.map((preset, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleApplyPreset(preset)}
-                  className="text-[11px] font-medium bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 border border-slate-200/80 hover:border-sky-200 px-2.5 py-1 rounded-lg transition-all text-left cursor-pointer active:scale-95 shadow-2xs"
-                >
-                  + {preset}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Footer Actions */}
-          <DialogFooter className="gap-2 sm:gap-2.5 pt-3 border-t border-slate-100">
+          <DialogFooter className="gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
-              className="h-10 px-4 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-900 border-slate-200 cursor-pointer shadow-2xs"
+              className="h-10 px-4 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 border-slate-200 cursor-pointer"
             >
               Batal
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !penanganan.trim()}
-              className="h-10 px-5 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex items-center gap-1.5 transition-all"
+              className="h-10 px-5 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white cursor-pointer transition-all"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
                   Menyimpan...
                 </>
               ) : (
-                <>
-                  <CheckCircle2 className="h-4 w-4" />
-                  Simpan &amp; Tandai Selesai
-                </>
+                "Submit"
               )}
             </Button>
           </DialogFooter>
