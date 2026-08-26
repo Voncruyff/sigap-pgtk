@@ -38,6 +38,7 @@ import {
   filterReportsForExport,
   exportToExcel,
   exportToPdf,
+  exportToDocx,
   exportToTxt,
 } from "@/lib/export-utils";
 
@@ -50,7 +51,7 @@ export function ExportDialog({ completedReports }: ExportDialogProps) {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [bagian, setBagian] = useState<string>("ALL");
-  const [format, setFormat] = useState<"PDF" | "EXCEL" | "TXT">("PDF");
+  const [format, setFormat] = useState<"PDF" | "EXCEL" | "DOCX" | "TXT">("PDF");
   const [isExporting, setIsExporting] = useState(false);
 
   // Helper to format local date without UTC offset shifting (guaranteed day 1)
@@ -112,6 +113,11 @@ export function ExportDialog({ completedReports }: ExportDialogProps) {
         exportToExcel(filteredData, options);
         toast.success("File Excel / CSV berhasil diunduh!", {
           description: `Menyimpan ${filteredData.length} baris data laporan.`,
+        });
+      } else if (format === "DOCX") {
+        exportToDocx(filteredData, options);
+        toast.success("File Dokumen Word (DOCX) berhasil diunduh!", {
+          description: `Menyimpan ${filteredData.length} arsip laporan Word.`,
         });
       } else if (format === "TXT") {
         exportToTxt(filteredData, options);
@@ -264,19 +270,19 @@ export function ExportDialog({ completedReports }: ExportDialogProps) {
               <Sparkles className="h-3.5 w-3.5 text-sky-600" />
               3. Pilih Format Berkas
             </Label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {/* PDF Option */}
               <button
                 type="button"
                 onClick={() => setFormat("PDF")}
-                className={`p-2.5 sm:p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
                   format === "PDF"
                     ? "border-rose-500 bg-rose-50/70 text-rose-900 shadow-2xs ring-2 ring-rose-500/20"
                     : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 <FileText className={`h-4 w-4 ${format === "PDF" ? "text-rose-600" : "text-slate-400"}`} />
-                <span className="text-xs font-extrabold block">Dokumen PDF</span>
+                <span className="text-xs font-extrabold block">PDF</span>
                 <span className="text-[10px] text-slate-400 font-medium">Siap Cetak</span>
               </button>
 
@@ -284,29 +290,44 @@ export function ExportDialog({ completedReports }: ExportDialogProps) {
               <button
                 type="button"
                 onClick={() => setFormat("EXCEL")}
-                className={`p-2.5 sm:p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
                   format === "EXCEL"
                     ? "border-emerald-500 bg-emerald-50/70 text-emerald-900 shadow-2xs ring-2 ring-emerald-500/20"
                     : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 <FileSpreadsheet className={`h-4 w-4 ${format === "EXCEL" ? "text-emerald-600" : "text-slate-400"}`} />
-                <span className="text-xs font-extrabold block">Berkas Excel</span>
+                <span className="text-xs font-extrabold block">Excel</span>
                 <span className="text-[10px] text-slate-400 font-medium">CSV / XLS</span>
+              </button>
+
+              {/* DOCX Word Option */}
+              <button
+                type="button"
+                onClick={() => setFormat("DOCX")}
+                className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                  format === "DOCX"
+                    ? "border-blue-500 bg-blue-50/70 text-blue-900 shadow-2xs ring-2 ring-blue-500/20"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                }`}
+              >
+                <FileText className={`h-4 w-4 ${format === "DOCX" ? "text-blue-600" : "text-slate-400"}`} />
+                <span className="text-xs font-extrabold block">Word</span>
+                <span className="text-[10px] text-slate-400 font-medium">DOC / DOCX</span>
               </button>
 
               {/* TXT Option */}
               <button
                 type="button"
                 onClick={() => setFormat("TXT")}
-                className={`p-2.5 sm:p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                className={`p-2.5 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
                   format === "TXT"
                     ? "border-sky-500 bg-sky-50/70 text-sky-900 shadow-2xs ring-2 ring-sky-500/20"
                     : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 <FileType className={`h-4 w-4 ${format === "TXT" ? "text-sky-600" : "text-slate-400"}`} />
-                <span className="text-xs font-extrabold block">Dokumen TXT</span>
+                <span className="text-xs font-extrabold block">TXT</span>
                 <span className="text-[10px] text-slate-400 font-medium">Teks Rinci</span>
               </button>
             </div>

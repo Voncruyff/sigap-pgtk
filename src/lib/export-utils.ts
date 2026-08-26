@@ -140,6 +140,111 @@ export function exportToTxt(reports: CompletedReportItem[], options: ExportFilte
   URL.revokeObjectURL(url);
 }
 
+// 🟦 3. Export as Word / DOCX
+export function exportToDocx(reports: CompletedReportItem[], options: ExportFilterOptions) {
+  const startText = options.startDate ? options.startDate : "Awal";
+  const endText = options.endDate ? options.endDate : "Sekarang";
+  const bagianText = options.bagian && options.bagian !== "ALL" ? options.bagian : "Semua Bagian";
+
+  const rowsHtml = reports
+    .map(
+      (r, idx) => `
+      <tr>
+        <td style="text-align: center; border: 1px solid #cbd5e1; padding: 6px;">${idx + 1}</td>
+        <td style="font-family: Consolas, monospace; font-weight: bold; color: #0284c7; border: 1px solid #cbd5e1; padding: 6px;">${r.ticket_number}</td>
+        <td style="font-weight: bold; border: 1px solid #cbd5e1; padding: 6px;">${r.nama_pelapor}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px;">${r.bagian}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px;">${r.unit_kerja}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px;">${r.lokasi_kerusakan}</td>
+        <td style="text-align: center; border: 1px solid #cbd5e1; padding: 6px;">
+          <b style="color: #15803d; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">${r.status}</b>
+        </td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px;">${formatDateIndo(r.updated_at || r.created_at)}</td>
+      </tr>
+    `
+    )
+    .join("");
+
+  const wordContent = `
+    <html xmlns:o='urn:schemas-microsoft-com:office:office'
+          xmlns:w='urn:schemas-microsoft-com:office:word'
+          xmlns='http://www.w3.org/TR/REC-html40'>
+    <head>
+      <meta charset="utf-8">
+      <title>Laporan Riwayat SIGAP - PT Kebon Agung PG Trangkil</title>
+      <!--[if gte mso 9]>
+      <xml>
+        <w:WordDocument>
+          <w:View>Print</w:View>
+          <w:Zoom>100</w:Zoom>
+          <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+      </xml>
+      <![endif]-->
+      <style>
+        body { font-family: Arial, sans-serif; font-size: 11pt; color: #0f172a; }
+        h1 { color: #0284c7; font-size: 16pt; margin: 0; text-align: center; text-transform: uppercase; font-weight: bold; }
+        h2 { color: #334155; font-size: 12pt; margin: 4px 0; text-align: center; font-weight: bold; }
+        .sub-header { color: #64748b; font-size: 10pt; font-weight: bold; text-align: center; margin-bottom: 16px; }
+        .meta-table { width: 100%; margin-bottom: 16px; font-size: 10pt; border-collapse: collapse; }
+        .meta-table td { padding: 4px; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+        .data-table th { background-color: #0284c7; color: #ffffff; padding: 8px; border: 1px solid #0284c7; font-weight: bold; text-align: left; }
+      </style>
+    </head>
+    <body>
+      <h1>SISTEM INFORMASI GANGGUAN DAN PERBAIKAN (SIGAP)</h1>
+      <h2>REKAPITULASI ARSIP LAPORAN GANGGUAN & PERBAIKAN</h2>
+      <div class="sub-header">PT KEBON AGUNG &bull; PABRIK GULA TRANGKIL</div>
+
+      <table class="meta-table">
+        <tr>
+          <td style="width: 140px; font-weight: bold;">Periode Data</td>
+          <td>: ${startText} s/d ${endText}</td>
+          <td style="width: 140px; font-weight: bold;">Tanggal Cetak</td>
+          <td>: ${new Date().toLocaleString("id-ID")}</td>
+        </tr>
+        <tr>
+          <td style="font-weight: bold;">Filter Bagian</td>
+          <td>: ${bagianText}</td>
+          <td style="font-weight: bold;">Total Laporan Selesai</td>
+          <td>: <b>${reports.length} Tiket Laporan</b></td>
+        </tr>
+      </table>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 30px; text-align: center;">No</th>
+            <th style="width: 130px;">Nomor Tiket</th>
+            <th style="width: 120px;">Nama Pelapor</th>
+            <th style="width: 70px;">Bagian</th>
+            <th>Unit / Bagian Kerja</th>
+            <th>Lokasi Kerusakan</th>
+            <th style="width: 70px; text-align: center;">Status</th>
+            <th style="width: 120px;">Waktu Selesai</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml || `<tr><td colspan="8" style="text-align: center; padding: 15px;">Tidak ada data laporan</td></tr>`}
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `;
+
+  const blob = new Blob(["\uFEFF" + wordContent], { type: "application/msword" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const filename = `SIGAP_Riwayat_Laporan_${options.startDate || "all"}_sd_${options.endDate || "all"}.doc`;
+  link.setAttribute("href", url);
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 // 📕 3. Export as PDF (Direct Print without about:blank tab)
 export function exportToPdf(reports: CompletedReportItem[], options: ExportFilterOptions) {
   const startText = options.startDate ? options.startDate : "Awal";
