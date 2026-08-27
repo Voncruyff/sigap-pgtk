@@ -15,6 +15,8 @@ import {
   Copy,
   CheckCircle2,
   RefreshCw,
+  ArrowUpDown,
+  RotateCcw,
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { ReportStatusBadge } from "@/components/user/report-status-badge";
@@ -46,6 +48,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBagian, setSelectedBagian] = useState<string>("ALL");
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
+  const [sortBy, setSortBy] = useState<string>("NEWEST");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Sync initialReports when props change
@@ -78,6 +81,19 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
     }
   };
 
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setSelectedBagian("ALL");
+    setSelectedStatus("ALL");
+    setSortBy("NEWEST");
+  };
+
+  const isFiltered =
+    searchQuery !== "" ||
+    selectedBagian !== "ALL" ||
+    selectedStatus !== "ALL" ||
+    sortBy !== "NEWEST";
+
   const filteredReports = reports.filter((item) => {
     const q = searchQuery.toLowerCase();
     const matchesQuery =
@@ -94,11 +110,30 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
     return matchesQuery && matchesBagian && matchesStatus;
   });
 
+  const sortedReports = [...filteredReports].sort((a, b) => {
+    if (sortBy === "NEWEST") {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+    if (sortBy === "OLDEST") {
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    }
+    if (sortBy === "TICKET_ASC") {
+      return a.ticket_number.localeCompare(b.ticket_number, "id-ID");
+    }
+    if (sortBy === "TICKET_DESC") {
+      return b.ticket_number.localeCompare(a.ticket_number, "id-ID");
+    }
+    if (sortBy === "UNIT_ASC") {
+      return a.unit_kerja.localeCompare(b.unit_kerja, "id-ID");
+    }
+    return 0;
+  });
+
   const waitingCount = reports.filter((r) => r.status === "MENUNGGU").length;
   const processingCount = reports.filter((r) => r.status === "DIPROSES").length;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-12">
+    <div className="max-w-4xl mx-auto space-y-3.5 sm:space-y-6 pb-12">
       {/* Header Halaman Dynamic */}
       <FadeIn>
         <PageHeader
@@ -112,9 +147,9 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
       </FadeIn>
 
       {/* Main Search & Realtime Counter Bar */}
-      <FadeInScale delay={0.05} className="space-y-4">
+      <FadeInScale delay={0.05} className="space-y-3">
         <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
-          <CardContent className="p-4 sm:p-6 space-y-4">
+          <CardContent className="p-3 sm:p-6 space-y-2.5 sm:space-y-4">
             {/* Search Input Bar */}
             <form onSubmit={handleDirectSearch} className="space-y-2">
               <div className="flex flex-col sm:flex-row items-center gap-2">
@@ -124,14 +159,14 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Cari nomor tiket atau nama unit kerja / pelapor..."
-                    className="pl-10 h-11 text-xs sm:text-sm font-medium rounded-xl border-slate-200 focus-visible:ring-sky-500/20 focus-visible:border-sky-500 bg-white shadow-2xs"
+                    className="pl-10 h-9 sm:h-11 text-xs sm:text-sm font-medium rounded-xl border-slate-200 focus-visible:ring-sky-500/20 focus-visible:border-sky-500 bg-white shadow-2xs"
                   />
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <Button
                     type="submit"
-                    className="h-11 px-5 rounded-xl text-xs sm:text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex-1 sm:flex-initial"
+                    className="h-9 sm:h-11 px-4 sm:px-5 rounded-xl text-xs sm:text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex-1 sm:flex-initial"
                   >
                     <Search className="mr-1.5 h-4 w-4" />
                     Cari Tiket
@@ -143,7 +178,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                     onClick={handleRefresh}
                     disabled={isRefreshing}
                     title="Refresh data langsung dari server"
-                    className="h-11 w-11 p-0 rounded-xl border-slate-200 text-slate-600 hover:text-sky-700 hover:bg-sky-50 cursor-pointer shrink-0"
+                    className="h-9 w-9 sm:h-11 sm:w-11 p-0 rounded-xl border-slate-200 text-slate-600 hover:text-sky-700 hover:bg-sky-50 cursor-pointer shrink-0"
                   >
                     <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin text-sky-600" : ""}`} />
                   </Button>
@@ -151,67 +186,104 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
               </div>
             </form>
 
-            {/* Filter Pills (Bagian & Status) */}
-            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-              {/* Bagian Filter Pills */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] font-bold text-slate-400 mr-1 flex items-center gap-1">
-                  <Building className="h-3 w-3" /> Bagian:
-                </span>
-                {["ALL", "TUK", "Teknik", "Pabrikasi", "Tanaman"].map((dept) => (
+            {/* Filter Pills & Sorting Controls */}
+            <div className="pt-2 border-t border-slate-100 space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
+                {/* Bagian Filter Pills */}
+                <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+                  <span className="text-[10.5px] sm:text-[11px] font-bold text-slate-400 mr-0.5 sm:mr-1 flex items-center gap-1">
+                    <Building className="h-3 w-3" /> Bagian:
+                  </span>
+                  {["ALL", "TUK", "Teknik", "Pabrikasi", "Tanaman"].map((dept) => (
+                    <button
+                      key={dept}
+                      type="button"
+                      onClick={() => setSelectedBagian(dept)}
+                      className={`h-6 sm:h-7 px-2 sm:px-3 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
+                        selectedBagian === dept
+                          ? "bg-sky-700 text-white shadow-2xs"
+                          : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
+                      }`}
+                    >
+                      {dept === "ALL" ? "Semua" : dept}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Status Filter Pills */}
+                <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+                  <span className="text-[10.5px] sm:text-[11px] font-bold text-slate-400 mr-0.5 sm:mr-1 flex items-center gap-1">
+                    <Filter className="h-3 w-3" /> Status:
+                  </span>
                   <button
-                    key={dept}
                     type="button"
-                    onClick={() => setSelectedBagian(dept)}
-                    className={`h-7 px-3 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                      selectedBagian === dept
-                        ? "bg-sky-700 text-white shadow-2xs"
+                    onClick={() => setSelectedStatus("ALL")}
+                    className={`h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
+                      selectedStatus === "ALL"
+                        ? "bg-slate-800 text-white shadow-2xs"
                         : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
                     }`}
                   >
-                    {dept === "ALL" ? "Semua Bagian" : dept}
+                    Semua ({reports.length})
                   </button>
-                ))}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedStatus("MENUNGGU")}
+                    className={`h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
+                      selectedStatus === "MENUNGGU"
+                        ? "bg-amber-600 text-white shadow-2xs"
+                        : "bg-amber-50 text-amber-800 hover:bg-amber-100/80 border border-amber-200/60"
+                    }`}
+                  >
+                    Menunggu ({waitingCount})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedStatus("DIPROSES")}
+                    className={`h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
+                      selectedStatus === "DIPROSES"
+                        ? "bg-sky-700 text-white shadow-2xs"
+                        : "bg-sky-50 text-sky-800 hover:bg-sky-100/80 border border-sky-200/60"
+                    }`}
+                  >
+                    Diproses ({processingCount})
+                  </button>
+                </div>
               </div>
 
-              {/* Status Filter Pills */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] font-bold text-slate-400 mr-1 flex items-center gap-1">
-                  <Filter className="h-3 w-3" /> Status:
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setSelectedStatus("ALL")}
-                  className={`h-7 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                    selectedStatus === "ALL"
-                      ? "bg-slate-800 text-white shadow-2xs"
-                      : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
-                  }`}
-                >
-                  Semua ({reports.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedStatus("MENUNGGU")}
-                  className={`h-7 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                    selectedStatus === "MENUNGGU"
-                      ? "bg-amber-600 text-white shadow-2xs"
-                      : "bg-amber-50 text-amber-800 hover:bg-amber-100/80 border border-amber-200/60"
-                  }`}
-                >
-                  Menunggu ({waitingCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedStatus("DIPROSES")}
-                  className={`h-7 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                    selectedStatus === "DIPROSES"
-                      ? "bg-sky-700 text-white shadow-2xs"
-                      : "bg-sky-50 text-sky-800 hover:bg-sky-100/80 border border-sky-200/60"
-                  }`}
-                >
-                  Diproses ({processingCount})
-                </button>
+              {/* Row 2: Sort Control Bar & Reset */}
+              <div className="pt-1 flex items-center justify-between gap-2 text-[10.5px]">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400 font-medium flex items-center gap-1">
+                    <ArrowUpDown className="h-3 w-3 text-sky-600" /> Urutkan:
+                  </span>
+                  <div className="relative inline-flex items-center">
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="pl-2 pr-6 h-6.5 text-[10.5px] font-bold rounded-lg border border-slate-200 bg-sky-50/50 text-sky-900 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none"
+                      aria-label="Urutkan Berdasarkan"
+                    >
+                      <option value="NEWEST">⚡ Terbaru (Default)</option>
+                      <option value="OLDEST">⏳ Terlama</option>
+                      <option value="TICKET_ASC">🔤 Nomor Tiket (A-Z)</option>
+                      <option value="TICKET_DESC">🔤 Nomor Tiket (Z-A)</option>
+                      <option value="UNIT_ASC">🔧 Unit Kerja (A-Z)</option>
+                    </select>
+                    <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[7px]">▼</div>
+                  </div>
+                </div>
+
+                {isFiltered && (
+                  <button
+                    type="button"
+                    onClick={handleResetFilters}
+                    className="text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-0.5 cursor-pointer text-[10px]"
+                  >
+                    <RotateCcw className="h-2.5 w-2.5" />
+                    Reset
+                  </button>
+                )}
               </div>
             </div>
           </CardContent>
@@ -220,26 +292,26 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
 
       {/* Section Title & Realtime Count */}
       <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <div className="p-1.5 rounded-lg bg-sky-100 text-sky-700">
-            <Sparkles className="h-4 w-4" />
+            <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </div>
           <div>
-            <h2 className="text-sm sm:text-base font-bold text-slate-900">
+            <h2 className="text-xs sm:text-base font-bold text-slate-900">
               Laporan Yang Belum Selesai
             </h2>
-            <p className="text-[11px] text-slate-500 font-medium">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">
               Data laporan aktif langsung dari server SIGAP PG Trangkil
             </p>
           </div>
         </div>
-        <span className="text-xs font-bold font-mono text-sky-800 bg-sky-50 border border-sky-200 px-3 py-1 rounded-xl shadow-2xs">
-          {filteredReports.length} Laporan Aktif
+        <span className="text-[10.5px] sm:text-xs font-bold font-mono text-sky-800 bg-sky-50 border border-sky-200 px-2 py-0.5 sm:px-3 sm:py-1 rounded-xl shadow-2xs">
+          {sortedReports.length} Laporan
         </span>
       </div>
 
       {/* Cards List of Active Reports */}
-      {filteredReports.length === 0 ? (
+      {sortedReports.length === 0 ? (
         <Card className="border border-dashed border-slate-200 bg-white rounded-2xl p-8 sm:p-12 text-center shadow-2xs space-y-3">
           <div className="mx-auto w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center">
             <CheckCircle2 className="h-6 w-6" />
@@ -262,13 +334,12 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
           </Link>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredReports.map((report) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
+          {sortedReports.map((report) => {
             const dateObj = new Date(report.created_at);
             const formattedDate = dateObj.toLocaleDateString("id-ID", {
               day: "numeric",
               month: "short",
-              year: "numeric",
             });
             const formattedTime = dateObj.toLocaleTimeString("id-ID", {
               hour: "2-digit",
@@ -278,19 +349,19 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
             return (
               <Card
                 key={report.id}
-                className="border border-slate-200/80 hover:border-sky-300 bg-white rounded-2xl shadow-2xs hover:shadow-sm transition-all overflow-hidden flex flex-col justify-between"
+                className="border border-slate-200/80 hover:border-sky-300 bg-white rounded-xl shadow-2xs hover:shadow-xs transition-all overflow-hidden flex flex-col justify-between"
               >
                 <div>
                   {/* Card Header: Ticket Number & Status Badge */}
-                  <CardHeader className="p-4 pb-3 bg-slate-50/70 border-b border-slate-100 flex flex-row items-center justify-between gap-2">
+                  <CardHeader className="p-2.5 sm:p-4 pb-2 sm:pb-3 bg-slate-50/70 border-b border-slate-100 flex flex-row items-center justify-between gap-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-mono text-xs font-bold text-sky-800 truncate">
+                      <span className="font-mono text-[11px] sm:text-xs font-bold text-sky-800 truncate">
                         {report.ticket_number}
                       </span>
                       <button
                         type="button"
                         onClick={() => copyTicket(report.ticket_number)}
-                        className="p-1 rounded-md text-slate-400 hover:text-sky-700 hover:bg-white transition-colors cursor-pointer shrink-0"
+                        className="p-0.5 sm:p-1 rounded-md text-slate-400 hover:text-sky-700 hover:bg-white transition-colors cursor-pointer shrink-0"
                         title="Salin Nomor Tiket"
                       >
                         <Copy className="h-3 w-3" />
@@ -300,26 +371,26 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                   </CardHeader>
 
                   {/* Card Content: Details */}
-                  <CardContent className="p-4 space-y-3 text-xs">
+                  <CardContent className="p-2.5 sm:p-4 space-y-1.5 sm:space-y-3 text-xs">
                     <div>
-                      <span className="font-bold text-sm text-slate-900 block flex items-center gap-1.5">
+                      <span className="font-bold text-xs sm:text-sm text-slate-900 block flex items-center gap-1">
                         <Wrench className="h-3.5 w-3.5 text-sky-700 shrink-0" />
-                        {report.unit_kerja}
+                        <span className="truncate">{report.unit_kerja}</span>
                       </span>
-                      <p className="text-slate-600 text-xs font-medium mt-1 line-clamp-2 leading-relaxed bg-slate-50/80 p-2.5 rounded-xl border border-slate-100">
+                      <p className="text-slate-600 text-[10.5px] sm:text-xs font-normal mt-0.5 sm:mt-1 line-clamp-2 leading-relaxed bg-slate-50/80 p-1.5 sm:p-2.5 rounded-lg border border-slate-100">
                         {report.deskripsi || report.lokasi_kerusakan}
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-500">
+                    <div className="grid grid-cols-2 gap-1 pt-0.5 text-[10px] sm:text-[11px] text-slate-500">
                       <div className="flex items-center gap-1 truncate">
-                        <User className="h-3 w-3 text-slate-400 shrink-0" />
+                        <User className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-slate-400 shrink-0" />
                         <span className="truncate font-semibold text-slate-700">
                           {report.nama_pelapor}
                         </span>
                       </div>
                       <div className="flex items-center gap-1 truncate justify-end">
-                        <Calendar className="h-3 w-3 text-slate-400 shrink-0" />
+                        <Calendar className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-slate-400 shrink-0" />
                         <span className="font-medium text-slate-500">
                           {formattedDate}, {formattedTime}
                         </span>
@@ -329,18 +400,18 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                 </div>
 
                 {/* Card Footer: Detail Link */}
-                <div className="p-3 px-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
+                <div className="p-2 sm:p-3 px-2.5 sm:px-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[9.5px] sm:text-[11px] font-bold text-sky-700 bg-sky-50 px-1.5 sm:px-2 py-0.5 rounded-md border border-sky-100">
                     {report.bagian}
                   </span>
 
                   <Link href={`/status/${report.ticket_number}`}>
                     <Button
                       size="sm"
-                      className="h-8 px-3 rounded-xl text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex items-center gap-1.5"
+                      className="h-6.5 sm:h-8 px-2 sm:px-3 rounded-md sm:rounded-xl text-[10.5px] sm:text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex items-center gap-1"
                     >
                       Lacak Status
-                      <ExternalLink className="h-3 w-3" />
+                      <ExternalLink className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                     </Button>
                   </Link>
                 </div>

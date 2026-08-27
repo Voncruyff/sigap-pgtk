@@ -23,6 +23,13 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // Auto-redirect logged-in admin from root "/" or "/admin/login" to "/admin/dashboard"
+  if ((pathname === "/" || pathname === "/admin/login") && isAuthenticated) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/dashboard";
+    return NextResponse.redirect(url);
+  }
+
   // Protect /admin routes (except /admin/login)
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
     if (!isAuthenticated) {
@@ -30,13 +37,6 @@ export async function proxy(request: NextRequest) {
       url.pathname = "/admin/login";
       return NextResponse.redirect(url);
     }
-  }
-
-  // Redirect logged-in admin from /admin/login to /admin/dashboard
-  if (pathname === "/admin/login" && isAuthenticated) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/admin/dashboard";
-    return NextResponse.redirect(url);
   }
 
   return response;

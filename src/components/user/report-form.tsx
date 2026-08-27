@@ -33,29 +33,6 @@ import {
 } from "@/components/ui/select";
 import { ImageUpload } from "./image-upload";
 
-function generateTicketNumber(bagian?: string) {
-  const now = new Date();
-  const day = String(now.getDate()).padStart(2, "0");
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const tglBulan = `${day}${month}`;
-  let prefix = "TUK";
-  if (bagian) {
-    const cleaned = bagian.trim().toUpperCase();
-    if (cleaned.includes("TUK")) {
-      prefix = "TUK";
-    } else if (cleaned.includes("TEKNIK") || cleaned.startsWith("TEK") || cleaned.startsWith("TNK")) {
-      prefix = "TNK";
-    } else if (cleaned.includes("PABRIK") || cleaned.startsWith("PAB") || cleaned.startsWith("PBK")) {
-      prefix = "PBK";
-    } else if (cleaned.includes("TANAMAN") || cleaned.startsWith("TAN") || cleaned.startsWith("TNM")) {
-      prefix = "TNM";
-    } else {
-      prefix = cleaned.replace(/[^A-Z0-9]/g, "").slice(0, 3) || "TUK";
-    }
-  }
-  return `${prefix}-${tglBulan}-001`;
-}
-
 export function ReportForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,10 +69,7 @@ export function ReportForm() {
         });
       }
 
-      const ticketNumber = generateTicketNumber(data.bagian);
-
       const payload = {
-        ticket_number: ticketNumber,
         nama_pelapor: data.namaPelapor,
         bagian: data.bagian,
         unit_kerja: data.unitKerja,
@@ -117,7 +91,7 @@ export function ReportForm() {
         throw new Error(resData.error || "Gagal menyimpan laporan ke database MySQL.");
       }
 
-      const finalTicketNumber = resData.ticket_number || ticketNumber;
+      const finalTicketNumber = resData.ticket_number;
 
       toast.success("Laporan berhasil terkirim!", {
         description: `Nomor tiket resmi: ${finalTicketNumber}`,

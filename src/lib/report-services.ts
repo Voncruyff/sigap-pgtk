@@ -144,9 +144,9 @@ export function getBagianTicketPrefix(bagian?: string): string {
   if (!bagian) return "TUK";
   const cleaned = bagian.trim().toUpperCase();
   if (cleaned.includes("TUK")) return "TUK";
-  if (cleaned.includes("TEKNIK") || cleaned.startsWith("TEK") || cleaned.startsWith("TNK")) return "TNK";
-  if (cleaned.includes("PABRIK") || cleaned.startsWith("PAB") || cleaned.startsWith("PBK")) return "PBK";
-  if (cleaned.includes("TANAMAN") || cleaned.startsWith("TAN") || cleaned.startsWith("TNM")) return "TNM";
+  if (cleaned.includes("TEKNIK") || cleaned.startsWith("TEK") || cleaned.startsWith("TNK")) return "TEK";
+  if (cleaned.includes("PABRIK") || cleaned.startsWith("PAB") || cleaned.startsWith("PBK")) return "PAB";
+  if (cleaned.includes("TANAMAN") || cleaned.startsWith("TAN") || cleaned.startsWith("TNM")) return "TAN";
   return cleaned.replace(/[^A-Z0-9]/g, "").slice(0, 3) || "TUK";
 }
 
