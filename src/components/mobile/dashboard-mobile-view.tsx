@@ -92,7 +92,7 @@ export function DashboardMobileView({
 
   return (
     <div className="space-y-3">
-      {/* 📊 Minimalist Compact Stat Cards */}
+      {/* Minimalist Compact Stat Cards */}
       <div className="grid grid-cols-2 gap-1.5">
         {stats.map((stat, idx) => {
           const Icon = stat.icon;
@@ -125,7 +125,7 @@ export function DashboardMobileView({
         })}
       </div>
 
-      {/* 📋 Minimalist Recent Reports List */}
+      {/* Minimalist Recent Reports List */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between px-0.5 pt-1">
           <div className="flex items-center gap-1">
@@ -183,7 +183,7 @@ export function DashboardMobileView({
         )}
       </div>
 
-      {/* 📜 Minimalist Log Activity Feed */}
+      {/* Minimalist Log Activity Feed */}
       <div className="bg-white border border-slate-200/80 rounded-xl p-2.5 shadow-2xs space-y-1.5">
         <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
           <div className="flex items-center gap-1">

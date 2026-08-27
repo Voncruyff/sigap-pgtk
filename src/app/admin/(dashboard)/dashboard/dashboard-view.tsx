@@ -118,7 +118,7 @@ export function DashboardView(props: DashboardViewProps) {
         badgeText="SIGAP Summary"
       />
 
-      {/* 🖥️ Tampilan Utama Desktop / PC */}
+      {/* Tampilan Utama Desktop / PC */}
       <div className="hidden lg:block space-y-5">
         {/* Sleek Minimalist Stat Cards 5 Columns Grid */}
         <div className="grid grid-cols-5 gap-3.5">
@@ -252,7 +252,7 @@ export function DashboardView(props: DashboardViewProps) {
         </div>
       </div>
 
-      {/* 📱 Tampilan Khusus Mobile HP */}
+      {/* Tampilan Khusus Mobile HP */}
       <div className="block lg:hidden">
         <DashboardMobileView {...props} />
       </div>

@@ -12,7 +12,7 @@ import { LandingMobileView } from "@/components/mobile/landing-mobile-view";
 export function LandingView() {
   return (
     <>
-      {/* 🖥️ Tampilan Utama Desktop / PC */}
+      {/* Tampilan Utama Desktop / PC */}
       <div className="hidden lg:block space-y-10 py-4">
         {/* Desktop Hero Section Minimalis & Corporate */}
         <StaggerContainer className="text-center space-y-5 max-w-3xl mx-auto pt-2">
@@ -181,7 +181,7 @@ export function LandingView() {
         </section>
       </div>
 
-      {/* 📱 Tampilan Khusus Mobile HP */}
+      {/* Tampilan Khusus Mobile HP */}
       <div className="block lg:hidden">
         <LandingMobileView />
       </div>

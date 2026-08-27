@@ -94,35 +94,20 @@ export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) 
     return matchesSearch && matchesBagian && matchesPeriod;
   });
 
+  // Sorting: Terbaru dan Terlama saja (tanpa emote)
   const sortedReports = [...filteredReports].sort((a, b) => {
-    if (sortBy === "NEWEST") {
-      const dateA = new Date(a.updated_at || a.created_at).getTime();
-      const dateB = new Date(b.updated_at || b.created_at).getTime();
-      return dateB - dateA;
-    }
+    const dateA = new Date(a.updated_at || a.created_at).getTime();
+    const dateB = new Date(b.updated_at || b.created_at).getTime();
     if (sortBy === "OLDEST") {
-      const dateA = new Date(a.updated_at || a.created_at).getTime();
-      const dateB = new Date(b.updated_at || b.created_at).getTime();
       return dateA - dateB;
     }
-    if (sortBy === "TICKET_ASC") {
-      return a.ticket_number.localeCompare(b.ticket_number, "id-ID");
-    }
-    if (sortBy === "TICKET_DESC") {
-      return b.ticket_number.localeCompare(a.ticket_number, "id-ID");
-    }
-    if (sortBy === "NAME_ASC") {
-      return a.nama_pelapor.localeCompare(b.nama_pelapor, "id-ID");
-    }
-    if (sortBy === "NAME_DESC") {
-      return b.nama_pelapor.localeCompare(a.nama_pelapor, "id-ID");
-    }
-    return 0;
+    // Default NEWEST
+    return dateB - dateA;
   });
 
   return (
     <div className="space-y-2.5 pb-6">
-      {/* 🔍 Ramping & Minimalis Mobile Search & Multi-Controls */}
+      {/* Mobile Search & Controls */}
       <div className="space-y-1.5 bg-white p-2 rounded-xl border border-slate-200/80 shadow-2xs">
         {/* Search Bar Input & Export Dialog */}
         <div className="flex items-center gap-1.5">
@@ -174,27 +159,23 @@ export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) 
             <div className="absolute right-1 pointer-events-none text-slate-400 text-[7px]">▼</div>
           </div>
 
-          {/* ⚡ Fitur Urutkan */}
+          {/* Fitur Urutkan: Terbaru dan Terlama saja */}
           <div className="relative flex items-center w-full">
             <ArrowUpDown className="absolute left-1.5 h-3 w-3 text-emerald-600 pointer-events-none" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full pl-5 pr-4 h-7.5 text-[10px] font-bold rounded-lg border border-slate-200 bg-emerald-50/50 text-emerald-900 focus:outline-hidden focus:border-emerald-500 cursor-pointer appearance-none truncate"
+              className="w-full pl-5 pr-4 h-7.5 text-[10px] font-bold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:border-emerald-500 cursor-pointer appearance-none truncate"
               aria-label="Urutkan Riwayat"
             >
-              <option value="NEWEST">⚡ Terbaru</option>
-              <option value="OLDEST">⏳ Terlama</option>
-              <option value="TICKET_ASC">🔤 No. Tiket (A-Z)</option>
-              <option value="TICKET_DESC">🔤 No. Tiket (Z-A)</option>
-              <option value="NAME_ASC">👤 Pelapor (A-Z)</option>
-              <option value="NAME_DESC">👤 Pelapor (Z-A)</option>
+              <option value="NEWEST">Terbaru</option>
+              <option value="OLDEST">Terlama</option>
             </select>
             <div className="absolute right-1 pointer-events-none text-slate-400 text-[7px]">▼</div>
           </div>
         </div>
 
-        {/* Baris Status Hasil & Reset Button */}
+        {/* Status Hasil & Reset Button */}
         <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px]">
           <span className="text-slate-400 font-medium">
             Total <strong className="text-slate-700 font-bold">{sortedReports.length}</strong> riwayat tuntas
@@ -212,7 +193,7 @@ export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) 
         </div>
       </div>
 
-      {/* 📱 Minimalist Mobile Completed Reports List */}
+      {/* Minimalist Mobile Completed Reports List */}
       {sortedReports.length === 0 ? (
         <Card className="border border-dashed border-slate-200 bg-white rounded-xl p-6 text-center shadow-2xs">
           <p className="text-xs text-slate-400 italic font-medium">
@@ -241,10 +222,10 @@ export function RiwayatMobileView({ completedReports }: RiwayatMobileViewProps) 
                   {/* Top Row: Ticket Number, Bagian Badge & Status Badge */}
                   <div className="flex items-center justify-between gap-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-mono text-[11px] font-black text-emerald-800 truncate">
+                      <span className="font-mono text-[11px] font-bold text-emerald-800 truncate">
                         {report.ticket_number}
                       </span>
-                      <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60 shrink-0">
+                      <span className="text-[9px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60 shrink-0">
                         {report.bagian}
                       </span>
                     </div>

@@ -111,22 +111,11 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
   });
 
   const sortedReports = [...filteredReports].sort((a, b) => {
-    if (sortBy === "NEWEST") {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    }
     if (sortBy === "OLDEST") {
       return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
     }
-    if (sortBy === "TICKET_ASC") {
-      return a.ticket_number.localeCompare(b.ticket_number, "id-ID");
-    }
-    if (sortBy === "TICKET_DESC") {
-      return b.ticket_number.localeCompare(a.ticket_number, "id-ID");
-    }
-    if (sortBy === "UNIT_ASC") {
-      return a.unit_kerja.localeCompare(b.unit_kerja, "id-ID");
-    }
-    return 0;
+    // Default NEWEST
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
   const waitingCount = reports.filter((r) => r.status === "MENUNGGU").length;
@@ -261,14 +250,11 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="pl-2 pr-6 h-6.5 text-[10.5px] font-bold rounded-lg border border-slate-200 bg-sky-50/50 text-sky-900 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none"
+                      className="pl-2 pr-6 h-6.5 text-[10.5px] font-bold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none"
                       aria-label="Urutkan Berdasarkan"
                     >
-                      <option value="NEWEST">⚡ Terbaru (Default)</option>
-                      <option value="OLDEST">⏳ Terlama</option>
-                      <option value="TICKET_ASC">🔤 Nomor Tiket (A-Z)</option>
-                      <option value="TICKET_DESC">🔤 Nomor Tiket (Z-A)</option>
-                      <option value="UNIT_ASC">🔧 Unit Kerja (A-Z)</option>
+                      <option value="NEWEST">Terbaru</option>
+                      <option value="OLDEST">Terlama</option>
                     </select>
                     <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[7px]">▼</div>
                   </div>

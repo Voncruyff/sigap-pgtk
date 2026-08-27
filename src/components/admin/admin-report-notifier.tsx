@@ -51,7 +51,7 @@ export function AdminReportNotifier() {
           sendBrowserPushNotification({
             title: `Laporan Kerusakan Baru #${ticket}`,
             body: `${pelapor} (${unit}): ${deskripsi}`,
-            onClickUrl: `/admin/riwayat`,
+            onClickUrl: `/admin/laporan`,
           });
 
           // 2. In-App Floating Toast Alert (Visible immediately on screen for mobile & desktop)
@@ -59,8 +59,8 @@ export function AdminReportNotifier() {
             description: `${pelapor} - ${unit}: ${deskripsi}`,
             duration: 8000,
             action: {
-              label: "Buka Riwayat",
-              onClick: () => router.push("/admin/riwayat"),
+              label: "Buka Laporan",
+              onClick: () => router.push("/admin/laporan"),
             },
           });
 

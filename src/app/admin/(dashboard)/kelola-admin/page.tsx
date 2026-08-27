@@ -48,5 +48,12 @@ export default async function KelolaAdminPage() {
     users = SAMPLE_ADMINS;
   }
 
-  return <KelolaAdminView users={users} currentUserRole={currentUserRole} />;
+  return (
+    <KelolaAdminView
+      users={users}
+      currentUserRole={currentUserRole}
+      currentUserId={session?.id}
+      currentUsername={session?.username}
+    />
+  );
 }

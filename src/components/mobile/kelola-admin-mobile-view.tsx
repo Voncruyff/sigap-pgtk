@@ -23,6 +23,8 @@ import { AdminUserItem } from "@/app/admin/(dashboard)/kelola-admin/kelola-admin
 export interface KelolaAdminMobileViewProps {
   users: AdminUserItem[];
   currentUserRole?: string;
+  currentUserId?: string;
+  currentUsername?: string;
   onOpenAdd?: () => void;
   onOpenEdit?: (adminItem: AdminUserItem) => void;
   onOpenBan?: (adminItem: AdminUserItem) => void;
@@ -33,6 +35,8 @@ export interface KelolaAdminMobileViewProps {
 export function KelolaAdminMobileView({
   users,
   currentUserRole = "ADMIN",
+  currentUserId,
+  currentUsername,
   onOpenAdd,
   onOpenEdit,
   onOpenBan,
@@ -63,31 +67,23 @@ export function KelolaAdminMobileView({
     return matchesSearch && matchesRole;
   });
 
+  // Sorting: Pin own account to the very top, then sort by Terbaru / Terlama
   const sortedUsers = [...filteredUsers].sort((a, b) => {
-    if (sortBy === "NEWEST") {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    }
+    const isASelf = (currentUserId && a.id === currentUserId) || (currentUsername && a.username === currentUsername);
+    const isBSelf = (currentUserId && b.id === currentUserId) || (currentUsername && b.username === currentUsername);
+    if (isASelf) return -1;
+    if (isBSelf) return 1;
+
     if (sortBy === "OLDEST") {
       return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
     }
-    if (sortBy === "NAME_ASC") {
-      return a.nama.localeCompare(b.nama, "id-ID");
-    }
-    if (sortBy === "NAME_DESC") {
-      return b.nama.localeCompare(a.nama, "id-ID");
-    }
-    if (sortBy === "USERNAME_ASC") {
-      return a.username.localeCompare(b.username, "id-ID");
-    }
-    if (sortBy === "ROLE") {
-      return a.role.localeCompare(b.role, "id-ID");
-    }
-    return 0;
+    // Default NEWEST
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
   return (
     <div className="space-y-2.5 pb-6">
-      {/* 🔍 Ramping & Minimalis Mobile Search & Multi-Controls */}
+      {/* Mobile Search & Controls */}
       <div className="space-y-1.5 bg-white p-2 rounded-xl border border-slate-200/80 shadow-2xs">
         {/* Search Bar & Tambah Button */}
         <div className="flex items-center gap-1">
@@ -113,7 +109,7 @@ export function KelolaAdminMobileView({
           )}
         </div>
 
-        {/* Dropdowns Row: Role Filter & Sort Controls */}
+        {/* Dropdowns Row: Role Filter & Sort Controls (Terbaru / Terlama saja) */}
         <div className="grid grid-cols-2 gap-1">
           <div className="relative flex items-center w-full">
             <Users className="absolute left-2 h-3 w-3 text-sky-600 pointer-events-none" />
@@ -130,27 +126,23 @@ export function KelolaAdminMobileView({
             <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[8px]">▼</div>
           </div>
 
-          {/* ⚡ Fitur Urutkan */}
+          {/* Fitur Urutkan: Terbaru dan Terlama saja */}
           <div className="relative flex items-center w-full">
             <ArrowUpDown className="absolute left-2 h-3 w-3 text-sky-600 pointer-events-none" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full pl-6 pr-5 h-7.5 text-[10.5px] font-bold rounded-lg border border-slate-200 bg-sky-50/50 text-sky-900 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none truncate"
+              className="w-full pl-6 pr-5 h-7.5 text-[10.5px] font-bold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none truncate"
               aria-label="Urutkan Akun Admin"
             >
-              <option value="NEWEST">⚡ Terbaru (Default)</option>
-              <option value="OLDEST">⏳ Terlama</option>
-              <option value="NAME_ASC">👤 Nama (A-Z)</option>
-              <option value="NAME_DESC">👤 Nama (Z-A)</option>
-              <option value="USERNAME_ASC">🔤 Username (A-Z)</option>
-              <option value="ROLE">👑 Hak Akses</option>
+              <option value="NEWEST">Terbaru</option>
+              <option value="OLDEST">Terlama</option>
             </select>
             <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[8px]">▼</div>
           </div>
         </div>
 
-        {/* Baris Status Hasil & Reset Button */}
+        {/* Status Hasil & Reset Button */}
         <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px]">
           <span className="text-slate-400 font-medium">
             Total <strong className="text-slate-700 font-bold">{sortedUsers.length}</strong> akun admin
@@ -168,7 +160,7 @@ export function KelolaAdminMobileView({
         </div>
       </div>
 
-      {/* 📊 Minimalist Summary Pills */}
+      {/* Summary Pills */}
       <div className="grid grid-cols-2 gap-1 text-xs">
         <div className="p-1.5 px-2 rounded-lg border border-slate-200/80 bg-white shadow-2xs flex items-center justify-between">
           <div className="flex items-center gap-1">
@@ -177,7 +169,7 @@ export function KelolaAdminMobileView({
             </div>
             <span className="font-semibold text-slate-600 text-[10px]">Super Admin</span>
           </div>
-          <span className="font-extrabold text-purple-700 text-[11px]">
+          <span className="font-bold text-purple-700 text-[11px]">
             {users.filter((u) => u.role === "SUPER_ADMIN").length}
           </span>
         </div>
@@ -189,13 +181,13 @@ export function KelolaAdminMobileView({
             </div>
             <span className="font-semibold text-slate-600 text-[10px]">Admin Teknis</span>
           </div>
-          <span className="font-extrabold text-sky-700 text-[11px]">
+          <span className="font-bold text-sky-700 text-[11px]">
             {users.filter((u) => u.role === "ADMIN").length}
           </span>
         </div>
       </div>
 
-      {/* 📱 Minimalist Admin User Cards List */}
+      {/* Minimalist Admin User Cards List */}
       {sortedUsers.length === 0 ? (
         <Card className="border border-dashed border-slate-200 bg-white rounded-xl p-6 text-center shadow-2xs">
           <p className="text-xs text-slate-400 italic font-medium">
@@ -207,6 +199,7 @@ export function KelolaAdminMobileView({
           {sortedUsers.map((adminItem) => {
             const isSuper = adminItem.role === "SUPER_ADMIN";
             const isBanned = Boolean(adminItem.is_banned);
+            const isSelf = (currentUserId && adminItem.id === currentUserId) || (currentUsername && adminItem.username === currentUsername);
             const dateObj = new Date(adminItem.created_at);
             const formattedDate = dateObj.toLocaleDateString("id-ID", {
               day: "numeric",
@@ -217,7 +210,9 @@ export function KelolaAdminMobileView({
               <Card
                 key={adminItem.id}
                 className={`border rounded-xl transition-all shadow-2xs overflow-hidden ${
-                  isBanned
+                  isSelf
+                    ? "bg-sky-50/50 border-sky-300"
+                    : isBanned
                     ? "bg-rose-50/30 border-rose-200"
                     : "bg-white border-slate-200/80 hover:border-sky-300"
                 }`}
@@ -230,6 +225,8 @@ export function KelolaAdminMobileView({
                         className={`h-7 w-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
                           isBanned
                             ? "bg-rose-100 text-rose-700"
+                            : isSelf
+                            ? "bg-sky-700 text-white"
                             : isSuper
                             ? "bg-purple-100 text-purple-700"
                             : "bg-sky-100 text-sky-700"
@@ -238,9 +235,16 @@ export function KelolaAdminMobileView({
                         {adminItem.nama.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <h4 className="font-bold text-slate-900 text-xs truncate">
-                          {adminItem.nama}
-                        </h4>
+                        <div className="flex items-center gap-1">
+                          <h4 className="font-bold text-slate-900 text-xs truncate">
+                            {adminItem.nama}
+                          </h4>
+                          {isSelf && (
+                            <span className="text-[9px] font-bold text-sky-700 bg-sky-100 px-1 py-0.2 rounded border border-sky-200 shrink-0">
+                              (Anda)
+                            </span>
+                          )}
+                        </div>
                         <span className="font-mono text-[9.5px] font-semibold text-slate-400 block">
                           @{adminItem.username}
                         </span>
@@ -295,8 +299,10 @@ export function KelolaAdminMobileView({
                           <Button
                             size="sm"
                             variant="ghost"
+                            disabled={Boolean(isSelf)}
                             onClick={() => onOpenEdit(adminItem)}
-                            className="h-6 px-1.5 text-[10px] font-semibold text-slate-600 hover:text-sky-700 hover:bg-sky-50 rounded-md cursor-pointer"
+                            className="h-6 px-1.5 text-[10px] font-semibold text-slate-600 hover:text-sky-700 hover:bg-sky-50 rounded-md cursor-pointer disabled:opacity-25"
+                            title={isSelf ? "Tidak dapat mengedit akun sendiri di sini" : "Edit Akun"}
                           >
                             <Edit3 className="h-2.5 w-2.5 mr-0.5 text-sky-600" />
                             Edit
@@ -308,6 +314,7 @@ export function KelolaAdminMobileView({
                             <Button
                               size="sm"
                               variant="outline"
+                              disabled={Boolean(isSelf)}
                               onClick={() => onOpenUnban(adminItem)}
                               className="h-6 px-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 rounded-md cursor-pointer"
                             >
@@ -320,8 +327,10 @@ export function KelolaAdminMobileView({
                             <Button
                               size="sm"
                               variant="ghost"
+                              disabled={Boolean(isSelf || isSuper)}
                               onClick={() => onOpenBan(adminItem)}
-                              className="h-6 px-1.5 text-[10px] font-semibold text-amber-700 hover:bg-amber-50 rounded-md cursor-pointer"
+                              className="h-6 px-1.5 text-[10px] font-semibold text-amber-700 hover:bg-amber-50 rounded-md cursor-pointer disabled:opacity-25"
+                              title={isSelf ? "Tidak dapat membanned akun sendiri" : "Ban Akun"}
                             >
                               <Ban className="h-2.5 w-2.5 mr-0.5 text-amber-600" />
                               Ban

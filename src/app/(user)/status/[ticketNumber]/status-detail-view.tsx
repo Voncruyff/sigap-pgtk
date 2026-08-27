@@ -82,7 +82,7 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
         </div>
       )}
 
-      {/* 🚀 TOP ROW: Progres Penanganan (Langkah 1-4) & Card Tanggal / Info Tiket */}
+      {/* TOP ROW: Progres Penanganan (Langkah 1-4) & Card Tanggal / Info Tiket */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
         {/* Left/Main Card: Stepper Progres Penanganan */}
         <Card className="lg:col-span-2 border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden flex flex-col justify-between">
@@ -219,7 +219,7 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
         </Card>
       </div>
 
-      {/* 🛠️ BOTTOM ROW: Card Deskripsi Sejajar dengan Card Solusi / Penanganan */}
+      {/* BOTTOM ROW: Card Deskripsi Sejajar dengan Card Solusi / Penanganan */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
         {/* Left Card: Deskripsi Kerusakan & Lampiran Foto */}
         <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden flex flex-col justify-between">
@@ -323,7 +323,7 @@ export function StatusDetailView({ ticketNumber, report }: StatusDetailViewProps
       {/* Action Footer */}
       <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-xs text-slate-500 font-medium text-center sm:text-left">
-          💡 Status diperbarui oleh petugas SIGAP setelah verifikasi teknis di lapangan.
+          Status diperbarui oleh petugas SIGAP setelah verifikasi teknis di lapangan.
         </p>
 
         <Link href="/cek-status">

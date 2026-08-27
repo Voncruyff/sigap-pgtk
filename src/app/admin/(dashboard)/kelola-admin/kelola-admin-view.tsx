@@ -73,6 +73,8 @@ export interface AdminUserItem {
 export interface KelolaAdminViewProps {
   users: AdminUserItem[];
   currentUserRole?: string;
+  currentUserId?: string;
+  currentUsername?: string;
 }
 
 type SortField = "nama" | "username" | "role" | "created_at";
@@ -81,6 +83,8 @@ type SortOrder = "asc" | "desc";
 export function KelolaAdminView({
   users: initialUsers,
   currentUserRole = "ADMIN",
+  currentUserId,
+  currentUsername,
 }: KelolaAdminViewProps) {
   const isSuperAdmin = currentUserRole === "SUPER_ADMIN";
 
@@ -470,6 +474,11 @@ export function KelolaAdminView({
   });
 
   const sortedUsers = [...filteredUsers].sort((a, b) => {
+    const isASelf = (currentUserId && a.id === currentUserId) || (currentUsername && a.username === currentUsername);
+    const isBSelf = (currentUserId && b.id === currentUserId) || (currentUsername && b.username === currentUsername);
+    if (isASelf) return -1;
+    if (isBSelf) return 1;
+
     let comparison = 0;
     if (sortField === "created_at") {
       comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
@@ -1103,6 +1112,7 @@ export function KelolaAdminView({
                     const isSuper = adminItem.role === "SUPER_ADMIN";
                     const isBanned = Boolean(adminItem.is_banned);
                     const isProcessing = processingId === adminItem.id;
+                    const isSelf = (currentUserId && adminItem.id === currentUserId) || (currentUsername && adminItem.username === currentUsername);
                     const dateObj = new Date(adminItem.created_at);
                     const formattedDate = dateObj.toLocaleDateString("id-ID", {
                       day: "2-digit",
@@ -1145,7 +1155,11 @@ export function KelolaAdminView({
                       <TableRow
                         key={adminItem.id}
                         className={`transition-colors border-b border-slate-100 ${
-                          isBanned ? "bg-rose-50/25 hover:bg-rose-50/40 opacity-80" : "hover:bg-sky-50/40"
+                          isSelf
+                            ? "bg-sky-50/60 hover:bg-sky-50/80 font-medium"
+                            : isBanned
+                            ? "bg-rose-50/25 hover:bg-rose-50/40 opacity-80"
+                            : "hover:bg-slate-50/60"
                         }`}
                       >
                         <TableCell className="pl-5 pr-3 py-4">
@@ -1154,6 +1168,8 @@ export function KelolaAdminView({
                               className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
                                 isBanned
                                   ? "bg-rose-100 text-rose-700"
+                                  : isSelf
+                                  ? "bg-sky-700 text-white"
                                   : "bg-sky-100 text-sky-700"
                               }`}
                             >
@@ -1162,6 +1178,11 @@ export function KelolaAdminView({
                             <div className="space-y-0.5">
                               <div className="font-bold text-xs text-slate-900 flex items-center gap-2">
                                 <span>{adminItem.nama}</span>
+                                {isSelf && (
+                                  <span className="text-[10px] font-bold text-sky-700 bg-sky-100/90 px-1.5 py-0.5 rounded-md border border-sky-200">
+                                    (Akun Anda)
+                                  </span>
+                                )}
                               </div>
                               {banInfoBadge && <div>{banInfoBadge}</div>}
                             </div>
@@ -1196,9 +1217,10 @@ export function KelolaAdminView({
                               <Button
                                 variant="ghost"
                                 size="icon"
+                                disabled={Boolean(isSelf)}
                                 onClick={() => handleOpenEdit(adminItem)}
-                                className="h-8 w-8 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-full cursor-pointer transition-colors"
-                                title="Edit Data Admin & Ubah Role"
+                                className="h-8 w-8 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-full cursor-pointer transition-colors disabled:opacity-25"
+                                title={isSelf ? "Gunakan menu Pengaturan untuk mengedit akun Anda sendiri" : "Edit Data Admin & Ubah Role"}
                               >
                                 <Pencil className="h-3.5 w-3.5" />
                               </Button>
@@ -1208,7 +1230,7 @@ export function KelolaAdminView({
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  disabled={isProcessing}
+                                  disabled={Boolean(isProcessing || isSelf)}
                                   onClick={() => handleOpenUnbanModal(adminItem)}
                                   className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full cursor-pointer transition-colors"
                                   title="Buka Banned (Aktifkan Kembali)"
@@ -1223,10 +1245,10 @@ export function KelolaAdminView({
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  disabled={isProcessing || isSuper}
+                                  disabled={Boolean(isProcessing || isSuper || isSelf)}
                                   onClick={() => handleOpenBan(adminItem)}
-                                  className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full cursor-pointer transition-colors disabled:opacity-20"
-                                  title={isSuper ? "Super Admin tidak dapat dibanned" : "Banned Akun Admin"}
+                                  className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full cursor-pointer transition-colors disabled:opacity-25"
+                                  title={isSelf ? "Tidak dapat membanned akun sendiri" : isSuper ? "Super Admin tidak dapat dibanned" : "Banned Akun Admin"}
                                 >
                                   <Ban className="h-3.5 w-3.5" />
                                 </Button>
@@ -1236,7 +1258,7 @@ export function KelolaAdminView({
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                disabled={isProcessing}
+                                disabled={Boolean(isProcessing)}
                                 onClick={() => handleOpenDeleteModal(adminItem)}
                                 className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full cursor-pointer transition-colors"
                                 title="Hapus Akun Admin"
@@ -1261,11 +1283,13 @@ export function KelolaAdminView({
       </Card>
       </div>
 
-      {/* 📱 Mobile Card View */}
+      {/* Mobile Card View */}
       <div className="block lg:hidden">
         <KelolaAdminMobileView
           users={users}
           currentUserRole={currentUserRole}
+          currentUserId={currentUserId}
+          currentUsername={currentUsername}
           onOpenAdd={() => {
             setNama("");
             setUsername("");

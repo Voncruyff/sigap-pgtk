@@ -159,7 +159,7 @@ export default function UserLayout({
         {children}
       </main>
 
-      {/* 📱 Mobile User Floating Dockbar */}
+      {/* Mobile User Floating Dockbar */}
       <UserDockbar />
 
       {/* Footer Minimalis Corporate */}

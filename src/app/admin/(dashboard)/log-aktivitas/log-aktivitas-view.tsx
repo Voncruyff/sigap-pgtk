@@ -254,7 +254,7 @@ export function LogAktivitasView({ logs }: LogAktivitasViewProps) {
       </div>
       </div>
 
-      {/* 📱 Tampilan Khusus Mobile HP */}
+      {/* Tampilan Khusus Mobile HP */}
       <div className="block lg:hidden">
         <LogAktivitasMobileView logs={logs} />
       </div>

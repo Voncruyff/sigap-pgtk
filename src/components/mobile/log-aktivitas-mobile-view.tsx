@@ -9,7 +9,6 @@ import {
   Clock,
   RotateCcw,
   ArrowUpDown,
-  User,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -53,28 +52,18 @@ export function LogAktivitasMobileView({ logs }: LogAktivitasMobileViewProps) {
     return matchesSearch && matchesFilter;
   });
 
+  // Sorting: Terbaru dan Terlama saja (tanpa emote)
   const sortedLogs = [...filteredLogs].sort((a, b) => {
-    if (sortBy === "NEWEST") {
-      return new Date(b.waktu).getTime() - new Date(a.waktu).getTime();
-    }
     if (sortBy === "OLDEST") {
       return new Date(a.waktu).getTime() - new Date(b.waktu).getTime();
     }
-    if (sortBy === "ADMIN_ASC") {
-      return a.admin.localeCompare(b.admin, "id-ID");
-    }
-    if (sortBy === "ADMIN_DESC") {
-      return b.admin.localeCompare(a.admin, "id-ID");
-    }
-    if (sortBy === "ACTIVITY_ASC") {
-      return a.aktivitas.localeCompare(b.aktivitas, "id-ID");
-    }
-    return 0;
+    // Default NEWEST
+    return new Date(b.waktu).getTime() - new Date(a.waktu).getTime();
   });
 
   return (
     <div className="space-y-2.5 pb-6">
-      {/* 🔍 Ramping & Minimalis Mobile Search & Multi-Controls */}
+      {/* Mobile Search & Controls */}
       <div className="space-y-1.5 bg-white p-2 rounded-xl border border-slate-200/80 shadow-2xs">
         {/* Search Bar Input */}
         <div className="relative w-full">
@@ -104,26 +93,23 @@ export function LogAktivitasMobileView({ logs }: LogAktivitasMobileViewProps) {
             <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[8px]">▼</div>
           </div>
 
-          {/* ⚡ Fitur Urutkan */}
+          {/* Fitur Urutkan: Terbaru dan Terlama saja */}
           <div className="relative flex items-center w-full">
             <ArrowUpDown className="absolute left-2 h-3 w-3 text-purple-600 pointer-events-none" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full pl-6 pr-5 h-7.5 text-[10.5px] font-bold rounded-lg border border-slate-200 bg-purple-50/50 text-purple-900 focus:outline-hidden focus:border-purple-500 cursor-pointer appearance-none truncate"
+              className="w-full pl-6 pr-5 h-7.5 text-[10.5px] font-bold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:border-purple-500 cursor-pointer appearance-none truncate"
               aria-label="Urutkan Log"
             >
-              <option value="NEWEST">⚡ Terbaru (Default)</option>
-              <option value="OLDEST">⏳ Terlama</option>
-              <option value="ADMIN_ASC">👤 Admin (A-Z)</option>
-              <option value="ADMIN_DESC">👤 Admin (Z-A)</option>
-              <option value="ACTIVITY_ASC">📋 Jenis Aktivitas</option>
+              <option value="NEWEST">Terbaru</option>
+              <option value="OLDEST">Terlama</option>
             </select>
             <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[8px]">▼</div>
           </div>
         </div>
 
-        {/* Baris Status Hasil & Reset Button */}
+        {/* Status Hasil & Reset Button */}
         <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px]">
           <span className="text-slate-400 font-medium">
             Total <strong className="text-slate-700 font-bold">{sortedLogs.length}</strong> catatan
@@ -141,7 +127,7 @@ export function LogAktivitasMobileView({ logs }: LogAktivitasMobileViewProps) {
         </div>
       </div>
 
-      {/* 📜 Minimalist Mobile Activity Cards */}
+      {/* Mobile Activity Cards */}
       {sortedLogs.length === 0 ? (
         <Card className="border border-dashed border-slate-200 bg-white rounded-xl p-6 text-center shadow-2xs">
           <p className="text-xs text-slate-400 italic font-medium">

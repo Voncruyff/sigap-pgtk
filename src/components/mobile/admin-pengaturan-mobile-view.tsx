@@ -75,7 +75,7 @@ export function AdminPengaturanMobileView({
 
   return (
     <div className="space-y-4 pb-20">
-      {/* 👤 Compact Profile Header Card */}
+      {/* Compact Profile Header Card */}
       <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center gap-3">
@@ -132,7 +132,7 @@ export function AdminPengaturanMobileView({
         </CardContent>
       </Card>
 
-      {/* 🧭 Section 1: Operasional & Log Petugas */}
+      {/* Section 1: Operasional & Log Petugas */}
       <div className="space-y-1.5">
         <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 px-1">
           Menu Operasional &amp; Log
@@ -185,7 +185,7 @@ export function AdminPengaturanMobileView({
         </div>
       </div>
 
-      {/* 🔔 Section 2: Preferensi Notifikasi */}
+      {/* Section 2: Preferensi Notifikasi */}
       <div className="space-y-1.5">
         <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 px-1">
           Notifikasi Realtime
@@ -271,7 +271,7 @@ export function AdminPengaturanMobileView({
         </div>
       </div>
 
-      {/* 🚪 Section 3: Keluar Sistem (Logout) */}
+      {/* Section 3: Keluar Sistem (Logout) */}
       <div className="pt-2">
         <Button
           onClick={() => setIsLogoutModalOpen(true)}

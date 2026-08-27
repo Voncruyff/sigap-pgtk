@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import {
   Search,
   Wrench,
-  Calendar,
   ArrowRight,
   Play,
   CheckCircle2,
@@ -39,7 +38,6 @@ export function LaporanMobileView({
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [bagianFilter, setBagianFilter] = useState<string>("ALL");
-  const [periodFilter, setPeriodFilter] = useState<string>("ALL");
   const [sortBy, setSortBy] = useState<string>("NEWEST");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -51,7 +49,6 @@ export function LaporanMobileView({
     setSearchQuery("");
     setStatusFilter("ALL");
     setBagianFilter("ALL");
-    setPeriodFilter("ALL");
     setSortBy("NEWEST");
   };
 
@@ -59,7 +56,6 @@ export function LaporanMobileView({
     searchQuery !== "" ||
     statusFilter !== "ALL" ||
     bagianFilter !== "ALL" ||
-    periodFilter !== "ALL" ||
     sortBy !== "NEWEST";
 
   // Handle Quick Status Change on Mobile (e.g. MENUNGGU -> DIPROSES)
@@ -67,7 +63,7 @@ export function LaporanMobileView({
     setUpdatingId(id);
     try {
       const res = await fetch("/api/reports/status", {
-        method: "POST",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),
       });
@@ -90,37 +86,6 @@ export function LaporanMobileView({
     }
   };
 
-  const isWithinPeriod = (dateStr: string, period: string) => {
-    if (period === "ALL") return true;
-    const itemDate = new Date(dateStr);
-    if (isNaN(itemDate.getTime())) return true;
-    const now = new Date();
-
-    if (period === "TODAY") {
-      return (
-        itemDate.getDate() === now.getDate() &&
-        itemDate.getMonth() === now.getMonth() &&
-        itemDate.getFullYear() === now.getFullYear()
-      );
-    }
-    if (period === "7DAYS") {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(now.getDate() - 7);
-      sevenDaysAgo.setHours(0, 0, 0, 0);
-      return itemDate >= sevenDaysAgo;
-    }
-    if (period === "THIS_MONTH") {
-      return (
-        itemDate.getMonth() === now.getMonth() &&
-        itemDate.getFullYear() === now.getFullYear()
-      );
-    }
-    if (period === "THIS_YEAR") {
-      return itemDate.getFullYear() === now.getFullYear();
-    }
-    return true;
-  };
-
   const filteredReports = reports.filter((item) => {
     const q = searchQuery.toLowerCase();
     const matchesSearch =
@@ -135,41 +100,22 @@ export function LaporanMobileView({
 
     const matchesStatus = statusFilter === "ALL" || item.status === statusFilter;
     const matchesBagian = bagianFilter === "ALL" || item.bagian === bagianFilter;
-    const matchesPeriod = isWithinPeriod(item.created_at, periodFilter);
 
-    return matchesSearch && matchesStatus && matchesBagian && matchesPeriod;
+    return matchesSearch && matchesStatus && matchesBagian;
   });
 
-  // Dynamic sorting with explicit Terbaru / Terlama / etc.
+  // Sorting: Terbaru dan Terlama saja (tanpa emote)
   const sortedReports = [...filteredReports].sort((a, b) => {
-    if (sortBy === "NEWEST") {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    }
     if (sortBy === "OLDEST") {
       return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
     }
-    if (sortBy === "TICKET_ASC") {
-      return a.ticket_number.localeCompare(b.ticket_number, "id-ID");
-    }
-    if (sortBy === "TICKET_DESC") {
-      return b.ticket_number.localeCompare(a.ticket_number, "id-ID");
-    }
-    if (sortBy === "NAME_ASC") {
-      return a.nama_pelapor.localeCompare(b.nama_pelapor, "id-ID");
-    }
-    if (sortBy === "NAME_DESC") {
-      return b.nama_pelapor.localeCompare(a.nama_pelapor, "id-ID");
-    }
-    if (sortBy === "STATUS") {
-      const statusWeight: Record<string, number> = { MENUNGGU: 1, DIPROSES: 2, SELESAI: 3 };
-      return (statusWeight[a.status] || 0) - (statusWeight[b.status] || 0);
-    }
-    return 0;
+    // Default NEWEST
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
   return (
     <div className="space-y-2.5 pb-6">
-      {/* 🔍 Ramping & Minimalis Mobile Search & Multi-Controls */}
+      {/* Mobile Search & Multi-Controls */}
       <div className="space-y-1.5 bg-white p-2 rounded-xl border border-slate-200/80 shadow-2xs">
         {/* Search Bar Input */}
         <div className="relative w-full">
@@ -182,14 +128,15 @@ export function LaporanMobileView({
           />
         </div>
 
-        {/* Dropdowns Row 1: Bagian & Status */}
-        <div className="grid grid-cols-2 gap-1">
+        {/* Dropdowns Row: Bagian, Status, dan Urutkan (Terbaru / Terlama) */}
+        <div className="grid grid-cols-3 gap-1">
+          {/* Bagian Filter */}
           <div className="relative flex items-center w-full">
-            <Building className="absolute left-2 h-3 w-3 text-sky-600 pointer-events-none" />
+            <Building className="absolute left-1.5 h-3 w-3 text-sky-600 pointer-events-none" />
             <select
               value={bagianFilter}
               onChange={(e) => setBagianFilter(e.target.value)}
-              className="w-full pl-6 pr-5 h-7.5 text-[10.5px] font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none truncate"
+              className="w-full pl-5 pr-4 h-7.5 text-[10px] font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none truncate"
               aria-label="Filter Bagian Laporan"
             >
               <option value="ALL">Semua Bagian</option>
@@ -198,67 +145,42 @@ export function LaporanMobileView({
               <option value="Pabrikasi">Pabrikasi</option>
               <option value="Tanaman">Tanaman</option>
             </select>
-            <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[8px]">▼</div>
+            <div className="absolute right-1 pointer-events-none text-slate-400 text-[7px]">▼</div>
           </div>
 
+          {/* Status Filter */}
           <div className="relative flex items-center w-full">
-            <Filter className="absolute left-2 h-3 w-3 text-sky-600 pointer-events-none" />
+            <Filter className="absolute left-1.5 h-3 w-3 text-sky-600 pointer-events-none" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full pl-6 pr-5 h-7.5 text-[10.5px] font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none truncate"
+              className="w-full pl-5 pr-4 h-7.5 text-[10px] font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none truncate"
               aria-label="Filter Status Laporan"
             >
-              <option value="ALL">Semua Status ({reports.length})</option>
+              <option value="ALL">Semua Status</option>
               <option value="MENUNGGU">Menunggu ({reports.filter((r) => r.status === "MENUNGGU").length})</option>
               <option value="DIPROSES">Diproses ({reports.filter((r) => r.status === "DIPROSES").length})</option>
             </select>
-            <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[8px]">▼</div>
-          </div>
-        </div>
-
-        {/* Dropdowns Row 2: Periode & Fitur Urutkan (Terbaru/Terlama/dsb) */}
-        <div className="grid grid-cols-2 gap-1">
-          {/* Periode */}
-          <div className="relative flex items-center w-full">
-            <Calendar className="absolute left-2 h-3 w-3 text-sky-600 pointer-events-none" />
-            <select
-              value={periodFilter}
-              onChange={(e) => setPeriodFilter(e.target.value)}
-              className="w-full pl-6 pr-5 h-7.5 text-[10.5px] font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none truncate"
-              aria-label="Filter Periode Waktu Laporan"
-            >
-              <option value="ALL">Semua Waktu</option>
-              <option value="TODAY">Hari Ini</option>
-              <option value="7DAYS">7 Hari Terakhir</option>
-              <option value="THIS_MONTH">Bulan Ini</option>
-              <option value="THIS_YEAR">Tahun Ini</option>
-            </select>
-            <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[8px]">▼</div>
+            <div className="absolute right-1 pointer-events-none text-slate-400 text-[7px]">▼</div>
           </div>
 
-          {/* ⚡ Fitur Urutkan (Terbaru / Terlama / A-Z / Status) */}
+          {/* Fitur Urutkan: Terbaru dan Terlama saja */}
           <div className="relative flex items-center w-full">
-            <ArrowUpDown className="absolute left-2 h-3 w-3 text-sky-600 pointer-events-none" />
+            <ArrowUpDown className="absolute left-1.5 h-3 w-3 text-sky-600 pointer-events-none" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full pl-6 pr-5 h-7.5 text-[10.5px] font-bold rounded-lg border border-slate-200 bg-sky-50/50 text-sky-900 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none truncate"
+              className="w-full pl-5 pr-4 h-7.5 text-[10px] font-bold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none truncate"
               aria-label="Urutkan Laporan"
             >
-              <option value="NEWEST">⚡ Terbaru (Default)</option>
-              <option value="OLDEST">⏳ Terlama</option>
-              <option value="TICKET_ASC">🔤 No. Tiket (A-Z)</option>
-              <option value="TICKET_DESC">🔤 No. Tiket (Z-A)</option>
-              <option value="NAME_ASC">👤 Pelapor (A-Z)</option>
-              <option value="NAME_DESC">👤 Pelapor (Z-A)</option>
-              <option value="STATUS">📋 Status Laporan</option>
+              <option value="NEWEST">Terbaru</option>
+              <option value="OLDEST">Terlama</option>
             </select>
-            <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[8px]">▼</div>
+            <div className="absolute right-1 pointer-events-none text-slate-400 text-[7px]">▼</div>
           </div>
         </div>
 
-        {/* Baris Status Hasil & Reset Button */}
+        {/* Status Hasil & Reset Button */}
         <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px]">
           <span className="text-slate-400 font-medium">
             Total <strong className="text-slate-700 font-bold">{sortedReports.length}</strong> laporan
@@ -276,7 +198,7 @@ export function LaporanMobileView({
         </div>
       </div>
 
-      {/* 📱 Minimalist Mobile Report Cards List */}
+      {/* Minimalist Mobile Report Cards List */}
       <div className="space-y-2">
         {sortedReports.length === 0 ? (
           <div className="text-center py-6 text-slate-400 italic text-xs bg-white rounded-xl border border-slate-200/80 p-3">
@@ -305,17 +227,17 @@ export function LaporanMobileView({
                   {/* Top Row: Ticket Number, Bagian Badge & Status Badge */}
                   <div className="flex items-center justify-between gap-1.5">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-mono text-[11px] font-black text-sky-800 truncate">
+                      <span className="font-mono text-[11px] font-bold text-sky-800 truncate">
                         {report.ticket_number}
                       </span>
-                      <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60 shrink-0">
+                      <span className="text-[9px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60 shrink-0">
                         {report.bagian}
                       </span>
                     </div>
                     <ReportStatusBadge status={report.status} />
                   </div>
 
-                  {/* Middle: Unit Kerja & Clean Clamped Description */}
+                  {/* Middle: Unit Kerja & Description */}
                   <div>
                     <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1">
                       <Wrench className="h-3 w-3 text-sky-600 shrink-0" />

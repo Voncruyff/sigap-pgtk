@@ -31,7 +31,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
         </main>
       </div>
 
-      {/* 📱 Mobile Fixed Floating Dockbar (Immune to page scroll) */}
+      {/* Mobile Fixed Floating Dockbar (Immune to page scroll) */}
       <AdminDockbar />
     </div>
   );

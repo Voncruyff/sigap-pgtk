@@ -169,7 +169,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
         badgeColor="emerald"
       />
 
-      {/* 🖥️ Tampilan Utama Desktop / PC */}
+      {/* Tampilan Utama Desktop / PC */}
       <div className="hidden lg:block">
         <div className="bg-white border border-slate-200/80 rounded-2xl shadow-2xs overflow-hidden">
           <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50">
@@ -409,7 +409,7 @@ export function RiwayatView({ completedReports }: RiwayatViewProps) {
         </div>
       </div>
 
-      {/* 📱 Tampilan Khusus Mobile HP */}
+      {/* Tampilan Khusus Mobile HP */}
       <div className="block lg:hidden">
         <RiwayatMobileView completedReports={completedReports} />
       </div>

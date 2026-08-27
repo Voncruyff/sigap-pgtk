@@ -230,7 +230,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
         </button>
       )}
 
-      {/* 📱 Modal: Option Modal (Kamera Asli Perangkat vs Galeri) */}
+      {/* Modal: Option Modal (Kamera Asli Perangkat vs Galeri) */}
       <Dialog open={isOptionModalOpen} onOpenChange={setIsOptionModalOpen}>
         <DialogContent className="max-w-sm sm:max-w-md p-5 sm:p-6 rounded-3xl bg-white border border-sky-100 shadow-2xl space-y-4">
           <DialogHeader>

@@ -518,7 +518,7 @@ export function AdminPengaturanView() {
         </div>
       </div>
 
-      {/* 📱 Tampilan Khusus Mobile HP */}
+      {/* Tampilan Khusus Mobile HP */}
       <div className="block lg:hidden">
         <AdminPengaturanMobileView
           nama={nama}
