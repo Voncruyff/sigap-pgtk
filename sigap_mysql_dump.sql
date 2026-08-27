@@ -78,17 +78,13 @@ CREATE TABLE `admin_users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
--- 4. Initial Seed Data: Default Admin Accounts (Multi-Role)
+-- 4. Initial Seed Data: Default Super Admin Account Only
 -- 
 -- Akun Login Bawaan:
--- 1. Super Admin  -> Username: superadmin | Password: super123
--- 2. Admin Teknis -> Username: admin      | Password: admin123
--- 3. Admin Teknis -> Username: yonosub    | Password: admin123
+-- Super Admin -> Username: superadmin | Password: super123
 -- ---------------------------------------------------------
 INSERT INTO `admin_users` (`id`, `username`, `password`, `nama`, `role`, `is_banned`, `created_at`, `updated_at`) VALUES
-('adm-super-001', 'superadmin', '$2b$10$xOKrgkg9BvNwaltLeCLtPuWkrRna/l4GT/X33JetzW.AvL4VujukC', 'Super Admin SIGAP', 'SUPER_ADMIN', 0, NOW(3), NOW(3)),
-('adm-teknis-002', 'admin', '$2b$10$28YzUhSq.4nH4Z9vVWrvROiclmbMMyQdpWQac1uotijn9hCvI2Iwa', 'Jayadi Brawijaya Diningkrat', 'ADMIN', 0, NOW(3), NOW(3)),
-('adm-teknis-003', 'yonosub', '$2b$10$28YzUhSq.4nH4Z9vVWrvROiclmbMMyQdpWQac1uotijn9hCvI2Iwa', 'Yono Subadyo', 'ADMIN', 0, NOW(3), NOW(3));
+('adm-super-001', 'superadmin', '$2b$10$xOKrgkg9BvNwaltLeCLtPuWkrRna/l4GT/X33JetzW.AvL4VujukC', 'Super Admin SIGAP', 'SUPER_ADMIN', 0, NOW(3), NOW(3));
 
 -- ---------------------------------------------------------
 -- 5. Initial Seed Data: Sample Activity Log
