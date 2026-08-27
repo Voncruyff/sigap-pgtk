@@ -99,7 +99,7 @@ export function LandingMobileView() {
                   Pantau tiket laporan perbaikan langsung di HP.
                 </p>
                 <span className="inline-flex items-center gap-1 bg-sky-50 text-sky-700 px-1.5 py-0.5 rounded text-[10px] font-bold border border-sky-100 mt-0.5">
-                  <CheckCircle2 className="h-3 w-3" /> Lacak Realtime
+                  <CheckCircle2 className="h-3 w-3" /> Cek Status Realtime
                 </span>
               </div>
             </CardContent>

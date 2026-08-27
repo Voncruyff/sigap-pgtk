@@ -396,7 +396,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                       size="sm"
                       className="h-6.5 sm:h-8 px-2 sm:px-3 rounded-md sm:rounded-xl text-[10.5px] sm:text-xs font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex items-center gap-1"
                     >
-                      Lacak Status
+                      Cek Status
                       <ExternalLink className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                     </Button>
                   </Link>

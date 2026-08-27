@@ -34,7 +34,7 @@ export function LandingView() {
               </span>
             </h1>
             <p className="text-sm sm:text-base text-slate-600 max-w-xl mx-auto leading-relaxed font-medium">
-              Layanan terpadu pelaporan kerusakan alat atau fasilitas pabrik. Kirim laporan secara praktis dan lacak status penanganan teknisi secara realtime.
+              Layanan terpadu pelaporan kerusakan alat atau fasilitas pabrik. Kirim laporan secara praktis dan cek status penanganan teknisi secara realtime.
             </p>
           </StaggerItem>
 
@@ -111,7 +111,7 @@ export function LandingView() {
                     </p>
                     <div className="pt-0.5">
                       <span className="inline-flex items-center gap-1 bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md text-[11px] font-bold border border-sky-100">
-                        <CheckCircle2 className="h-3 w-3" /> Lacak Realtime
+                        <CheckCircle2 className="h-3 w-3" /> Cek Status Realtime
                       </span>
                     </div>
                   </div>
