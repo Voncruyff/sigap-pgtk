@@ -135,10 +135,10 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
         />
       </FadeIn>
 
-      {/* Main Search & Realtime Counter Bar */}
+      {/* Main Search & Clean Selector Controls Card */}
       <FadeInScale delay={0.05} className="space-y-3">
         <Card className="border border-slate-200/80 bg-white rounded-2xl shadow-2xs overflow-hidden">
-          <CardContent className="p-3 sm:p-6 space-y-2.5 sm:space-y-4">
+          <CardContent className="p-3 sm:p-5 space-y-3">
             {/* Search Input Bar */}
             <form onSubmit={handleDirectSearch} className="space-y-2">
               <div className="flex flex-col sm:flex-row items-center gap-2">
@@ -147,15 +147,15 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cari nomor tiket atau nama unit kerja / pelapor..."
-                    className="pl-10 h-9 sm:h-11 text-xs sm:text-sm font-medium rounded-xl border-slate-200 focus-visible:ring-sky-500/20 focus-visible:border-sky-500 bg-white shadow-2xs"
+                    placeholder="Cari nomor tiket, nama pelapor, unit kerja..."
+                    className="pl-10 h-10 text-xs sm:text-sm font-medium rounded-xl border-slate-200 focus-visible:ring-sky-500/20 focus-visible:border-sky-500 bg-slate-50/40 focus:bg-white shadow-none transition-all"
                   />
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <Button
                     type="submit"
-                    className="h-9 sm:h-11 px-4 sm:px-5 rounded-xl text-xs sm:text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex-1 sm:flex-initial"
+                    className="h-10 px-5 rounded-xl text-xs sm:text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-2xs cursor-pointer flex-1 sm:flex-initial"
                   >
                     <Search className="mr-1.5 h-4 w-4" />
                     Cari Tiket
@@ -167,7 +167,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
                     onClick={handleRefresh}
                     disabled={isRefreshing}
                     title="Refresh data langsung dari server"
-                    className="h-9 w-9 sm:h-11 sm:w-11 p-0 rounded-xl border-slate-200 text-slate-600 hover:text-sky-700 hover:bg-sky-50 cursor-pointer shrink-0"
+                    className="h-10 w-10 p-0 rounded-xl border-slate-200 text-slate-600 hover:text-sky-700 hover:bg-sky-50 cursor-pointer shrink-0"
                   >
                     <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin text-sky-600" : ""}`} />
                   </Button>
@@ -175,99 +175,73 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
               </div>
             </form>
 
-            {/* Filter Pills & Sorting Controls */}
-            <div className="pt-2 border-t border-slate-100 space-y-2">
-              <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2">
-                {/* Bagian Filter Pills */}
-                <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
-                  <span className="text-[10.5px] sm:text-[11px] font-bold text-slate-400 mr-0.5 sm:mr-1 flex items-center gap-1">
-                    <Building className="h-3 w-3" /> Bagian:
-                  </span>
-                  {["ALL", "TUK", "Teknik", "Pabrikasi", "Tanaman"].map((dept) => (
-                    <button
-                      key={dept}
-                      type="button"
-                      onClick={() => setSelectedBagian(dept)}
-                      className={`h-6 sm:h-7 px-2 sm:px-3 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
-                        selectedBagian === dept
-                          ? "bg-sky-700 text-white shadow-2xs"
-                          : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
-                      }`}
-                    >
-                      {dept === "ALL" ? "Semua" : dept}
-                    </button>
-                  ))}
+            {/* Clean Dropdown Filter Selectors Grid */}
+            <div className="pt-2.5 border-t border-slate-100 space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {/* 1. Selector Bagian */}
+                <div className="relative flex items-center w-full">
+                  <Building className="absolute left-3 h-3.5 w-3.5 text-sky-600 pointer-events-none" />
+                  <select
+                    value={selectedBagian}
+                    onChange={(e) => setSelectedBagian(e.target.value)}
+                    className="w-full pl-9 pr-7 h-9 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-hidden focus:border-sky-500 hover:border-sky-300 cursor-pointer appearance-none truncate transition-colors"
+                    aria-label="Filter Bagian"
+                  >
+                    <option value="ALL">Semua Bagian</option>
+                    <option value="TUK">TUK</option>
+                    <option value="Teknik">Teknik</option>
+                    <option value="Pabrikasi">Pabrikasi</option>
+                    <option value="Tanaman">Tanaman</option>
+                  </select>
+                  <div className="absolute right-2.5 pointer-events-none text-slate-400 text-[9px]">▼</div>
                 </div>
 
-                {/* Status Filter Pills */}
-                <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
-                  <span className="text-[10.5px] sm:text-[11px] font-bold text-slate-400 mr-0.5 sm:mr-1 flex items-center gap-1">
-                    <Filter className="h-3 w-3" /> Status:
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedStatus("ALL")}
-                    className={`h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
-                      selectedStatus === "ALL"
-                        ? "bg-slate-800 text-white shadow-2xs"
-                        : "bg-slate-100/80 hover:bg-slate-200/80 text-slate-600"
-                    }`}
+                {/* 2. Selector Status */}
+                <div className="relative flex items-center w-full">
+                  <Filter className="absolute left-3 h-3.5 w-3.5 text-sky-600 pointer-events-none" />
+                  <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="w-full pl-9 pr-7 h-9 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-hidden focus:border-sky-500 hover:border-sky-300 cursor-pointer appearance-none truncate transition-colors"
+                    aria-label="Filter Status"
                   >
-                    Semua ({reports.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedStatus("MENUNGGU")}
-                    className={`h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
-                      selectedStatus === "MENUNGGU"
-                        ? "bg-amber-600 text-white shadow-2xs"
-                        : "bg-amber-50 text-amber-800 hover:bg-amber-100/80 border border-amber-200/60"
-                    }`}
+                    <option value="ALL">Semua Status ({reports.length})</option>
+                    <option value="MENUNGGU">Menunggu ({waitingCount})</option>
+                    <option value="DIPROSES">Diproses ({processingCount})</option>
+                  </select>
+                  <div className="absolute right-2.5 pointer-events-none text-slate-400 text-[9px]">▼</div>
+                </div>
+
+                {/* 3. Selector Urutkan */}
+                <div className="relative flex items-center w-full">
+                  <ArrowUpDown className="absolute left-3 h-3.5 w-3.5 text-sky-600 pointer-events-none" />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full pl-9 pr-7 h-9 text-xs font-bold rounded-xl border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:border-sky-500 hover:border-sky-300 cursor-pointer appearance-none truncate transition-colors"
+                    aria-label="Urutkan Laporan"
                   >
-                    Menunggu ({waitingCount})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedStatus("DIPROSES")}
-                    className={`h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer ${
-                      selectedStatus === "DIPROSES"
-                        ? "bg-sky-700 text-white shadow-2xs"
-                        : "bg-sky-50 text-sky-800 hover:bg-sky-100/80 border border-sky-200/60"
-                    }`}
-                  >
-                    Diproses ({processingCount})
-                  </button>
+                    <option value="NEWEST">Terbaru</option>
+                    <option value="OLDEST">Terlama</option>
+                  </select>
+                  <div className="absolute right-2.5 pointer-events-none text-slate-400 text-[9px]">▼</div>
                 </div>
               </div>
 
-              {/* Row 2: Sort Control Bar & Reset */}
-              <div className="pt-1 flex items-center justify-between gap-2 text-[10.5px]">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-slate-400 font-medium flex items-center gap-1">
-                    <ArrowUpDown className="h-3 w-3 text-sky-600" /> Urutkan:
-                  </span>
-                  <div className="relative inline-flex items-center">
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="pl-2 pr-6 h-6.5 text-[10.5px] font-bold rounded-lg border border-slate-200 bg-white text-slate-800 focus:outline-hidden focus:border-sky-500 cursor-pointer appearance-none"
-                      aria-label="Urutkan Berdasarkan"
-                    >
-                      <option value="NEWEST">Terbaru</option>
-                      <option value="OLDEST">Terlama</option>
-                    </select>
-                    <div className="absolute right-1.5 pointer-events-none text-slate-400 text-[7px]">▼</div>
-                  </div>
-                </div>
+              {/* Result Summary & Reset */}
+              <div className="flex items-center justify-between pt-1 text-xs">
+                <span className="text-slate-400 font-medium text-[11px]">
+                  Menampilkan <strong className="text-slate-700 font-bold">{sortedReports.length}</strong> laporan aktif
+                </span>
 
                 {isFiltered && (
                   <button
                     type="button"
                     onClick={handleResetFilters}
-                    className="text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-0.5 cursor-pointer text-[10px]"
+                    className="text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1 cursor-pointer text-[11px] hover:underline"
                   >
-                    <RotateCcw className="h-2.5 w-2.5" />
-                    Reset
+                    <RotateCcw className="h-3 w-3" />
+                    Reset Filter
                   </button>
                 )}
               </div>
@@ -320,7 +294,7 @@ export function CekStatusView({ initialReports }: CekStatusViewProps) {
           </Link>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-4">
           {sortedReports.map((report) => {
             const dateObj = new Date(report.created_at);
             const formattedDate = dateObj.toLocaleDateString("id-ID", {
